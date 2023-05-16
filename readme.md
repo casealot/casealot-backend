@@ -1,7 +1,7 @@
 ### casealot
 
 ## 📢 프로젝트 설명
-- 안재현 병신새끼
+- casealot
 
 ## ⚙ 개발 환경
 - 운영체제 :  Windows
