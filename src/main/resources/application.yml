@@ -1,3 +1,6 @@
+server:
+  port: 8000
+
 spring:
   profiles.active: local
   
@@ -21,7 +24,6 @@ spring:
         format_sql: true
         show_sql: true
         use_sql_comments: true
-
   # Security OAuth
   security:
     oauth2.client:
@@ -50,11 +52,11 @@ spring:
             - profile_image
           clientName: Naver
         kakao:
-          clientId: '{카카오 client-id}'
-          clientSecret: '{카카오 client-secret}'
+          clientId: 88c1619692f45a3a7c65e94206346da4
+          clientSecret: mDjShWDkXnOwNoSIj4kjvpcL6nACSKkz
           clientAuthenticationMethod: post
           authorizationGrantType: authorization_code
-          redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+          redirectUri: http://localhost:8000/login/oauth2/code/kakao
           scope:
             - profile_nickname
             - profile_image
@@ -75,7 +77,7 @@ spring:
 
 
 # jwt
-jwt.secret-key: Y2FzZWFsb3Qtc2hvcC1wcm9qZWN0LWNhc2VhbG90LXNob3AtcHJvamVjdC1jYXNlYWxvdC1zaG9wLXByb2plY3Q=
+jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
 
 # 토큰 관련 secret Key 및 RedirectUri 설정
 app:
@@ -86,3 +88,6 @@ app:
   oauth2:
     authorizedRedirectUris:
       - http://localhost:3000/oauth/redirect
+    defaultRedirectUri: http://localhost:3000/oauth/redirect
+
+

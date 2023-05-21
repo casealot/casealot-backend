@@ -1,15 +1,12 @@
 package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import kr.casealot.shop.oauth.entity.ProviderType;
-import kr.casealot.shop.oauth.entity.RoleType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import kr.casealot.shop.global.entity.BaseTimeEntity;
+import kr.casealot.shop.global.oauth.entity.ProviderType;
+import kr.casealot.shop.global.oauth.entity.RoleType;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -17,18 +14,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "CUSTOMER")
-public class Customer {
+public class Customer extends BaseTimeEntity {
     @JsonIgnore
     @Id
     @Column(name = "CUSTOMER_SEQ")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerSeq;
+    private Long seq;
 
     @Column(name = "CUSTOMER_ID", length = 64, unique = true)
-    private String customerId;
+    private String id;
 
     @Column(name = "CUSTOMER_NAME", length = 100)
-    private String customerName;
+    private String name;
 
     @JsonIgnore
     @Column(name = "PASSWORD", length = 128)
@@ -40,8 +37,8 @@ public class Customer {
     @Column(name = "EMAIL_VERIFIED_YN", length = 1)
     private String emailVerifiedYn;
 
-//    @Column(name = "PROFILE_IMAGE_URL", length = 512)
-//    private String profileImageUrl;
+   @Column(name = "PROFILE_IMAGE_URL", length = 512)
+   private String profileImageUrl;
 
     @Column(name = "PROVIDER_TYPE", length = 20)
     @Enumerated(EnumType.STRING)
@@ -51,32 +48,29 @@ public class Customer {
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
-    @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
+    @Column(name = "ADDRESS", length = 512)
+    private String address;
 
-    @Column(name = "MODIFIED_AT")
-    private LocalDateTime modifiedAt;
+    @Column(name = "ADDRESS_DETAIL", length = 128)
+    private String addressDetail;
 
+    @Builder
     public Customer(
-            String userId,
-            String username,
+            String id,
+            String name,
             String email,
             String emailVerifiedYn,
-            //String profileImageUrl,
+            String profileImageUrl,
             ProviderType providerType,
-            RoleType roleType,
-            LocalDateTime createdAt,
-            LocalDateTime modifiedAt
+            RoleType roleType
     ) {
-        this.customerId = customerId;
-        this.customerName = customerName;
+        this.id = id;
+        this.name = name;
         this.password = "NO_PASS";
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn;
-        //this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
+        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
         this.providerType = providerType;
         this.roleType = roleType;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
     }
 }
