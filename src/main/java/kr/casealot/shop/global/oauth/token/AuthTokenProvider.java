@@ -2,6 +2,7 @@ package kr.casealot.shop.global.oauth.token;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
+import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.exception.TokenValidFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,4 +58,5 @@ public class AuthTokenProvider {
             throw new TokenValidFailedException();
         }
     }
+
 }
