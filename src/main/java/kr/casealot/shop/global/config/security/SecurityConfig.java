@@ -86,8 +86,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                 .authorizeRequests().expressionHandler(expressionHandler())
-                .antMatchers(HttpMethod.GET, "/api/v1/auth/**").permitAll()
-                .antMatchers("api/v1/**").hasAnyRole("USER")
+                .antMatchers(HttpMethod.GET, "/cal/v1/auth/**").permitAll()
+                .antMatchers("cal/v1/**").hasAnyRole("USER")
                 .antMatchers("/",
                         "/error",
                         "/favicon.ico",
