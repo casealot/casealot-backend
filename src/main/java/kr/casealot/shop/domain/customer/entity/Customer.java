@@ -54,7 +54,6 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
-    @Builder
     public Customer(
             String id,
             String name,

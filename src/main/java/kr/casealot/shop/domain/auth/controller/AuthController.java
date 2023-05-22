@@ -6,6 +6,7 @@ import kr.casealot.shop.domain.auth.repository.UserRefreshTokenRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
 import kr.casealot.shop.global.oauth.entity.RoleType;
+import kr.casealot.shop.global.oauth.entity.UserPrincipal;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.CookieUtil;
