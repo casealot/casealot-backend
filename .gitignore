@@ -35,8 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
-<<<<<<< HEAD
-=======
 
 src/main/resources/application.*
->>>>>>> c9dcfe936d9d5ae91d7bea81d9179425ea74c7e6
