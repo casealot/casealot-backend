@@ -29,6 +29,7 @@ public class QnaCommentController {
         QnaCommentDTO qnaCommentDTO = QnaCommentDTO.builder()
                 .id(qnaComment.getId())
                 .qnaId(qnaComment.getQna().getId())
+                .title(qnaComment.getTitle())
                 .content(qnaComment.getContent())
                 .registrationDate(qnaComment.getRegistrationDate())
                 .modificationDate(qnaComment.getModificationDate())
@@ -36,4 +37,11 @@ public class QnaCommentController {
 
         return ResponseEntity.status(CREATED).body(qnaCommentDTO);
     }
+
+//    // 댓글 삭제
+//    @DeleteMapping("/qna/{qna_id}/comments/{comment_id}")
+//
+//    // 댓글 수정
+//    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
+
 }
