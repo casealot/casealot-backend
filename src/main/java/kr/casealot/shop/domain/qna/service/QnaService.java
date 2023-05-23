@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,20 @@ public class QnaService {
         return qnaRepository.save(qna);
     }
 
+    public QnaDTO getQna(Long qnaId) throws NotFoundException {
+        Qna qna = qnaRepository.findById(qnaId)
+                .orElseThrow(() -> new NotFoundException());
+        return QnaDTO.builder()
+                .title(qna.getTitle())
+                .content(qna.getContent())
+                .photoUrl(qna.getPhotoUrl())
+                .qnaCommentList(qna.getQnaCommentList())
+                .registrationDate(qna.getRegistrationDate())
+                .modificationDate(qna.getModificationDate())
+                .build();
+    }
+
+
     public void updateQna(Long qnaId, QnaDTO qnaDto) throws NotFoundException {
         Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
 
@@ -35,6 +51,7 @@ public class QnaService {
                 .title(qnaDto.getTitle())
                 .content(qnaDto.getContent())
                 .photoUrl(qnaDto.getPhotoUrl())
+                .registrationDate(qna.getRegistrationDate())
                 .modificationDate(LocalDateTime.now())
                 .build();
 
@@ -51,4 +68,6 @@ public class QnaService {
     public Page<Qna> getQnaList(Pageable pageable) {
         return qnaRepository.findAll(pageable);
     }
+
+
 }

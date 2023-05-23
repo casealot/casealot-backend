@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.qna.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import lombok.*;
 
@@ -25,6 +26,7 @@ public class Qna {
     private LocalDateTime registrationDate;
     private LocalDateTime modificationDate;
 
+    @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QnaComment> qnaCommentList = new ArrayList<>();

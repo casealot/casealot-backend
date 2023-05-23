@@ -28,6 +28,13 @@ public class QnaController {
         return ResponseEntity.status(CREATED).body(qna);
     }
 
+    @GetMapping("/qna/{qna_id}")
+    public QnaDTO getQna(@PathVariable("qna_id") Long qnaId) throws ChangeSetPersister.NotFoundException {
+
+        return qnaService.getQna(qnaId);
+    }
+
+
     @PutMapping("/qna/{qna_id}")
     public ResponseEntity<String> updateQna(@PathVariable("qna_id") Long qnaId,
                                             @RequestBody QnaDTO qnaDto) throws ChangeSetPersister.NotFoundException {
@@ -48,11 +55,4 @@ public class QnaController {
         Page<Qna> qnaList = qnaService.getQnaList(pageable);
         return ResponseEntity.ok(qnaList);
     }
-
-
-//    @PostMapping("/qna/{qna_id}/comment")
-//
-//    @DeleteMapping("/qna/{qna_id}/comment")
-//
-//    @PutMapping("/qna/{qna_id}/comment")
 }

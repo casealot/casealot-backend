@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.qna.comment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import lombok.*;
 
@@ -17,10 +18,12 @@ public class QnaComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
+    private String title;
     private String content;
 
     private LocalDateTime registrationDate;

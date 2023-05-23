@@ -23,6 +23,7 @@ public class QnaCommentService {
 
         QnaComment qnaComment = QnaComment.builder()
                 .qna(qna)
+                .title(qnaCommentDto.getTitle())
                 .content(qnaCommentDto.getContent())
                 .registrationDate(LocalDateTime.now())
                 .modificationDate(LocalDateTime.now())
