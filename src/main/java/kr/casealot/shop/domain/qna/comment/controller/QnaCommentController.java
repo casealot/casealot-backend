@@ -49,5 +49,13 @@ public class QnaCommentController {
         return ResponseEntity.ok("댓글 삭제 완료");
     }
     // 댓글 수정
-//    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
+    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
+    public ResponseEntity<String> updateComment(
+            @PathVariable("qna_id")Long qnaId,
+            @PathVariable("comment_id") Long commentId,
+            @RequestBody QnaCommentDTO qnaCommentDTO
+    ) throws ChangeSetPersister.NotFoundException {
+        qnaCommentService.updateComment(qnaId, commentId, qnaCommentDTO);
+        return ResponseEntity.ok("댓글 수정 완료");
+    }
 }

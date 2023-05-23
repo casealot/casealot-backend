@@ -8,16 +8,17 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class QnaService {
     private final QnaRepository qnaRepository;
 
+    @Transactional
     public Qna createQna(QnaDTO qnaDTO){
         Qna qna = Qna.builder()
                 .title(qnaDTO.getTitle())
@@ -29,6 +30,7 @@ public class QnaService {
         return qnaRepository.save(qna);
     }
 
+    @Transactional
     public QnaDTO getQna(Long qnaId) throws NotFoundException {
         Qna qna = qnaRepository.findById(qnaId)
                 .orElseThrow(() -> new NotFoundException());
@@ -43,6 +45,8 @@ public class QnaService {
     }
 
 
+
+    @Transactional
     public void updateQna(Long qnaId, QnaDTO qnaDto) throws NotFoundException {
         Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
 
@@ -58,13 +62,16 @@ public class QnaService {
         qnaRepository.save(qna);
     }
 
+    @Transactional
     public void deleteQna(Long qnaId) throws NotFoundException {
         Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
 
         qnaRepository.delete(qna);
     }
 
+
     //다시생각해보자
+    @Transactional
     public Page<Qna> getQnaList(Pageable pageable) {
         return qnaRepository.findAll(pageable);
     }

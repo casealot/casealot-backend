@@ -6,7 +6,6 @@ import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,5 +38,14 @@ public class QnaCommentService {
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
         qna.getQnaCommentList().remove(qnaComment);
         qnaCommentRepository.delete(qnaComment);
+    }
+
+    public void updateComment(Long qnaId, Long commentId, QnaCommentDTO qnaCommentDTO) throws NotFoundException {
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
+        qnaComment.setTitle(qnaCommentDTO.getTitle());
+        qnaComment.setContent(qnaCommentDTO.getContent());
+        qnaComment.setModificationDate(LocalDateTime.now());
+        qnaCommentRepository.save(qnaComment);
     }
 }
