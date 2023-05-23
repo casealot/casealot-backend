@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -25,7 +26,6 @@ public class QnaCommentController {
             @RequestBody QnaCommentDTO qnaCommentDto) throws ChangeSetPersister.NotFoundException {
 
         QnaComment qnaComment = qnaCommentService.createQnaComment(qna_id, qnaCommentDto);
-
         QnaCommentDTO qnaCommentDTO = QnaCommentDTO.builder()
                 .id(qnaComment.getId())
                 .qnaId(qnaComment.getQna().getId())
@@ -38,10 +38,16 @@ public class QnaCommentController {
         return ResponseEntity.status(CREATED).body(qnaCommentDTO);
     }
 
-//    // 댓글 삭제
-//    @DeleteMapping("/qna/{qna_id}/comments/{comment_id}")
-//
-//    // 댓글 수정
-//    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
+    // 댓글 삭제
+    @DeleteMapping("/qna/{qna_id}/comments/{comment_id}")
+    public ResponseEntity<String> deleteComment(
+            @PathVariable("qna_id")Long qnaId,
+            @PathVariable("comment_id") Long commentId
+    ) throws ChangeSetPersister.NotFoundException {
+        qnaCommentService.deleteComment(qnaId, commentId);
 
+        return ResponseEntity.ok("댓글 삭제 완료");
+    }
+    // 댓글 수정
+//    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
 }
