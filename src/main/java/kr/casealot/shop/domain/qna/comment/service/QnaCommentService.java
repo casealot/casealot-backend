@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.data.crossstore.ChangeSetPersister.*;
+
 @Service
 @RequiredArgsConstructor
 public class QnaCommentService {
@@ -18,8 +20,8 @@ public class QnaCommentService {
     private final QnaCommentRepository qnaCommentRepository;
     private final QnaRepository qnaRepository;
 
-    public QnaComment createQnaComment(Long qnaId, QnaCommentDTO qnaCommentDto) throws ChangeSetPersister.NotFoundException {
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(ChangeSetPersister.NotFoundException::new);
+    public QnaComment createQnaComment(Long qnaId, QnaCommentDTO qnaCommentDto) throws NotFoundException {
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
 
         QnaComment qnaComment = QnaComment.builder()
                 .qna(qna)
@@ -30,5 +32,12 @@ public class QnaCommentService {
                 .build();
 
         return qnaCommentRepository.save(qnaComment);
+    }
+
+    public void deleteComment(Long qnaId, Long commentId) throws NotFoundException {
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
+        qna.getQnaCommentList().remove(qnaComment);
+        qnaCommentRepository.delete(qnaComment);
     }
 }
