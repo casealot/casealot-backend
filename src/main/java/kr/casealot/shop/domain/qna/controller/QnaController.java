@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -51,8 +53,9 @@ public class QnaController {
 
     //다시생각해보자
     @GetMapping("/qna/list")
-    public ResponseEntity<?> getQnaList(Pageable pageable){
-        Page<Qna> qnaList = qnaService.getQnaList(pageable);
+    public ResponseEntity<List<Qna>> getQnaList(Pageable pageable) {
+        Page<Qna> qnaPage = qnaService.getQnaList(pageable);
+        List<Qna> qnaList = qnaPage.getContent();
         return ResponseEntity.ok(qnaList);
     }
 }
