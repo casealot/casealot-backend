@@ -46,6 +46,7 @@ public class QnaCommentService {
         qnaComment.setTitle(qnaCommentDTO.getTitle());
         qnaComment.setContent(qnaCommentDTO.getContent());
         qnaComment.setModificationDate(LocalDateTime.now());
+        qnaComment.setQna(qna);
         qnaCommentRepository.save(qnaComment);
     }
 }
