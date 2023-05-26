@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.data.crossstore.ChangeSetPersister.*;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -21,21 +21,12 @@ public class QnaCommentController {
     private final QnaCommentService qnaCommentService;
 
     @PostMapping("/qna/{qna_id}/comments")
-    public ResponseEntity<QnaCommentDTO> createQnaComment(
+    public ResponseEntity<QnaComment> createQnaComment(
             @PathVariable Long qna_id,
-            @RequestBody QnaCommentDTO qnaCommentDto) throws ChangeSetPersister.NotFoundException {
+            @RequestBody QnaCommentDTO qnaCommentDto) throws NotFoundException {
 
         QnaComment qnaComment = qnaCommentService.createQnaComment(qna_id, qnaCommentDto);
-        QnaCommentDTO qnaCommentDTO = QnaCommentDTO.builder()
-                .id(qnaComment.getId())
-                .qnaId(qnaComment.getQna().getId())
-                .title(qnaComment.getTitle())
-                .content(qnaComment.getContent())
-                .registrationDate(qnaComment.getRegistrationDate())
-                .modificationDate(qnaComment.getModificationDate())
-                .build();
-
-        return ResponseEntity.status(CREATED).body(qnaCommentDTO);
+        return ResponseEntity.status(CREATED).body(qnaComment);
     }
 
     // 댓글 삭제
@@ -43,7 +34,7 @@ public class QnaCommentController {
     public ResponseEntity<String> deleteComment(
             @PathVariable("qna_id")Long qnaId,
             @PathVariable("comment_id") Long commentId
-    ) throws ChangeSetPersister.NotFoundException {
+    ) throws NotFoundException {
         qnaCommentService.deleteComment(qnaId, commentId);
 
         return ResponseEntity.ok("댓글 삭제 완료");
@@ -54,7 +45,7 @@ public class QnaCommentController {
             @PathVariable("qna_id")Long qnaId,
             @PathVariable("comment_id") Long commentId,
             @RequestBody QnaCommentDTO qnaCommentDTO
-    ) throws ChangeSetPersister.NotFoundException {
+    ) throws NotFoundException {
         qnaCommentService.updateComment(qnaId, commentId, qnaCommentDTO);
         return ResponseEntity.ok("댓글 수정 완료");
     }
