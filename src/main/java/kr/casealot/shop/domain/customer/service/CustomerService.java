@@ -3,8 +3,6 @@ package kr.casealot.shop.domain.customer.service;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.global.oauth.entity.ProviderType;
-import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
