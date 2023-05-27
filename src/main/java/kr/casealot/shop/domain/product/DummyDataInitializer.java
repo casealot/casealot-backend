@@ -16,8 +16,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class DummyDataInitializer {
     private final ProductRepository productRepository;
-
-    @PostConstruct
     public void init(){
         List<String> season = Arrays.asList("봄","여름","가을","겨울");
         List<String> name = Arrays.asList("깔끔한","시원한","멋진","이쁜");

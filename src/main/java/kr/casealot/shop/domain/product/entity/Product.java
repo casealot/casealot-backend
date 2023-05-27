@@ -52,10 +52,6 @@ public class Product extends BaseTimeEntity {
     private String color;
     @Column(name = "PRODUCT_SEASON", length = 50)
     private String season;
-    /**
-     * NEW
-     * BEST ..etc
-     */
     @Column(name = "PRODUCT_TYPE", length = 50)
     private String type;
 
