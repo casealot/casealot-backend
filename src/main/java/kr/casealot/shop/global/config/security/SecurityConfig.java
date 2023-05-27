@@ -1,6 +1,6 @@
 package kr.casealot.shop.global.config.security;
 
-import kr.casealot.shop.domain.auth.repository.UserRefreshTokenRepository;
+import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.config.properties.AppProperties;
 import kr.casealot.shop.global.oauth.exception.RestAuthenticationEntryPoint;
@@ -15,7 +15,6 @@ import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -23,7 +22,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -46,13 +44,13 @@ import java.util.Map;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    private final CorsProperties corsProperties;
+    //    private final CorsProperties corsProperties;
     private final AppProperties appProperties;
     private final AuthTokenProvider tokenProvider;
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService oAuth2UserService;
     private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final CustomerRepository customerRepository;
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -86,8 +84,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                 .authorizeRequests().expressionHandler(expressionHandler())
-                .antMatchers(HttpMethod.GET, "/cal/v1/auth/**").permitAll()
-                .antMatchers("cal/v1/**").hasAnyRole("USER")
+                .antMatchers("/cal/v1/auth/local").permitAll()
+                .antMatchers("/cal/v1/auth/signup").permitAll()
+                .antMatchers("/cal/v1/product/**").permitAll()
+                .antMatchers("/cal/v1/notice/**").permitAll()
+                .antMatchers("/cal/v1/qna/**").permitAll()
+                .antMatchers("/cal/v1/customer/**").permitAll()
+                .antMatchers("/cal/v1/wish/**").permitAll()
+                .antMatchers("/cal/v1/cart/**").permitAll()
+                .antMatchers("/cal/v1/**").hasAnyRole("USER")
                 .antMatchers("/",
                         "/error",
                         "/favicon.ico",
@@ -164,7 +169,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new OAuth2AuthenticationSuccessHandler(
                 tokenProvider,
                 appProperties,
-                userRefreshTokenRepository,
+                customerRefreshTokenRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository(),
                 customerRepository
         );

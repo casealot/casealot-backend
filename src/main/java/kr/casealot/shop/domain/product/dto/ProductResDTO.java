@@ -11,14 +11,14 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ProductListDTO {
+public class ProductResDTO {
     private List<Product> items = new ArrayList<>();
     private Long count;
     private Long totalPages;
     private Long totalCount;
 
     @Builder
-    public ProductListDTO(List<Product> items, Long count ,Long totalPages, Long totalCount){
+    public ProductResDTO(List<Product> items, Long count , Long totalPages, Long totalCount){
         this.items= items;
         this.count= count;
         this.totalPages= totalPages;
