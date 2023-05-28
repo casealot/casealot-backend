@@ -136,7 +136,7 @@ public class AuthController {
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
 
-        return ResponseEntity.ok("시발련아");
+        return ResponseEntity.ok("success");
     }
 
 
