@@ -7,9 +7,5 @@ import lombok.Getter;
 @Getter
 public class SortDTO {
     private String field;
-    /**
-     * DESC
-     *
-     */
     private String option;
 }
