@@ -1,8 +1,12 @@
 package kr.casealot.shop.domain.auth.controller;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
-import kr.casealot.shop.domain.auth.repository.UserRefreshTokenRepository;
+import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
 import kr.casealot.shop.global.oauth.entity.RoleType;
@@ -11,6 +15,8 @@ import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +33,8 @@ public class AuthController {
     private final AppProperties appProperties;
     private final AuthTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
+    private final CustomerService customerService;
 
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
@@ -61,7 +68,7 @@ public class AuthController {
         }
 
         // userId refresh token 으로 DB 확인
-        CustomerRefreshToken userRefreshToken = userRefreshTokenRepository.findByIdAndRefreshToken(userId, refreshToken);
+        CustomerRefreshToken userRefreshToken = customerRefreshTokenRepository.findByIdAndRefreshToken(userId, refreshToken);
         if (userRefreshToken == null) {
             return APIResponse.invalidRefreshToken();
         }
@@ -95,4 +102,42 @@ public class AuthController {
 
         return APIResponse.success("token", newAccessToken.getToken());
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<Customer> signup(@RequestBody Customer customer){
+        Customer createdCustomer = customerService.signup(customer);
+        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/local")
+    public ResponseEntity<String> login(@RequestBody Customer customer){
+        Customer savedCustomer = customerService.login(customer);
+        Date expireDate= new Date(new Date().getTime() + appProperties.getAuth().getTokenExpiry());
+        // subj role exp
+        AuthToken authToken = tokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expireDate);
+        return ResponseEntity.ok(authToken.getToken());
+    }
+
+    @DeleteMapping("/quit")
+    public ResponseEntity<String> quit(HttpServletRequest request){
+        // Step 1 :: Header 에서 토큰 꺼내옴
+        String accessToken = HeaderUtil.getAccessToken(request);
+        // Step 2 :: 토큰 값으로 authToken 객체 변환
+        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+        // expired access token 인지 확인
+
+        // Claims
+        Claims claims = authToken.getTokenClaims();
+        String userId = claims.getId();
+
+        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
+                .map(Cookie::getValue)
+                .orElse((null));
+        AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
+
+
+        return ResponseEntity.ok("시발련아");
+    }
+
+
 }

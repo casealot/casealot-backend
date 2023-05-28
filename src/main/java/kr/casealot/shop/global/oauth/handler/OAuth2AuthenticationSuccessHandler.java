@@ -1,7 +1,7 @@
 package kr.casealot.shop.global.oauth.handler;
 
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
-import kr.casealot.shop.domain.auth.repository.UserRefreshTokenRepository;
+import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.config.properties.AppProperties;
@@ -40,7 +40,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
     private final CustomerRepository customerRepository;
 
@@ -97,12 +97,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         );
 
         // DB 저장
-        CustomerRefreshToken customerRefreshToken = userRefreshTokenRepository.findById(userInfo.getId());
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userInfo.getId());
         if (customerRefreshToken != null) {
             customerRefreshToken.setRefreshToken(refreshToken.getToken());
         } else {
             customerRefreshToken = new CustomerRefreshToken(customerEntity.getId(), refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(customerRefreshToken);
+            customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
         }
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
