@@ -103,41 +103,41 @@ public class AuthController {
         return APIResponse.success("token", newAccessToken.getToken());
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<Customer> signup(@RequestBody Customer customer){
-        Customer createdCustomer = customerService.signup(customer);
-        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/local")
-    public ResponseEntity<String> login(@RequestBody Customer customer){
-        Customer savedCustomer = customerService.login(customer);
-        Date expireDate= new Date(new Date().getTime() + appProperties.getAuth().getTokenExpiry());
-        // subj role exp
-        AuthToken authToken = tokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expireDate);
-        return ResponseEntity.ok(authToken.getToken());
-    }
-
-    @DeleteMapping("/quit")
-    public ResponseEntity<String> quit(HttpServletRequest request){
-        // Step 1 :: Header 에서 토큰 꺼내옴
-        String accessToken = HeaderUtil.getAccessToken(request);
-        // Step 2 :: 토큰 값으로 authToken 객체 변환
-        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
-        // expired access token 인지 확인
-
-        // Claims
-        Claims claims = authToken.getTokenClaims();
-        String userId = claims.getId();
-
-        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
-                .map(Cookie::getValue)
-                .orElse((null));
-        AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
-
-
-        return ResponseEntity.ok("시발련아");
-    }
+//    @PostMapping("/signup")
+//    public ResponseEntity<Customer> signup(@RequestBody Customer customer){
+//        Customer createdCustomer = customerService.signup(customer);
+//        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+//    }
+//
+//    @PostMapping("/local")
+//    public ResponseEntity<String> login(@RequestBody Customer customer){
+//        Customer savedCustomer = customerService.login(customer);
+//        Date expireDate= new Date(new Date().getTime() + appProperties.getAuth().getTokenExpiry());
+//        // subj role exp
+//        AuthToken authToken = tokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expireDate);
+//        return ResponseEntity.ok(authToken.getToken());
+//    }
+//
+//    @DeleteMapping("/quit")
+//    public ResponseEntity<String> quit(HttpServletRequest request){
+//        // Step 1 :: Header 에서 토큰 꺼내옴
+//        String accessToken = HeaderUtil.getAccessToken(request);
+//        // Step 2 :: 토큰 값으로 authToken 객체 변환
+//        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+//        // expired access token 인지 확인
+//
+//        // Claims
+//        Claims claims = authToken.getTokenClaims();
+//        String userId = claims.getId();
+//
+//        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
+//                .map(Cookie::getValue)
+//                .orElse((null));
+//        AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
+//
+//
+//        return ResponseEntity.ok("success");
+//    }
 
 
 }

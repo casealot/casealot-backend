@@ -1,16 +1,19 @@
 package kr.casealot.shop.domain.customer.dto;
 
 import kr.casealot.shop.global.oauth.entity.RoleType;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class CustomerDTO {
+@Getter
+@Setter
+@Builder
+public class CustomerDto {
     private String id;
     private String name;
     private String password;
     private String email;
     private String profileImageUrl;
-    private String postNo;
     private String address;
     private String addressDetail;
     private RoleType roleType;
