@@ -25,13 +25,9 @@ public class ProductController {
     public ResponseEntity<ProductResDTO> getProductList(
             @RequestBody ProductReqDTO productReqDTO
             ) {
-        // TODO Sort기능 추가해야함.
-        Pageable pageable = PageRequest.of(productReqDTO.getPage()
-                , productReqDTO.getSize());
-        ProductResDTO productList = productService.findAll(pageable);
+        ProductResDTO productList = productService.findAll(productReqDTO);
         return ResponseEntity.ok(productList);
     }
-
 
     /**
      * 상품 조회
@@ -44,4 +40,5 @@ public class ProductController {
         Product product = productService.findById(id);
         return ResponseEntity.ok(product);
     }
+
 }

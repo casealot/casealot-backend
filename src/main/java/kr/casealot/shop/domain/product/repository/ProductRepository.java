@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAll(Pageable pageable);
+    Page<Product> findByNameContaining(String query, Pageable pageable);
     Optional<Product> findById(Long id);
 }
