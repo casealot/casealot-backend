@@ -1,7 +1,9 @@
 package kr.casealot.shop.global.oauth.token;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.exception.TokenValidFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,4 +59,20 @@ public class AuthTokenProvider {
             throw new TokenValidFailedException();
         }
     }
+
+    public String getUserIdFromToken(String token) {
+        AuthToken authToken = convertAuthToken(token);
+        if (authToken.validate()) {
+            Claims claims = authToken.getTokenClaims();
+            return claims.getSubject();
+        } else {
+            throw new TokenValidFailedException("토큰 유효성 검사에 실패했습니다.");
+        }
+    }
+
+    public static String extractIdFromToken(String token) {
+        Claims claims = Jwts.parser().parseClaimsJws(token).getBody();
+        return claims.get("id", String.class);
+    }
+
 }
