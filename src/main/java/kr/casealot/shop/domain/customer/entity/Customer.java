@@ -14,7 +14,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "CUSTOMER")
-@Builder
 public class Customer extends BaseTimeEntity {
     @JsonIgnore
     @Id
@@ -28,18 +27,18 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "CUSTOMER_NAME", length = 100)
     private String name;
 
-    @JsonIgnore
     @Column(name = "PASSWORD", length = 128)
     private String password;
 
     @Column(name = "EMAIL", length = 512, unique = true)
     private String email;
 
-//    @Column(name = "EMAIL_VERIFIED_YN", length = 1)
-//    private String emailVerifiedYn;
+    @JsonIgnore
+    @Column(name = "EMAIL_VERIFIED_YN", length = 1)
+    private String emailVerifiedYn;
 
-   @Column(name = "PROFILE_IMAGE_URL", length = 512)
-   private String profileImageUrl;
+    @Column(name = "PROFILE_IMAGE_URL", length = 512)
+    private String profileImageUrl;
 
     @Column(name = "PROVIDER_TYPE", length = 20)
     @Enumerated(EnumType.STRING)
@@ -48,19 +47,29 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ROLE_TYPE", length = 20)
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
-
+    @Column(name = "POST_NO", length = 20)
+    private String postNo;
     @Column(name = "ADDRESS", length = 512)
     private String address;
 
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
-//    @Builder
+    /**
+     * Create Customer for OAuth
+     * @param id
+     * @param name
+     * @param email
+     * @param emailVerifiedYn
+     * @param profileImageUrl
+     * @param providerType
+     * @param roleType
+     */
     public Customer(
             String id,
             String name,
             String email,
-//            String emailVerifiedYn,
+            String emailVerifiedYn,
             String profileImageUrl,
             ProviderType providerType,
             RoleType roleType
@@ -69,9 +78,42 @@ public class Customer extends BaseTimeEntity {
         this.name = name;
         this.password = "NO_PASS";
         this.email = email != null ? email : "NO_EMAIL";
-//        this.emailVerifiedYn = emailVerifiedYn;
+        this.emailVerifiedYn = emailVerifiedYn;
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
         this.providerType = providerType;
         this.roleType = roleType;
+    }
+
+
+    @Builder
+    public Customer(
+            String id,
+            String name,
+            String password,
+            String email,
+            String emailVerifiedYn,
+            String profileImageUrl,
+            ProviderType providerType,
+            RoleType roleType,
+            String postNo,
+            String address,
+            String addressDetail
+    ) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.email = email != null ? email : "NO_EMAIL";
+        this.emailVerifiedYn = emailVerifiedYn;
+        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
+        this.providerType = providerType;
+        this.roleType = roleType;
+        this.postNo = postNo;
+        this.address = address;
+        this.addressDetail = addressDetail;
+    }
+
+    public Customer(String id, String password) {
+        this.id=id;
+        this.password=password;
     }
 }
