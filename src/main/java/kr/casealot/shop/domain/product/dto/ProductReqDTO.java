@@ -2,8 +2,6 @@ package kr.casealot.shop.domain.product.dto;
 
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -11,6 +9,7 @@ import java.util.List;
 @Getter
 public class ProductReqDTO {
     private String query;
+    private List<SearchFilter> filter;
     private int size;
     private int page;
 

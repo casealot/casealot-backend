@@ -25,7 +25,7 @@ public class ProductController {
     public ResponseEntity<ProductResDTO> getProductList(
             @RequestBody ProductReqDTO productReqDTO
             ) {
-        ProductResDTO productList = productService.findAll(productReqDTO);
+        ProductResDTO productList = productService.findAllSearch(productReqDTO);
         return ResponseEntity.ok(productList);
     }
 
