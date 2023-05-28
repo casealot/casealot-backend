@@ -57,11 +57,11 @@ public class Customer extends BaseTimeEntity {
 
     /**
      * Create Customer for OAuth
+     *
      * @param id
      * @param name
      * @param email
      * @param emailVerifiedYn
-     * @param profileImageUrl
      * @param providerType
      * @param roleType
      */
@@ -70,7 +70,6 @@ public class Customer extends BaseTimeEntity {
             String name,
             String email,
             String emailVerifiedYn,
-            String profileImageUrl,
             ProviderType providerType,
             RoleType roleType
     ) {
