@@ -95,7 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("cal/v1/**").hasAnyRole("USER")
                 .antMatchers("/",
                         "/error",
-                        "/favicon.ico",
+                         "/favicon.ico",
                         "/**/*.png",
                         "/**/*.gif",
                         "/**/*.svg",
