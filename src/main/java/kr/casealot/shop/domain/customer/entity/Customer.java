@@ -1,12 +1,14 @@
 package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -55,6 +57,9 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Review> reviewList;
+
     /**
      * Create Customer for OAuth
      *
@@ -96,7 +101,8 @@ public class Customer extends BaseTimeEntity {
             RoleType roleType,
             String postNo,
             String address,
-            String addressDetail
+            String addressDetail,
+            List<Review> reviewList
     ) {
         this.id = id;
         this.name = name;
@@ -109,6 +115,8 @@ public class Customer extends BaseTimeEntity {
         this.postNo = postNo;
         this.address = address;
         this.addressDetail = addressDetail;
+        // ? 이렇게 하는게 맞나
+        this.reviewList = reviewList;
     }
 
     public Customer(String id, String password) {
