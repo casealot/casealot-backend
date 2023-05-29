@@ -29,9 +29,9 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
-    @Column(name = "rating")
-    private int rating; //별점
+    @Column(name = "RATING")
+    private Double rating; //별점
 
-    @Column(name = "reviewText", length = 1024)
+    @Column(name = "REVIEW_TEXT", length = 1024)
     private String reviewText; //리뷰 내용
 }
