@@ -92,6 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/cal/v1/customer/**").permitAll()
                 .antMatchers("/cal/v1/wish/**").permitAll()
                 .antMatchers("/cal/v1/cart/**").permitAll()
+                .antMatchers("/cal/v1/review/**").permitAll()
                 .antMatchers("/cal/v1/**").hasAnyRole("USER")
                 .antMatchers("/",
                         "/error",
