@@ -57,7 +57,8 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
+    @OneToMany(mappedBy = "customer")
     private List<Review> reviewList;
 
     /**
