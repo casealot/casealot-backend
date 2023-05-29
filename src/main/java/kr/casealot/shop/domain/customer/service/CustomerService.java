@@ -75,6 +75,4 @@ public class CustomerService {
 
         return customerRepository.deleteById(userId);
     }
-
-
 }

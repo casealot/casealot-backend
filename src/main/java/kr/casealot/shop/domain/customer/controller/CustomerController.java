@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/cal/v1/customer")
 public class CustomerController {
     private final CustomerService customerService;
-    private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
 
     @PostMapping("/join")
     public ResponseEntity<String> join(@RequestBody CustomerDto customerDto) {
