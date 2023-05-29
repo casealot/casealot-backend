@@ -26,11 +26,7 @@ public class ReviewService {
     private final CustomerRepository customerRepository;
 
     public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
-        // 토큰 파싱
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
+        String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
         reviewRepository.save(Review.builder()
@@ -41,10 +37,7 @@ public class ReviewService {
     }
 
     public void fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
+        String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
@@ -63,10 +56,7 @@ public class ReviewService {
     }
 
     public void deleteReview(Long reviewId, HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
+        String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
@@ -81,4 +71,12 @@ public class ReviewService {
             throw new IllegalArgumentException("Review not found with ID: " + reviewId);
         }
     }
+
+    private String findCustomerId(HttpServletRequest request) {
+        String token = HeaderUtil.getAccessToken(request);
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        Claims claims = authToken.getTokenClaims();
+        return claims.getSubject();
+    }
+
 }

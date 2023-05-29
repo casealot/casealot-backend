@@ -18,7 +18,7 @@ public class ReviewController {
 
     //TODO: 리뷰 작성할 때 상품 아이디 들고와야하는데 일단 상품없어서 상품아이디 없이 박음. 주소도 바꿔야함
     //생성
-//    @PostMapping("/{productId}/create")
+    //@PostMapping("/{productId}/create")
     @PostMapping("/create")
     private ResponseEntity<String> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         reviewService.createReview(reviewReqDTO, request);
@@ -27,7 +27,7 @@ public class ReviewController {
 
     //TODO: 리뷰 수정할 때 상품 아이디 들고와야하는데 일단 상품없어서 상품아이디 없이 박음. 주소도 바꿔야함
     //수정
-//    @PutMapping("/{productId}/fix/{reviewId}")
+    //@PutMapping("/{productId}/fix/{reviewId}")
     @PutMapping("/fix/{reviewId}")
     private ResponseEntity<String> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         reviewService.fixReview(reviewId,reviewReqDTO, request);
@@ -36,7 +36,7 @@ public class ReviewController {
 
     //TODO: 리뷰 삭제 때 상품 아이디 들고와야하는데 일단 상품없어서 상품아이디 없이 박음. 주소도 바꿔야함
     //삭제
-//    @DeleteMapping("/{productId}/delete/{reviewId}")
+    //@DeleteMapping("/{productId}/delete/{reviewId}")
     @DeleteMapping("/delete/{reviewId}")
     private ResponseEntity<String> deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
         reviewService.deleteReview(reviewId, request);
