@@ -25,7 +25,7 @@ public class ReviewService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
 
-    public void createReview( ReviewReqDTO reviewReqDTO,HttpServletRequest request) {
+    public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         // 토큰 파싱
         String token = HeaderUtil.getAccessToken(request);
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
@@ -38,5 +38,47 @@ public class ReviewService {
                 .rating(reviewReqDTO.getRating())
                 .reviewText(reviewReqDTO.getReviewText())
                 .build());
+    }
+
+    public void fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+        String token = HeaderUtil.getAccessToken(request);
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        Claims claims = authToken.getTokenClaims();
+        String customerId = claims.getSubject();
+
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            String reviewCustomerId = review.getCustomer().getId();
+            if (customerId.equals(reviewCustomerId)) {
+                review.setRating(reviewReqDTO.getRating());
+                review.setReviewText(reviewReqDTO.getReviewText());
+                reviewRepository.save(review);
+            } else {
+                throw new IllegalArgumentException("Unauthorized: You are not allowed to modify this review.");
+            }
+        } else {
+            throw new IllegalArgumentException("Review not found with ID: " + reviewId);
+        }
+    }
+
+    public void deleteReview(Long reviewId, HttpServletRequest request) {
+        String token = HeaderUtil.getAccessToken(request);
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        Claims claims = authToken.getTokenClaims();
+        String customerId = claims.getSubject();
+
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            String reviewCustomerId = review.getCustomer().getId();
+            if (customerId.equals(reviewCustomerId)) {
+                reviewRepository.delete(review);
+            } else {
+                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review.");
+            }
+        } else {
+            throw new IllegalArgumentException("Review not found with ID: " + reviewId);
+        }
     }
 }
