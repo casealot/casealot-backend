@@ -1,7 +1,9 @@
 package kr.casealot.shop.domain.qna.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.qna.entity.Qna;
+import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity(name = "qna_comment")
 @Builder
-public class QnaComment {
+public class QnaComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +28,8 @@ public class QnaComment {
     private String title;
     private String content;
 
-    private LocalDateTime registrationDate;
-    private LocalDateTime modificationDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CUSTOMER_SEQ")
+    private Customer customer;
+
 }
