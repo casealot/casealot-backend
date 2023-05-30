@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 public class QnaCommentDTO {
     private Long id;
+    private String customerId;
     private Long qnaId;
     private String title;
     private String content;
-    private LocalDateTime registrationDate;
-    private LocalDateTime modificationDate;
 }

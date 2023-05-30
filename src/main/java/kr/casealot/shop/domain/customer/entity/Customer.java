@@ -1,12 +1,16 @@
 package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
+import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -54,6 +58,13 @@ public class Customer extends BaseTimeEntity {
 
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Qna> qnaList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<QnaComment> qnaCommentList = new ArrayList<>();
+
 
     /**
      * Create Customer for OAuth
