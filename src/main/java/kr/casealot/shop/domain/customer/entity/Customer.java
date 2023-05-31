@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
