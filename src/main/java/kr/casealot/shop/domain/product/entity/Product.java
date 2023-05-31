@@ -5,6 +5,7 @@ import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,7 +22,7 @@ public class Product extends BaseTimeEntity {
 
     //상품 1개에 리뷰 n개 (1:n 설정)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
 
     @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;

@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
@@ -60,6 +61,9 @@ public class Customer extends BaseTimeEntity {
     //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
     @OneToMany(mappedBy = "customer")
     private List<Review> reviewList;
+
+    @OneToMany(mappedBy = "customer")
+    private List<ReviewComment> reviewCommentList;
 
     /**
      * Create Customer for OAuth
