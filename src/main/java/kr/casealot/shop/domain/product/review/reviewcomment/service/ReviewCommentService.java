@@ -8,6 +8,7 @@ import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReqDTO;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.global.oauth.token.AuthToken;
@@ -17,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +75,20 @@ public class ReviewCommentService {
         } else {
             throw new IllegalArgumentException("Review Comment not found with ID: " + reviewCommentId);
         }
+    }
 
+    public List<ReviewCommentResDTO> getReviewCommentByReviewId(Long reviewId) {
+        List<ReviewComment> reviewComments = reviewCommentRepository.findByReviewSeq(reviewId);
+        return reviewComments.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    private ReviewCommentResDTO mapToDto(ReviewComment reviewComment) {
+        return ReviewCommentResDTO.builder()
+                .customerName(reviewComment.getCustomer().getName())
+                .reviewCommentText(reviewComment.getReviewCommentText())
+                .build();
     }
 
     private String findCustomerId(HttpServletRequest request) {

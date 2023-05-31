@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.product.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Product extends BaseTimeEntity {
     private Long id;
 
     //상품 1개에 리뷰 n개 (1:n 설정)
+    @JsonBackReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 

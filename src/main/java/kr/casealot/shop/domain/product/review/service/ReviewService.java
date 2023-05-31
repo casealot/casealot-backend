@@ -9,8 +9,10 @@ import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
+import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.oauth.token.AuthToken;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class ReviewService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final ReviewCommentRepository reviewCommentRepository;
+    private final ReviewCommentService reviewCommentService;
 
     public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
@@ -103,11 +107,8 @@ public class ReviewService {
     // qna 조회
     @Transactional
     public Review getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
-        Review review = reviewRepository.findById(reviewSeq).orElseThrow(ChangeSetPersister.NotFoundException::new);
-        List<ReviewComment> commentList = reviewCommentRepository.findByReviewSeq(reviewSeq);
-        review.setReviewCommentList(commentList);
-        reviewRepository.save(review);
-        return review;
+        return reviewRepository.findById(reviewSeq)
+                .orElseThrow(ChangeSetPersister.NotFoundException::new);
     }
 
     private String findCustomerId(HttpServletRequest request) {
