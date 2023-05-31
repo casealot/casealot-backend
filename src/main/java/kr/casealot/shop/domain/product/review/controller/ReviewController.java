@@ -1,9 +1,12 @@
 package kr.casealot.shop.domain.product.review.controller;
 
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
+import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @RequestMapping("/cal/v1/review")
 public class ReviewController {
+    private final ReviewRepository reviewRepository;
     private final ReviewService reviewService;
 
     //TODO: 리뷰 작성할 때 상품 아이디 들고와야하는데 일단 상품없어서 상품아이디 없이 박음. 주소도 바꿔야함
@@ -41,5 +45,11 @@ public class ReviewController {
     private ResponseEntity<String> deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
         reviewService.deleteReview(reviewId, request);
         return ResponseEntity.ok("delete ok!");
+    }
+
+    @GetMapping("/view/{reviewId}")
+    private ResponseEntity<Review> viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
+        Review review = reviewService.getReview(reviewId);
+        return ResponseEntity.ok(review);
     }
 }
