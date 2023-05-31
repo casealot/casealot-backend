@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.review.reviewcomment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -22,8 +23,8 @@ public class ReviewComment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @ManyToOne
     @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
