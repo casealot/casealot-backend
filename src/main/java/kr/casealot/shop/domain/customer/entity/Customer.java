@@ -60,9 +60,11 @@ public class Customer extends BaseTimeEntity {
     private String addressDetail;
 
     //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
+    @JsonBackReference
     @OneToMany(mappedBy = "customer")
     private List<Review> reviewList;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer")
     private List<ReviewComment> reviewCommentList;
 

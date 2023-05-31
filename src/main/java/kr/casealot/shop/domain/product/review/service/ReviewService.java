@@ -3,18 +3,13 @@ package kr.casealot.shop.domain.product.review.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
-import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
-import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
-import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -24,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,11 +97,29 @@ public class ReviewService {
 //        return reviewResDTO;
 //    }
 
-    // qna 조회
-    @Transactional
-    public Review getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
-        return reviewRepository.findById(reviewSeq)
+    // review 조회
+//    @Transactional
+//    public ReviewResDTO getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
+//
+//        Review review = reviewRepository.findById(reviewSeq)
+//                .orElseThrow(ChangeSetPersister.NotFoundException::new);
+//
+//    }
+
+    @Transactional(readOnly = true)
+    public ReviewResDTO getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
+        Review review = reviewRepository.findById(reviewSeq)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
+
+        // Map Review entity to ReviewResDTO response object
+        ReviewResDTO reviewResDTO = new ReviewResDTO();
+        reviewResDTO.setCustomerName(review.getCustomer().getName());
+        reviewResDTO.setRating(review.getRating());
+        reviewResDTO.setReviewText(review.getReviewText());
+        reviewResDTO.setReviewCommentList(review.getReviewCommentList());
+        // Map other properties as needed
+
+        return reviewResDTO;
     }
 
     private String findCustomerId(HttpServletRequest request) {

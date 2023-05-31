@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ReviewResDTO {
-    private Customer customer;
+    private String customerName; //고객 이름
     private Double rating; //별점
     private String reviewText; //리뷰 내용
     @JsonProperty

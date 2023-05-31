@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.product.review.controller;
 
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
+import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.service.ReviewService;
@@ -48,8 +49,8 @@ public class ReviewController {
     }
 
     @GetMapping("/view/{reviewId}")
-    private ResponseEntity<Review> viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
-        Review review = reviewService.getReview(reviewId);
+    private ResponseEntity<ReviewResDTO> viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
+        ReviewResDTO review = reviewService.getReview(reviewId);
         return ResponseEntity.ok(review);
     }
 }
