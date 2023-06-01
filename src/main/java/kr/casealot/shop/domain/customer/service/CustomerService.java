@@ -34,7 +34,7 @@ public class CustomerService {
                 .profileImageUrl(customerDto.getProfileImageUrl())
                 .address(customerDto.getAddress())
                 .addressDetail(customerDto.getAddressDetail())
-                .roleType(RoleType.USER)
+                .roleType(customerDto.getRoleType())
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);

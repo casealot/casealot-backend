@@ -139,12 +139,11 @@ public class ProductService {
                 , Sort.by(orders));
 
         Page<Product> products = productRepository.findAll(specification, pageable);
-        ProductResDTO productResDTO = ProductResDTO.builder()
+        return ProductResDTO.builder()
                 .items(products.getContent())
                 .count((long) products.getContent().size())
                 .totalCount(products.getTotalElements())
                 .totalPages((long) products.getTotalPages()).build();
-        return productResDTO;
     }
 
     public Product findById(Long id) {
