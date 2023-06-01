@@ -83,6 +83,9 @@ public class Customer extends BaseTimeEntity {
     @OneToMany(mappedBy = "customer")
     private List<Product> productList;
 
+    @Column(name = "PHONE_NUM", length = 13)
+    private String phoneNum;
+
     /**
      * Create Customer for OAuth
      *
@@ -98,6 +101,7 @@ public class Customer extends BaseTimeEntity {
             String name,
             String email,
             String emailVerifiedYn,
+            String profileImageUrl,
             ProviderType providerType,
             RoleType roleType
     ) {
@@ -110,7 +114,6 @@ public class Customer extends BaseTimeEntity {
         this.providerType = providerType;
         this.roleType = roleType;
     }
-
 
     @Builder
     public Customer(
