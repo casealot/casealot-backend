@@ -1,18 +1,15 @@
 package kr.casealot.shop.domain.qna.comment.controller;
 
 import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.comment.service.QnaCommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @RestController
 @Slf4j

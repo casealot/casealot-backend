@@ -30,34 +30,28 @@ public class QnaController {
 //    }
 
 
-//    @PostMapping("/test")
-//    public CreateQna.Response createQna(@Valid @RequestBody CreateQna.Request request){
-//        return CreateQna.Response.from(
-//                qnaService.createQna(
-//                        request.getTitle(),
-//                        request.getContent(),
-//                        request.getPhotoUrl()
-//                )
-//        );
-//    }
+
     @PostMapping
-    public ResponseEntity<QnaDTO> createQna(@RequestBody QnaDTO qnaDTO,
+    public ResponseEntity<String> createQna(@RequestBody QnaDTO qnaDTO,
                                             HttpServletRequest request
     ) {
-        return ResponseEntity.ok(qnaService.createQna(qnaDTO, request));
+        qnaService.createQna(qnaDTO, request);
+        return ResponseEntity.ok("create Q&A");
     }
 
     @PutMapping("/{qna_id}")
-    public ResponseEntity<QnaDTO> updateQna(@PathVariable("qna_id") Long qnaId,
+    public ResponseEntity<String> updateQna(@PathVariable("qna_id") Long qnaId,
                                             @RequestBody QnaDTO qnaDTO,
-                                            HttpServletRequest request
-    ) throws NotFoundException {
+                                            HttpServletRequest request) throws NotFoundException {
 
-        return ResponseEntity.ok(qnaService.updateQna(qnaId, qnaDTO, request));
+        qnaService.updateQna(qnaId, qnaDTO, request);
+
+        return ResponseEntity.ok("update Q&A");
     }
 
     @GetMapping("/{qna_id}")
     public ResponseEntity<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId) throws NotFoundException {
+
         QnaDetailDTO qnaDTO = qnaService.getQna(qnaId);
         return ResponseEntity.ok(qnaDTO);
     }
