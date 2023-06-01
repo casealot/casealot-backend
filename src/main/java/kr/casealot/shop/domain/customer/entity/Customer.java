@@ -1,12 +1,20 @@
 package kr.casealot.shop.domain.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
+import kr.casealot.shop.domain.qna.entity.Qna;
+import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -55,6 +63,26 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Qna> qnaList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<QnaComment> qnaCommentList = new ArrayList<>();
+
+
+    //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<Review> reviewList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<ReviewComment> reviewCommentList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<Product> productList;
+
     /**
      * Create Customer for OAuth
      *
@@ -96,7 +124,8 @@ public class Customer extends BaseTimeEntity {
             RoleType roleType,
             String postNo,
             String address,
-            String addressDetail
+            String addressDetail,
+            List<Review> reviewList
     ) {
         this.id = id;
         this.name = name;
@@ -109,6 +138,8 @@ public class Customer extends BaseTimeEntity {
         this.postNo = postNo;
         this.address = address;
         this.addressDetail = addressDetail;
+        // ? 이렇게 하는게 맞나
+        this.reviewList = reviewList;
     }
 
     public Customer(String id, String password) {

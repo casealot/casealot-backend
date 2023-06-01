@@ -1,10 +1,8 @@
 package kr.casealot.shop.domain.customer.controller;
 
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
-import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/cal/v1/customer")
 public class CustomerController {
     private final CustomerService customerService;
-    private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
 
     @PostMapping("/join")
     public ResponseEntity<String> join(@RequestBody CustomerDto customerDto) {

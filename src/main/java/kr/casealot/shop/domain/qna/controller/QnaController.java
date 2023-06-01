@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.qna.controller;
 
 import kr.casealot.shop.domain.qna.dto.QnaDTO;
+import kr.casealot.shop.domain.qna.dto.QnaDetailDTO;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.service.QnaService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
@@ -28,38 +30,38 @@ public class QnaController {
 //    }
 
 
-//    @PostMapping("/test")
-//    public CreateQna.Response createQna(@Valid @RequestBody CreateQna.Request request){
-//        return CreateQna.Response.from(
-//                qnaService.createQna(
-//                        request.getTitle(),
-//                        request.getContent(),
-//                        request.getPhotoUrl()
-//                )
-//        );
-//    }
+
     @PostMapping
-    public ResponseEntity<QnaDTO> createQna(@RequestBody QnaDTO qnaDTO) {
-        return ResponseEntity.ok(qnaService.createQna(qnaDTO));
+    public ResponseEntity<String> createQna(@RequestBody QnaDTO qnaDTO,
+                                            HttpServletRequest request
+    ) {
+        qnaService.createQna(qnaDTO, request);
+        return ResponseEntity.ok("create Q&A");
     }
 
     @PutMapping("/{qna_id}")
-    public ResponseEntity<QnaDTO> updateQna(@PathVariable("qna_id") Long qnaId,
-                                            @RequestBody QnaDTO qnaDTO) throws NotFoundException {
+    public ResponseEntity<String> updateQna(@PathVariable("qna_id") Long qnaId,
+                                            @RequestBody QnaDTO qnaDTO,
+                                            HttpServletRequest request) throws NotFoundException {
 
-        return ResponseEntity.ok(qnaService.updateQna(qnaId, qnaDTO));
+        qnaService.updateQna(qnaId, qnaDTO, request);
+
+        return ResponseEntity.ok("update Q&A");
     }
 
     @GetMapping("/{qna_id}")
-    public ResponseEntity<Qna> getQna(@PathVariable("qna_id") Long qnaId) throws NotFoundException {
-        Qna qna = qnaService.getQna(qnaId);
-        return ResponseEntity.ok(qna);
+    public ResponseEntity<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId) throws NotFoundException {
+
+        QnaDetailDTO qnaDTO = qnaService.getQna(qnaId);
+        return ResponseEntity.ok(qnaDTO);
     }
 
     @DeleteMapping("/{qna_id}")
-    public ResponseEntity<String> deleteQna(@PathVariable("qna_id") Long qnaId) throws NotFoundException {
-        qnaService.deleteQna(qnaId);
-        return ResponseEntity.ok("Q&A가 성공적으로 삭제되었습니다.");
+    public ResponseEntity<String> deleteQna(@PathVariable("qna_id") Long qnaId,
+                                            HttpServletRequest request
+    ) throws NotFoundException {
+        qnaService.deleteQna(qnaId, request);
+        return ResponseEntity.ok("delete Q&A");
     }
 
     @GetMapping("/list")
