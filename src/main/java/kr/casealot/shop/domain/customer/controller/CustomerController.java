@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.customer.controller;
 
+import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.oauth.token.AuthToken;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = {"CUSTOMER API"}, description = "유저 관련 API")
 @RequestMapping("/cal/v1/customer")
 public class CustomerController {
     private final CustomerService customerService;

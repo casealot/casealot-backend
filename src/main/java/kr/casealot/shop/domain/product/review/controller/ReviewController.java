@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.product.review.controller;
 
+import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = {"REVIEW API"}, description = "리뷰 관련 API")
 @RequestMapping("/cal/v1/review")
 public class ReviewController {
     private final ReviewService reviewService;
