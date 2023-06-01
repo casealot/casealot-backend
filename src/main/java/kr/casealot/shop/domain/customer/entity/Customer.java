@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -67,6 +68,10 @@ public class Customer extends BaseTimeEntity {
     @JsonBackReference
     @OneToMany(mappedBy = "customer")
     private List<ReviewComment> reviewCommentList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<Product> productList;
 
     /**
      * Create Customer for OAuth
