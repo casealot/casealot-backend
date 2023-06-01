@@ -1,15 +1,11 @@
 package kr.casealot.shop.domain.qna.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
+import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
-import net.bytebuddy.implementation.bind.annotation.Default;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity(name = "qna")
 @Builder
-public class Qna {
+public class Qna extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,10 +28,12 @@ public class Qna {
     private String content;
     private String photoUrl;
     private int views;
-    private LocalDateTime registrationDate;
-    private LocalDateTime modificationDate;
 
     @Builder.Default
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL)
     private List<QnaComment> qnaCommentList = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CUSTOMER_SEQ")
+    private Customer customer;
 }
