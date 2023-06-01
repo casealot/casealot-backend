@@ -17,6 +17,8 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
 
 @RestController
@@ -29,25 +31,28 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/admin/product")
-    public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO){
-        productService.createProduct(productDTO);
+    public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO,
+                                                HttpServletRequest request){
+        productService.createProduct(productDTO, request);
         return ResponseEntity.ok("create product");
     }
 
     @PutMapping("/admin/product/{product_id}")
     public ResponseEntity<String> updateProduct(@PathVariable("product_id") Long productId,
-                                                @RequestBody ProductDTO productDTO){
+                                                @RequestBody ProductDTO productDTO,
+                                                HttpServletRequest request) throws NotFoundException {
 
-        productService.updateProduct(productId, productDTO);
+        productService.updateProduct(productId, productDTO, request);
 
         return ResponseEntity.ok("update product");
     }
 
     @DeleteMapping("/admin/product/{product_id}")
     public ResponseEntity<String> deleteProduct(
-            @PathVariable("product_id") Long productId) throws NotFoundException {
+            @PathVariable("product_id") Long productId, HttpServletRequest request)
+            throws NotFoundException {
 
-        productService.deleteProduct(productId);
+        productService.deleteProduct(productId, request);
         return ResponseEntity.ok("delete product");
     }
 
