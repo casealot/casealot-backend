@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "PRODUCT")
 public class Product extends BaseTimeEntity {
     @Id
