@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,5 @@ public class ReviewResDTO {
     private Double rating; //별점
     private String reviewText; //리뷰 내용
     @JsonProperty
-    private List<ReviewComment> reviewCommentList;
+    private List<ReviewCommentResDTO> reviewCommentList;
 }

@@ -116,7 +116,7 @@ public class ReviewService {
         reviewResDTO.setCustomerName(review.getCustomer().getName());
         reviewResDTO.setRating(review.getRating());
         reviewResDTO.setReviewText(review.getReviewText());
-        reviewResDTO.setReviewCommentList(review.getReviewCommentList());
+        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(reviewSeq));
         // Map other properties as needed
 
         return reviewResDTO;
