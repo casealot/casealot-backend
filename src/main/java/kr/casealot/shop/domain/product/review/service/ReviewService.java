@@ -78,34 +78,6 @@ public class ReviewService {
         }
     }
 
-//    public ReviewResDTO getReviewByReviewSeq(Long reviewSeq) {
-////        // 상품 ID를 사용하여 해당 상품의 리뷰 정보 조회
-////        Product product = getProductById(productId);
-//
-////        // 리뷰 정보 가져오기
-////        Review review = reviewRepository.findByProduct(product);
-//        Review review = reviewRepository.findBySeq(reviewSeq);
-//
-//        ReviewResDTO reviewResDTO = new ReviewResDTO();
-//        reviewResDTO.setCustomer(review.getCustomer());
-//        reviewResDTO.setRating(review.getRating());
-//        reviewResDTO.setReviewText(review.getReviewText());
-//        reviewResDTO.setReviewCommentList(review.getReviewCommentList());
-//
-//        // reviewCommentIds 설정
-//
-//        return reviewResDTO;
-//    }
-
-    // review 조회
-//    @Transactional
-//    public ReviewResDTO getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
-//
-//        Review review = reviewRepository.findById(reviewSeq)
-//                .orElseThrow(ChangeSetPersister.NotFoundException::new);
-//
-//    }
-
     @Transactional(readOnly = true)
     public ReviewResDTO getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
         Review review = reviewRepository.findById(reviewSeq)

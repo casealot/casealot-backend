@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.review.reviewcomment.dto;
 
-import kr.casealot.shop.domain.customer.entity.Customer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
