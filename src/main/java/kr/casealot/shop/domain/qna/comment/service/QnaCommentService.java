@@ -8,18 +8,17 @@ import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
-import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
-import static kr.casealot.shop.global.oauth.entity.RoleType.*;
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
+import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
+import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +29,12 @@ public class QnaCommentService {
     private final CustomerRepository customerRepository;
     private final AuthTokenProvider authTokenProvider;
 
-    public QnaComment createQnaComment(Long qnaId, QnaCommentDTO qnaCommentDto, HttpServletRequest request) throws NotFoundException {
+    public void createQnaComment(Long qnaId,
+                                 QnaCommentDTO qnaCommentDto,
+                                 HttpServletRequest request) throws NotFoundException {
 
         Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
-
         String customerId = findCustomerId(request);
-
         Customer customer = customerRepository.findById(customerId);
 
         QnaComment qnaComment = QnaComment.builder()
@@ -45,29 +44,25 @@ public class QnaCommentService {
                 .content(qnaCommentDto.getContent())
                 .build();
 
-        return qnaCommentRepository.save(qnaComment);
+        qnaCommentRepository.save(qnaComment);
     }
 
     public void deleteComment(Long qnaId, Long commentId, HttpServletRequest request) throws NotFoundException {
 
         Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
-
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
-
         String customerId = findCustomerId(request);
-
         String qnaCustomerId = qnaComment.getCustomer().getId();
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(customerId.equals(qnaCustomerId) || isAdmin) {
-            qna.getQnaCommentList().remove(qnaComment);
-            qnaCommentRepository.delete(qnaComment);
-        }else if(!isAdmin){
-            // 관리자만 삭제가능
-        }else{
-            // 본인 댓글만 삭제 가능
+        if (!(customerId.equals(qnaCustomerId) || !isAdmin)) {
+            throw new AccessDeniedException("You are not authorized to delete this QnaComment.");
         }
+
+        qna.getQnaCommentList().remove(qnaComment);
+        qnaCommentRepository.delete(qnaComment);
+
     }
 
     public void updateComment(Long qnaId, Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) throws NotFoundException {
@@ -78,15 +73,14 @@ public class QnaCommentService {
         String customerId = findCustomerId(request);
         String qnaCustomerId = qnaComment.getCustomer().getId();
 
-
-        if (customerId.equals(qnaCustomerId)) {
-            qnaComment.setTitle(qnaCommentDTO.getTitle());
-            qnaComment.setContent(qnaCommentDTO.getContent());
-            qnaComment.setQna(qna);
-            qnaCommentRepository.save(qnaComment);
-        } else {
-            // 본인 댓글만 수정 가능 (관리자도 안댐)
+        if (!(customerId.equals(qnaCustomerId))) {
+            throw new AccessDeniedException("You are not authorized to update this QnaComment.");
         }
+
+        qnaComment.setTitle(qnaCommentDTO.getTitle());
+        qnaComment.setContent(qnaCommentDTO.getContent());
+        qnaComment.setQna(qna);
+        qnaCommentRepository.save(qnaComment);
     }
 
     private String findCustomerId(HttpServletRequest request) {
@@ -98,10 +92,6 @@ public class QnaCommentService {
 
     private boolean checkAdminRole(String customerId) {
         Customer customer = customerRepository.findById(customerId);
-        if(customer.getRoleType() == ADMIN){
-            return true;
-        }else{
-            return false;
-        }
+        return customer.getRoleType() == ADMIN;
     }
 }
