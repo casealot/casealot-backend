@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.review.reviewcomment.controller;
 
-import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReqDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import lombok.RequiredArgsConstructor;

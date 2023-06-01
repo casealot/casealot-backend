@@ -3,8 +3,6 @@ package kr.casealot.shop.domain.product.review.reviewcomment.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.product.repository.ProductRepository;
-import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReqDTO;
