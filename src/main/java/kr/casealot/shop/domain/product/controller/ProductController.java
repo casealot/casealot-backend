@@ -5,6 +5,7 @@ import kr.casealot.shop.domain.product.dto.ProductDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import kr.casealot.shop.domain.product.dto.ProductGetDTO;
 import kr.casealot.shop.domain.product.dto.ProductResDTO;
 import kr.casealot.shop.domain.product.dto.ProductReqDTO;
 import kr.casealot.shop.domain.product.entity.Product;
@@ -78,9 +79,12 @@ public class ProductController {
      * @return
      */
     @GetMapping("/product/{id}")
-    public ResponseEntity<Product> getProductDetail(
+    public ResponseEntity<ProductGetDTO> getProductDetail(
             @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) {
         Product product = productService.findById(id);
-        return ResponseEntity.ok(product);
+        ProductGetDTO productDTO = productService.convertToDTO(product);
+        return ResponseEntity.ok(productDTO);
     }
+
+
 }
