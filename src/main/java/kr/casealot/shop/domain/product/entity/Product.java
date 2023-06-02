@@ -30,7 +30,8 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;
 
-    @Column(name = "PRODUCT_CONTENT", length = 4000)
+    @Lob @Basic(fetch = FetchType.LAZY)
+    @Column(name = "PRODUCT_CONTENT")
     private String content;
 
     @Column(name = "PRODUCT_IMG_B", length = 512)
