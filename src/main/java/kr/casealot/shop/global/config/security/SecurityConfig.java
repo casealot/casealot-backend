@@ -86,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                 .authorizeRequests().expressionHandler(expressionHandler())
+                .antMatchers("/health").permitAll()
                 .antMatchers("/cal/v1/auth/local").permitAll()
                 .antMatchers("/cal/v1/auth/signup").permitAll()
                 .antMatchers("/cal/v1/product/**").permitAll()
