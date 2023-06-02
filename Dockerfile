@@ -6,7 +6,7 @@ ENV SPRING_PROFILES_ACTIVE=develop
 WORKDIR /app
 
 # 빌드된 JAR 파일 복사
-COPY build/libs/casealot-backend.jar casealot-backend.jar
-
 COPY ${JAR_FILE} casealot-backend.jar
+
+# 실행
 CMD ["java","-jar","-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}","/casealot-backend.jar"]
