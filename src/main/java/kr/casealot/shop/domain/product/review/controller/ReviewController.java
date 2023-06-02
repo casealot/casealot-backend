@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.product.review.controller;
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
-import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+// /cal/v1/product/{id}
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"REVIEW API"}, description = "리뷰 관련 API")
-@RequestMapping("/cal/v1/review")
+@RequestMapping("/cal/v1/product/{id}/review")
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -25,8 +26,8 @@ public class ReviewController {
     //생성
     //@PostMapping("/{productId}/create")
     @PostMapping("/create")
-    private ResponseEntity<String> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
-        reviewService.createReview(reviewReqDTO, request);
+    private ResponseEntity<String> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request,@PathVariable Long id) {
+        reviewService.createReview(reviewReqDTO, request, id);
         return ResponseEntity.ok("create ok!");
     }
 

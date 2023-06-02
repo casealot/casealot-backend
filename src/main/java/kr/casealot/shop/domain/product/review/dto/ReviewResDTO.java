@@ -2,14 +2,14 @@ package kr.casealot.shop.domain.product.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class ReviewResDTO {
     private String customerName; //고객 이름

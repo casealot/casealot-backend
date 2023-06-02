@@ -3,6 +3,7 @@ package kr.casealot.shop.domain.product.review.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
@@ -31,15 +32,23 @@ public class ReviewService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+    public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
-        reviewRepository.save(Review.builder()
-                .customer(customer)
-                .rating(reviewReqDTO.getRating())
-                .reviewText(reviewReqDTO.getReviewText())
-                .build());
+
+        Optional<Product> productOptional = productRepository.findById(id);
+
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+
+            reviewRepository.save(Review.builder()
+                    .customer(customer)
+                    .product(product)
+                    .rating(reviewReqDTO.getRating())
+                    .reviewText(reviewReqDTO.getReviewText())
+                    .build());
+        }
     }
 
     public void fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
