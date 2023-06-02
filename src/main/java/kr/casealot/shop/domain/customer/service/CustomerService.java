@@ -38,9 +38,10 @@ public class CustomerService {
                 .phoneNumber(customerDto.getPhoneNumber())
                 .email(customerDto.getEmail())
                 .profileImageUrl(customerDto.getProfileImageUrl())
+                .postNo(customerDto.getPostNo())
                 .address(customerDto.getAddress())
                 .addressDetail(customerDto.getAddressDetail())
-                .roleType(customerDto.getRoleType())
+                .roleType(RoleType.USER)
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);

@@ -86,9 +86,6 @@ public class Customer extends BaseTimeEntity {
     @OneToMany(mappedBy = "customer")
     private List<Product> productList;
 
-    @Column(name = "PHONE_NUM", length = 13)
-    private String phoneNum;
-
     /**
      * Create Customer for OAuth
      *
