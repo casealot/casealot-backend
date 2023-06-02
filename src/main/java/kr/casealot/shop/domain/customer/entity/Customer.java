@@ -38,6 +38,9 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "PASSWORD", length = 128)
     private String password;
 
+    @Column(name = "PHONE_NUMBER", length = 11)
+    private String phoneNumber;
+
     @Column(name = "EMAIL", length = 512, unique = true)
     private String email;
 
@@ -120,6 +123,7 @@ public class Customer extends BaseTimeEntity {
             String id,
             String name,
             String password,
+            String phoneNumber,
             String email,
             String emailVerifiedYn,
             String profileImageUrl,
@@ -133,6 +137,7 @@ public class Customer extends BaseTimeEntity {
         this.id = id;
         this.name = name;
         this.password = password;
+        this.phoneNumber = phoneNumber;
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn;
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
