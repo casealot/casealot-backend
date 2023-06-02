@@ -62,8 +62,8 @@ public class CustomerService {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
 
-        // 토큰 유효 기간 설정 (1시간 후)
-        Date expiry = new Date(System.currentTimeMillis() + 3600000);
+        // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
+        Date expiry = new Date((System.currentTimeMillis() + 3600000) * 24);
 
         // 토큰 생성 (jwt)
         AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expiry);
