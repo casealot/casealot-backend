@@ -3,19 +3,21 @@ package kr.casealot.shop.domain.product.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.product.dto.ProductDTO;
-import kr.casealot.shop.domain.product.dto.ProductReqDTO;
-import kr.casealot.shop.domain.product.dto.ProductResDTO;
-import kr.casealot.shop.domain.product.dto.SortDTO;
+import kr.casealot.shop.domain.product.dto.*;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
+import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
+import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
+import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
+import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
+import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
-import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
@@ -39,6 +42,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final AuthTokenProvider authTokenProvider;
+    private final ReviewRepository reviewRepository;
+    private final ReviewCommentRepository reviewCommentRepository;
 
     @Transactional
     public void createProduct(ProductDTO productDTO, HttpServletRequest request) {
@@ -153,6 +158,46 @@ public class ProductService {
         productRepository.save(savedProduct);
         return savedProduct;
     }
+
+    public ProductGetDTO convertToDTO(Product product) {
+        List<ReviewResDTO> reviewList = new ArrayList<>();
+        for (Review review : product.getReviews()) {
+            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
+            for (ReviewComment reviewComment : review.getReviewCommentList()) {
+                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                        .customerName(reviewComment.getCustomer().getName())
+                        .reviewCommentText(reviewComment.getReviewCommentText())
+                        .build();
+                reviewCommentList.add(reviewCommentDTO);
+            }
+            ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                    .customerName(review.getCustomer().getName())
+                    .rating(review.getRating())
+                    .reviewText(review.getReviewText())
+                    .reviewCommentList(reviewCommentList)
+                    .build();
+            reviewList.add(reviewDTO);
+        }
+
+        return ProductGetDTO.builder()
+                .id(product.getId())
+                .userId(product.getId())
+                .name(product.getName())
+                .content(product.getContent())
+                .price(product.getPrice())
+                .views(product.getViews())
+                .img_B(product.getImg_B())
+                .img_M(product.getImg_M())
+                .img_S(product.getImg_S())
+                .sells(product.getSells())
+                .sale(product.getSale())
+                .color(product.getColor())
+                .season(product.getSeason())
+                .type(product.getType())
+                .reviewList(reviewList)
+                .build();
+    }
+
 
     private String findCustomerId(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
