@@ -1,7 +1,9 @@
 package kr.casealot.shop.domain.customer.controller;
 
 import io.swagger.annotations.Api;
+import kr.casealot.shop.domain.auth.entity.CustomerToken;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
+import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +27,15 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public AuthToken login(@RequestBody CustomerDto customerDto) {
-        return customerService.login(customerDto);
+    public CustomerToken login(@RequestBody CustomerLoginDto customerLoginDto) {
+        return customerService.login(customerLoginDto);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        customerService.logout(request);
+
+        return ResponseEntity.ok("logout okay");
     }
 
     @DeleteMapping("/quit")
