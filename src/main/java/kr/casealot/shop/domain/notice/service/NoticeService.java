@@ -1,7 +1,13 @@
 package kr.casealot.shop.domain.notice.service;
 
 import io.jsonwebtoken.Claims;
+import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
+import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
+import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
+import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
+import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import org.springframework.data.domain.Pageable;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
@@ -60,23 +66,41 @@ public class NoticeService {
     }
 
 
-    public NoticeResDTO getNoticeById(Long noticeId) throws NotFoundException {
-
+    public NoticeDetailDTO getNotice(Long noticeId) throws NotFoundException {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(NotFoundException::new);
 
         notice.setViews(notice.getViews() + 1);
 
-        return NoticeResDTO.builder()
+        NoticeDetailDTO noticeDetailDTO = NoticeDetailDTO.builder()
                 .id(notice.getId())
                 .customerId(notice.getCustomer().getId())
-                .title(notice.getContent())
+                .title(notice.getTitle())
                 .content(notice.getContent())
                 .photoUrl(notice.getPhotoUrl())
                 .views(notice.getViews())
-                .noticeCommentList(notice.getNoticeCommentList())
                 .build();
+
+        List<NoticeComment> noticeCommentList = notice.getNoticeCommentList();
+        List<NoticeCommentResDTO> noticeCommentResDTOList = new ArrayList<>();
+
+        for (NoticeComment noticeComment : noticeCommentList) {
+            NoticeCommentResDTO noticeCommentResDTO = NoticeCommentResDTO.builder()
+                    .id(noticeComment.getId())
+                    .noticeId(noticeComment.getNotice().getId())
+                    .customerId(noticeComment.getCustomer().getId())
+                    .title(noticeComment.getTitle())
+                    .content(noticeComment.getContent())
+                    .build();
+
+            noticeCommentResDTOList.add(noticeCommentResDTO);
+        }
+
+        noticeDetailDTO.setNoticeCommentList(noticeCommentResDTOList);
+
+        return noticeDetailDTO;
     }
+
 
     @Transactional
     public void createNotice(NoticeReqDTO noticeReqDTO, HttpServletRequest request) {

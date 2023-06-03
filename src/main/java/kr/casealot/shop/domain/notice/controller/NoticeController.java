@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.notice.controller;
 
+import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
 import kr.casealot.shop.domain.notice.entity.Notice;
@@ -31,9 +32,9 @@ public class NoticeController {
 
     // 특정 공지 조회
     @GetMapping("/{notice_id}")
-    public ResponseEntity<NoticeResDTO> getNotice(@PathVariable Long notice_id) throws NotFoundException {
-        NoticeResDTO noticeResDTO = noticeService.getNoticeById(notice_id);
-        return ResponseEntity.ok(noticeResDTO);
+    public ResponseEntity<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId) throws NotFoundException {
+        NoticeDetailDTO noticeDetailDTO = noticeService.getNotice(noticeId);
+        return ResponseEntity.ok(noticeDetailDTO);
     }
 
     // 공지 작성
@@ -46,19 +47,19 @@ public class NoticeController {
 
     // 공지 수정
     @PutMapping("/{notice_id}")
-    public ResponseEntity<String> updateNotice(@PathVariable Long notice_id,
+    public ResponseEntity<String> updateNotice(@PathVariable("notice_id") Long noticeId,
                                                @RequestBody NoticeReqDTO noticeReqDTO,
                                                HttpServletRequest request) throws NotFoundException {
-        noticeService.updateNotice(notice_id, noticeReqDTO, request);
+        noticeService.updateNotice(noticeId, noticeReqDTO, request);
 
         return ResponseEntity.ok("update notice");
     }
 
     // 공지 삭제
     @DeleteMapping("/{notice_id}")
-    public ResponseEntity<String> deleteNotice(@PathVariable Long notice_id,
+    public ResponseEntity<String> deleteNotice(@PathVariable("notice_id") Long noticeId,
                                                HttpServletRequest request) throws NotFoundException {
-        noticeService.deleteNotice(notice_id, request);
+        noticeService.deleteNotice(noticeId, request);
 
         return ResponseEntity.ok("delete notice");
     }
