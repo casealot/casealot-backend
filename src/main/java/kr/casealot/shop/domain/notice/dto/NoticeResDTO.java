@@ -1,13 +1,9 @@
 package kr.casealot.shop.domain.notice.dto;
 
-import kr.casealot.shop.domain.customer.entity.Customer;
-import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 
 @Getter
 @Setter
