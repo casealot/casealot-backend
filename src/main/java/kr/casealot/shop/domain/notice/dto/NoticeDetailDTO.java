@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.notice.dto;
 
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentDetailDTO;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import lombok.*;
@@ -19,5 +18,5 @@ public class NoticeDetailDTO {
     private String content;
     private String photoUrl;
     private int views;
-    private List<NoticeCommentDetailDTO> noticeCommentList;
+    private List<NoticeCommentResDTO> noticeCommentList;
 }

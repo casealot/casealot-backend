@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 public class QnaCommentDTO {
     private Long id;
     private String customerId;
-    private Long qnaId;
     private String title;
     private String content;
 }

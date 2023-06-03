@@ -1,7 +1,7 @@
 package kr.casealot.shop.domain.notice.service;
 
 import io.jsonwebtoken.Claims;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentDetailDTO;
+import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
@@ -58,7 +58,7 @@ public class NoticeService {
         return noticeResDTOList;
     }
 
-
+    @Transactional
     public NoticeDetailDTO getNotice(Long noticeId) throws NotFoundException {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(NotFoundException::new);
@@ -75,10 +75,10 @@ public class NoticeService {
                 .build();
 
         List<NoticeComment> noticeCommentList = notice.getNoticeCommentList();
-        List<NoticeCommentDetailDTO> commentDTOList = new ArrayList<>();
+        List<NoticeCommentResDTO> commentDTOList = new ArrayList<>();
 
         for (NoticeComment noticeComment : noticeCommentList) {
-            NoticeCommentDetailDTO noticeCommentResDTO = NoticeCommentDetailDTO.builder()
+            NoticeCommentResDTO noticeCommentResDTO = NoticeCommentResDTO.builder()
                     .id(noticeComment.getId())
                     .customerId(noticeComment.getCustomer().getId())
                     .title(noticeComment.getTitle())
