@@ -1,13 +1,10 @@
 package kr.casealot.shop.domain.notice.service;
 
 import io.jsonwebtoken.Claims;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
+import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentDetailDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import org.springframework.data.domain.Pageable;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
@@ -18,11 +15,8 @@ import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.NotFound;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +35,6 @@ public class NoticeService {
     private final CustomerRepository customerRepository;
 
     private final AuthTokenProvider authTokenProvider;
-
 
 
     public List<NoticeResDTO> getNoticeList(Pageable pageable) {
@@ -82,21 +75,20 @@ public class NoticeService {
                 .build();
 
         List<NoticeComment> noticeCommentList = notice.getNoticeCommentList();
-        List<NoticeCommentResDTO> noticeCommentResDTOList = new ArrayList<>();
+        List<NoticeCommentDetailDTO> commentDTOList = new ArrayList<>();
 
         for (NoticeComment noticeComment : noticeCommentList) {
-            NoticeCommentResDTO noticeCommentResDTO = NoticeCommentResDTO.builder()
+            NoticeCommentDetailDTO noticeCommentResDTO = NoticeCommentDetailDTO.builder()
                     .id(noticeComment.getId())
-                    .noticeId(noticeComment.getNotice().getId())
                     .customerId(noticeComment.getCustomer().getId())
                     .title(noticeComment.getTitle())
                     .content(noticeComment.getContent())
                     .build();
 
-            noticeCommentResDTOList.add(noticeCommentResDTO);
+            commentDTOList.add(noticeCommentResDTO);
         }
 
-        noticeDetailDTO.setNoticeCommentList(noticeCommentResDTOList);
+        noticeDetailDTO.setNoticeCommentList(commentDTOList);
 
         return noticeDetailDTO;
     }
