@@ -72,7 +72,7 @@ public class CustomerService {
         // 토큰 생성 (refresh)
         String refreshToken = String.valueOf(UUID.randomUUID());
 
-        CustomerToken customerToken = new CustomerToken(customerSeq, accessToken, refreshToken);
+        CustomerToken customerToken = new CustomerToken(customerSeq, accessToken, refreshToken, customer.getRoleType());
 
         customerTokenRepository.save(customerToken);
 

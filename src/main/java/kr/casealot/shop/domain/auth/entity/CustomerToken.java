@@ -3,6 +3,7 @@ package kr.casealot.shop.domain.auth.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
+import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -39,9 +40,14 @@ public class CustomerToken {
     @Size(max = 256)
     private String refreshToken;
 
-    public CustomerToken(Long customerSeq, String jwtToken, String refreshToken) {
+    @Column(name = "ROLE_TYPE", length = 256)
+    @NotNull
+    private RoleType roleType;
+
+    public CustomerToken(Long customerSeq, String jwtToken, String refreshToken, RoleType roleType) {
         this.customerSeq = customerSeq;
         this.jwtToken = jwtToken;
         this.refreshToken = refreshToken;
+        this.roleType = roleType;
     }
 }

@@ -11,4 +11,5 @@ import lombok.*;
 public class CustomerLoginDto {
     private String id;
     private String password;
+    private RoleType roleType;
 }
