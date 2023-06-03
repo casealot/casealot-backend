@@ -58,4 +58,8 @@ dependencies {
 
 bootJar {
 	mainClass = 'kr.casealot.shop.ShopApplication'
+	archivesBaseName = 'casealot-backend'
+	archiveFileName = 'casealot-backend.jar'
+	archiveVersion = "0.0.1"
 }
+
