@@ -1,10 +1,7 @@
 package kr.casealot.shop.domain.notice.comment.controller;
 
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentDTO;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
 import kr.casealot.shop.domain.notice.comment.service.NoticeCommentService;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
-import kr.casealot.shop.domain.qna.comment.service.QnaCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +17,11 @@ public class NoticeCommentController {
 
     @PostMapping("/notice/{notice_id}/comments")
     public ResponseEntity<String> createComment(
-            @PathVariable Long notice_id,
+            @PathVariable("notice_id") Long noticeId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
             HttpServletRequest request) throws ChangeSetPersister.NotFoundException {
 
-        noticeCommentService.createComment(notice_id, noticeCommentReqDTO, request);
+        noticeCommentService.createComment(noticeId, noticeCommentReqDTO, request);
 
         return ResponseEntity.ok("create notice");
     }
