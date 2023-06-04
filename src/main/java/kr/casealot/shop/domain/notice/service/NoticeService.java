@@ -5,6 +5,8 @@ import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
+import kr.casealot.shop.global.common.APIResponse;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Pageable;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
@@ -17,15 +19,18 @@ import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +42,7 @@ public class NoticeService {
     private final AuthTokenProvider authTokenProvider;
 
 
-    public List<NoticeResDTO> getNoticeList(Pageable pageable) {
+    public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
         Page<Notice> noticePage = noticeRepository.findAll(pageable);
         List<Notice> noticeList = noticePage.getContent();
 
@@ -55,13 +60,12 @@ public class NoticeService {
             noticeResDTOList.add(noticeResDTO);
         }
 
-        return noticeResDTOList;
+        return APIResponse.success("공지 목록 조회 성공", noticeResDTOList);
     }
 
     @Transactional
-    public NoticeDetailDTO getNotice(Long noticeId) throws NotFoundException {
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(NotFoundException::new);
+    public APIResponse<NoticeDetailDTO> getNotice(Long noticeId){
+        Notice notice = noticeRepository.findById(noticeId) .orElseThrow();
 
         notice.setViews(notice.getViews() + 1);
 
@@ -73,6 +77,8 @@ public class NoticeService {
                 .photoUrl(notice.getPhotoUrl())
                 .views(notice.getViews())
                 .build();
+
+
 
         List<NoticeComment> noticeCommentList = notice.getNoticeCommentList();
         List<NoticeCommentResDTO> commentDTOList = new ArrayList<>();
@@ -90,12 +96,12 @@ public class NoticeService {
 
         noticeDetailDTO.setNoticeCommentList(commentDTOList);
 
-        return noticeDetailDTO;
+        return APIResponse.success("공지 조회 성공", noticeDetailDTO);
     }
 
 
     @Transactional
-    public void createNotice(NoticeReqDTO noticeReqDTO, HttpServletRequest request) {
+    public APIResponse<Void> createNotice(NoticeReqDTO noticeReqDTO, HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
         Claims claims = authToken.getTokenClaims();
@@ -104,7 +110,7 @@ public class NoticeService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin){
-            throw new AccessDeniedException("권한 없음");
+            return APIResponse.permissionDenied();
         }
 
         Customer customer = customerRepository.findById(customerId);
@@ -117,19 +123,20 @@ public class NoticeService {
                 .build();
 
         noticeRepository.save(notice);
+
+        return APIResponse.success("공지 작성 성공", null);
     }
 
     @Transactional
-
-    public void updateNotice(Long noticeId, NoticeReqDTO noticeReqDTO, HttpServletRequest request) throws NotFoundException {
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow(NotFoundException::new);
+    public APIResponse<Void> updateNotice(Long noticeId, NoticeReqDTO noticeReqDTO, HttpServletRequest request) throws NotFoundException {
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
 
         String customerId = findCustomerId(request);
 
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin){
-            throw new AccessDeniedException("권한 없음");
+            return APIResponse.permissionDenied();
         }
 
         notice.setTitle(noticeReqDTO.getTitle());
@@ -137,11 +144,13 @@ public class NoticeService {
         notice.setPhotoUrl(noticeReqDTO.getPhotoUrl());
 
         noticeRepository.save(notice);
+
+        return APIResponse.success("공지 수정 성공", null);
     }
 
 
     @Transactional
-    public void deleteNotice(Long noticeId, HttpServletRequest request) throws NotFoundException {
+    public APIResponse<Void> deleteNotice(Long noticeId, HttpServletRequest request) throws NotFoundException {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(NotFoundException::new);
 
         String customerId = findCustomerId(request);
@@ -153,6 +162,8 @@ public class NoticeService {
         }
 
         noticeRepository.delete(notice);
+
+        return APIResponse.success("공지 삭제 성공", null);
     }
 
 
@@ -168,7 +179,4 @@ public class NoticeService {
         Customer customer = customerRepository.findById(customerId);
         return customer.getRoleType() == ADMIN;
     }
-
-
-
 }
