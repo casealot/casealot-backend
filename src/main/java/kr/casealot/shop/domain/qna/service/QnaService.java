@@ -108,7 +108,6 @@ public class QnaService {
         for (QnaComment qnaComment : qnaCommentList) {
             QnaCommentDTO qnaCommentDTO = QnaCommentDTO.builder()
                     .id(qnaComment.getId())
-                    .qnaId(qnaComment.getQna().getId())
                     .customerId(qnaComment.getCustomer().getId())
                     .title(qnaComment.getTitle())
                     .content(qnaComment.getContent())
