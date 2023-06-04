@@ -1,12 +1,11 @@
 package kr.casealot.shop.domain.customer.controller;
 
 import io.swagger.annotations.Api;
-import kr.casealot.shop.domain.auth.entity.CustomerToken;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
-import kr.casealot.shop.global.oauth.token.AuthToken;
+import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,7 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public CustomerTokenDto login(@RequestBody CustomerLoginDto customerLoginDto) {
+    public APIResponse<CustomerTokenDto> login(@RequestBody CustomerLoginDto customerLoginDto) {
         return customerService.login(customerLoginDto);
     }
 

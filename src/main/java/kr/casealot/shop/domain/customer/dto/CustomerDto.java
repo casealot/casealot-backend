@@ -18,5 +18,4 @@ public class CustomerDto {
     private String postNo;
     private String address;
     private String addressDetail;
-    private RoleType roleType;
 }
