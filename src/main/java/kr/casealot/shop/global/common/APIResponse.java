@@ -2,6 +2,7 @@ package kr.casealot.shop.global.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class APIResponse<T> {
     private final static String INVALID_ACCESS_TOKEN = "Invalid access token.";
     private final static String INVALID_REFRESH_TOKEN = "Invalid refresh token.";
     private final static String NOT_EXPIRED_TOKEN_YET = "Not expired token yet.";
+    private final static String PERMISSION_DENIED = "권한이 없습니다.";
 
     private final APIResponseHeader header;
     private final Map<String, T> body;
@@ -43,5 +45,13 @@ public class APIResponse<T> {
 
     public static <T> APIResponse<T> notExpiredTokenYet() {
         return new APIResponse(new APIResponseHeader(FAILED, NOT_EXPIRED_TOKEN_YET), null);
+    }
+
+    public static <T> APIResponse<T> permissionDenied() {
+        return new APIResponse(new APIResponseHeader(FAILED, PERMISSION_DENIED), null);
+    }
+
+    public static <T> APIResponse<T> notFound() {
+        return new APIResponse<>(new APIResponseHeader(FAILED, NOT_FOUND_MESSAGE), null);
     }
 }
