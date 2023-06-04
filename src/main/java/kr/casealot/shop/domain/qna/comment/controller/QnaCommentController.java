@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.qna.comment.controller;
 
-import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
 import kr.casealot.shop.domain.qna.comment.service.QnaCommentService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundExc
 
 @RestController
 @Slf4j
-@Api(tags = {"Q&A COMMENT API"}, description = "Q&A 댓글 관련 API")
 @RequiredArgsConstructor
 @RequestMapping("/cal/v1")
 public class QnaCommentController {
