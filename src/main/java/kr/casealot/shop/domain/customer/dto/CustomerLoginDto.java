@@ -8,14 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDto {
+public class CustomerLoginDto {
     private String id;
-    private String name;
     private String password;
-    private String phoneNumber;
-    private String email;
-    private String profileImageUrl;
-    private String postNo;
-    private String address;
-    private String addressDetail;
 }

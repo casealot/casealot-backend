@@ -1,11 +1,8 @@
 package kr.casealot.shop.domain.auth.controller;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
-import kr.casealot.shop.domain.customer.entity.Customer;
-import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
@@ -15,10 +12,10 @@ import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.qna.controller;
 
+import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.qna.dto.QnaDTO;
 import kr.casealot.shop.domain.qna.dto.QnaDetailDTO;
 import kr.casealot.shop.domain.qna.entity.Qna;
@@ -18,6 +19,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = {"QNA API"}, description = "QNA 관련 API")
 @RequestMapping("/cal/v1/qna")
 public class QnaController {
 

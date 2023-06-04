@@ -20,6 +20,9 @@ public class APIResponse<T> {
     private final static String INVALID_REFRESH_TOKEN = "Invalid refresh token.";
     private final static String NOT_EXPIRED_TOKEN_YET = "Not expired token yet.";
     private final static String PERMISSION_DENIED = "권한이 없습니다.";
+    private final static String NOT_CORRECTED_PASSWORD = "Bad Password.";
+    private final static String NOT_CORRECTED_ID = "Bad ID.";
+    private final static String DUPLICATED_EMAIL = "Duplicated Email.";
 
     private final APIResponseHeader header;
     private final Map<String, T> body;
@@ -50,5 +53,16 @@ public class APIResponse<T> {
         return new APIResponse(new APIResponseHeader(FAILED, PERMISSION_DENIED), null);
     }
 
+    public static <T> APIResponse<T> incorrectPassword() {
+        return new APIResponse(new APIResponseHeader(FAILED, NOT_CORRECTED_PASSWORD), null);
+    }
 
+    public static <T> APIResponse<T> incorrectID() {
+        return new APIResponse(new APIResponseHeader(FAILED, NOT_CORRECTED_ID), null);
+    }
+  
+    public static <T> APIResponse<T> duplicatedEmail() {
+        return new APIResponse(new APIResponseHeader(FAILED, DUPLICATED_EMAIL), null);
+    }
+  
 }
