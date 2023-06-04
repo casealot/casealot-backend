@@ -45,65 +45,65 @@ public class ProductService {
     private final ReviewRepository reviewRepository;
     private final ReviewCommentRepository reviewCommentRepository;
 
-    @Transactional
-    public void createProduct(ProductDTO productDTO, HttpServletRequest request) {
-
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
-
-        Customer customer = customerRepository.findById(customerId);
-
-        Product product = Product.builder()
-                .name(productDTO.getName())
-                .content(productDTO.getContent())
-                .price(productDTO.getPrice())
-                .views(productDTO.getViews())
-                .img_B(productDTO.getImg_B())
-                .img_M(productDTO.getImg_M())
-                .img_S(productDTO.getImg_S())
-                .sells(productDTO.getSells())
-                .sale(productDTO.getSale())
-                .sells(productDTO.getSells())
-                .color(productDTO.getColor())
-                .season(productDTO.getSeason())
-                .type(productDTO.getType())
-                .customer(customer)
-                .build();
-
-        productRepository.save(product);
-    }
-
-
-    @Transactional
-    public void updateProduct(Long productId, ProductDTO productDTO,
-                              HttpServletRequest request) throws NotFoundException {
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(NotFoundException::new);
-
-        String customerId = findCustomerId(request);
-
-        boolean isAdmin = checkAdminRole(customerId);
-
-        if (!isAdmin) {
-            throw new AccessDeniedException("You are not authorized to update this Product.");
-        }
-
-        product.setName(productDTO.getName());
-        product.setContent(productDTO.getContent());
-        product.setImg_B(productDTO.getImg_B());
-        product.setImg_M(productDTO.getImg_M());
-        product.setImg_S(productDTO.getImg_S());
-        product.setPrice(productDTO.getPrice());
-        product.setSale(productDTO.getSale());
-        product.setColor(productDTO.getColor());
-        product.setSeason(productDTO.getSeason());
-        product.setType(productDTO.getType());
-
-        productRepository.save(product);
-    }
+//    @Transactional
+//    public void createProduct(ProductDTO productDTO, HttpServletRequest request) {
+//
+//        String token = HeaderUtil.getAccessToken(request);
+//        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+//        Claims claims = authToken.getTokenClaims();
+//        String customerId = claims.getSubject();
+//
+//        Customer customer = customerRepository.findById(customerId);
+//
+//        Product product = Product.builder()
+//                .name(productDTO.getName())
+//                .content(productDTO.getContent())
+//                .price(productDTO.getPrice())
+//                .views(productDTO.getViews())
+//                .img_B(productDTO.getImg_B())
+//                .img_M(productDTO.getImg_M())
+//                .img_S(productDTO.getImg_S())
+//                .sells(productDTO.getSells())
+//                .sale(productDTO.getSale())
+//                .sells(productDTO.getSells())
+//                .color(productDTO.getColor())
+//                .season(productDTO.getSeason())
+//                .type(productDTO.getType())
+//                .customer(customer)
+//                .build();
+//
+//        productRepository.save(product);
+//    }
+//
+//
+//    @Transactional
+//    public void updateProduct(Long productId, ProductDTO productDTO,
+//                              HttpServletRequest request) throws NotFoundException {
+//
+//        Product product = productRepository.findById(productId)
+//                .orElseThrow(NotFoundException::new);
+//
+//        String customerId = findCustomerId(request);
+//
+//        boolean isAdmin = checkAdminRole(customerId);
+//
+//        if (!isAdmin) {
+//            throw new AccessDeniedException("You are not authorized to update this Product.");
+//        }
+//
+//        product.setName(productDTO.getName());
+//        product.setContent(productDTO.getContent());
+//        product.setImg_B(productDTO.getImg_B());
+//        product.setImg_M(productDTO.getImg_M());
+//        product.setImg_S(productDTO.getImg_S());
+//        product.setPrice(productDTO.getPrice());
+//        product.setSale(productDTO.getSale());
+//        product.setColor(productDTO.getColor());
+//        product.setSeason(productDTO.getSeason());
+//        product.setType(productDTO.getType());
+//
+//        productRepository.save(product);
+//    }
 
     @Transactional
     public void deleteProduct(Long productId, HttpServletRequest request) throws NotFoundException {
@@ -122,7 +122,7 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    public ProductResDTO findAllSearch(ProductReqDTO productReqDTO) {
+    public ProductResDTO findAllSearch(ProductDTO.GetRequest productReqDTO) {
 
         // query
         String query = productReqDTO.getQuery();
@@ -159,44 +159,44 @@ public class ProductService {
         return savedProduct;
     }
 
-    public ProductGetDTO convertToDTO(Product product) {
-        List<ReviewResDTO> reviewList = new ArrayList<>();
-        for (Review review : product.getReviews()) {
-            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
-            for (ReviewComment reviewComment : review.getReviewCommentList()) {
-                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
-                        .customerName(reviewComment.getCustomer().getName())
-                        .reviewCommentText(reviewComment.getReviewCommentText())
-                        .build();
-                reviewCommentList.add(reviewCommentDTO);
-            }
-            ReviewResDTO reviewDTO = ReviewResDTO.builder()
-                    .customerName(review.getCustomer().getName())
-                    .rating(review.getRating())
-                    .reviewText(review.getReviewText())
-                    .reviewCommentList(reviewCommentList)
-                    .build();
-            reviewList.add(reviewDTO);
-        }
-
-        return ProductGetDTO.builder()
-                .id(product.getId())
-                .userId(product.getId())
-                .name(product.getName())
-                .content(product.getContent())
-                .price(product.getPrice())
-                .views(product.getViews())
-                .img_B(product.getImg_B())
-                .img_M(product.getImg_M())
-                .img_S(product.getImg_S())
-                .sells(product.getSells())
-                .sale(product.getSale())
-                .color(product.getColor())
-                .season(product.getSeason())
-                .type(product.getType())
-                .reviewList(reviewList)
-                .build();
-    }
+//    public ProductGetDTO convertToDTO(Product product) {
+//        List<ReviewResDTO> reviewList = new ArrayList<>();
+//        for (Review review : product.getReviews()) {
+//            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
+//            for (ReviewComment reviewComment : review.getReviewCommentList()) {
+//                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+//                        .customerName(reviewComment.getCustomer().getName())
+//                        .reviewCommentText(reviewComment.getReviewCommentText())
+//                        .build();
+//                reviewCommentList.add(reviewCommentDTO);
+//            }
+//            ReviewResDTO reviewDTO = ReviewResDTO.builder()
+//                    .customerName(review.getCustomer().getName())
+//                    .rating(review.getRating())
+//                    .reviewText(review.getReviewText())
+//                    .reviewCommentList(reviewCommentList)
+//                    .build();
+//            reviewList.add(reviewDTO);
+//        }
+//
+//        return ProductGetDTO.builder()
+//                .id(product.getId())
+//                .userId(product.getId())
+//                .name(product.getName())
+//                .content(product.getContent())
+//                .price(product.getPrice())
+//                .views(product.getViews())
+//                .img_B(product.getImg_B())
+//                .img_M(product.getImg_M())
+//                .img_S(product.getImg_S())
+//                .sells(product.getSells())
+//                .sale(product.getSale())
+//                .color(product.getColor())
+//                .season(product.getSeason())
+//                .type(product.getType())
+//                .reviewList(reviewList)
+//                .build();
+//    }
 
 
     private String findCustomerId(HttpServletRequest request) {
