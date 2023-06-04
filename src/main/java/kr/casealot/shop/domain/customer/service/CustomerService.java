@@ -1,10 +1,12 @@
 package kr.casealot.shop.domain.customer.service;
 
 import io.jsonwebtoken.Claims;
-import kr.casealot.shop.domain.auth.entity.CustomerToken;
+import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
+import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerTokenRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
+import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.oauth.entity.RoleType;
@@ -18,16 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerTokenRepository customerTokenRepository;
+    private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
-
     public Long join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
@@ -48,14 +49,12 @@ public class CustomerService {
         return savedCustomer.getSeq();
     }
 
-    public CustomerToken login(CustomerLoginDto customerLoginDto) {
+    public CustomerTokenDto login(CustomerLoginDto customerLoginDto) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
             throw new IllegalArgumentException("ID가 " + customerLoginDto.getId() + "인 사용자를 찾을 수 없습니다.");
         }
-
-        Long customerSeq = customer.getSeq();
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(customerLoginDto.getPassword(), customer.getPassword())) {
@@ -63,34 +62,41 @@ public class CustomerService {
         }
 
         // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
-        Date expiry = new Date((System.currentTimeMillis() + 3600000) * 24);
+        Date jwtExpiry = new Date((System.currentTimeMillis() + 3600000) * 24);
+
+        // refreshToken 기간 2주 설정
+        Date refreshExpiry = new Date((System.currentTimeMillis() + 3600000) * 24 * 14);
 
         // 토큰 생성 (jwt)
-        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expiry);
+        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), jwtExpiry);
+        AuthToken refToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), refreshExpiry);
         String accessToken = authToken.getToken();
+        String refreshToken = refToken.getToken();
 
         // 토큰 생성 (refresh)
-        String refreshToken = String.valueOf(UUID.randomUUID());
 
-        CustomerToken customerToken = new CustomerToken(customerSeq, accessToken, refreshToken, customer.getRoleType());
+        CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
+        customerRefreshTokenRepository.save(customerRefreshToken);
 
-        customerTokenRepository.save(customerToken);
-
-        return customerToken;
+        return new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType());
     }
 
+    //로그아웃
     @Transactional
     public void logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
+
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
 
         Claims claims = authToken.getTokenClaims();
         String userId = claims.getSubject();
 
-        Customer customer = customerRepository.findCustomerById(userId);
-        Long customerSeq = customer.getSeq();
+        System.out.println("ID: " + userId);
 
-        customerTokenRepository.deleteByCustomerSeq(customerSeq);
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userId);
+        if (customerRefreshToken != null) {
+            customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
+        }
     }
 
 

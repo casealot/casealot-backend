@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.auth.entity.CustomerToken;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
+import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public CustomerToken login(@RequestBody CustomerLoginDto customerLoginDto) {
+    public CustomerTokenDto login(@RequestBody CustomerLoginDto customerLoginDto) {
         return customerService.login(customerLoginDto);
     }
 
@@ -38,7 +39,7 @@ public class CustomerController {
         return ResponseEntity.ok("logout okay");
     }
 
-    @DeleteMapping("/quit")
+    @PostMapping("/quit")
     public ResponseEntity<String> quit(HttpServletRequest request) {
         customerService.deleteCustomer(request);
 
