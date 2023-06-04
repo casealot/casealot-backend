@@ -102,10 +102,6 @@ public class CustomerService {
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
 
         Claims claims = authToken.getTokenClaims();
-        if (claims == null) {
-            return APIResponse.invalidAccessToken();
-        }
-
         String userId = claims.getSubject();
 
         System.out.println("ID: " + userId);
