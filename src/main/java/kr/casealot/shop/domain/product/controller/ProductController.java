@@ -31,10 +31,12 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @ApiOperation(value = "ADMIN 상품 등록", notes = "상품을 등록한다.")
     @PostMapping("/admin/product")
-    public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO,
-                                                HttpServletRequest request){
-        productService.createProduct(productDTO, request);
+    public ResponseEntity<String> createProduct(
+            @RequestBody ProductDTO.CreateRequest createRequest,
+            HttpServletRequest request){
+        //productService.createProduct(createRequest, request);
         return ResponseEntity.ok("create product");
     }
 
@@ -67,7 +69,7 @@ public class ProductController {
     @GetMapping("/product")
     @ApiOperation(value = "상품 검색 및 조회", notes = "상품 정보를 갖고온다.")
     public ResponseEntity<ProductResDTO> getProductList(
-            @ApiParam(value = "상품 요청 DTO") @RequestBody ProductReqDTO productReqDTO
+            @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO
             ) {
         ProductResDTO productList = productService.findAllSearch(productReqDTO);
         return ResponseEntity.ok(productList);

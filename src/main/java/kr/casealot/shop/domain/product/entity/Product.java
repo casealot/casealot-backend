@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
@@ -34,14 +35,15 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_CONTENT")
     private String content;
 
-    @Column(name = "PRODUCT_IMG_B", length = 512)
-    private String img_B;
+    // 상품 이미지 프리뷰
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "upload_file_id")
+    private UploadFile img_preview;
 
-    @Column(name = "PRODUCT_IMG_M", length = 512)
-    private String img_M;
-
-    @Column(name = "PRODUCT_IMG_S", length = 512)
-    private String img_S;
+    //상품 > 디테일 이미지
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "upload_file_id")
+    private UploadFile img_detail;
 
     @Column(name = "PRODUCT_PRICE")
     private int price;
