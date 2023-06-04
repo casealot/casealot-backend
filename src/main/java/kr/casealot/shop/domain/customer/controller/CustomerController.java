@@ -8,7 +8,6 @@ import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +30,7 @@ public class CustomerController {
         return customerService.login(customerLoginDto);
     }
 
-    @PostMapping("/logout")
+    @DeleteMapping("/logout")
     public APIResponse<String> logout(HttpServletRequest request) {
         return customerService.logout(request);
     }
