@@ -31,6 +31,7 @@ public class CustomerService {
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
+
     public Long join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
@@ -51,16 +52,16 @@ public class CustomerService {
         return savedCustomer.getSeq();
     }
 
-    public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto) {
+    public CustomerTokenDto login(CustomerLoginDto customerLoginDto) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
-            return APIResponse.incorrectID();
+            throw new IllegalArgumentException("ID" + customerLoginDto.getId() + "인 사용자를 찾을 수 없습니다.");
         }
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(customerLoginDto.getPassword(), customer.getPassword())) {
-            return APIResponse.incorrectPassword();
+            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
 
         // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
@@ -80,7 +81,7 @@ public class CustomerService {
         CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
         customerRefreshTokenRepository.save(customerRefreshToken);
 
-        return APIResponse.success("customerTokenDto", new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType()));
+        return new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType());
     }
 
     //로그아웃
@@ -101,7 +102,6 @@ public class CustomerService {
         }
     }
 
-
     @Transactional
     public long deleteCustomer(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
@@ -115,6 +115,4 @@ public class CustomerService {
 
         return customerRepository.deleteById(userId);
     }
-
-
 }

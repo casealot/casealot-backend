@@ -27,7 +27,7 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public APIResponse<CustomerTokenDto> login(@RequestBody CustomerLoginDto customerLoginDto) {
+    public CustomerTokenDto login(@RequestBody CustomerLoginDto customerLoginDto) {
         return customerService.login(customerLoginDto);
     }
 
