@@ -2,7 +2,6 @@ package kr.casealot.shop.global.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +50,5 @@ public class APIResponse<T> {
         return new APIResponse(new APIResponseHeader(FAILED, PERMISSION_DENIED), null);
     }
 
-    public static <T> APIResponse<T> notFound() {
-        return new APIResponse<>(new APIResponseHeader(FAILED, NOT_FOUND_MESSAGE), null);
-    }
+
 }
