@@ -2,6 +2,8 @@ package kr.casealot.shop.domain.customer.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
+import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.product.entity.Product;
@@ -71,6 +73,12 @@ public class Customer extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<QnaComment> qnaCommentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Notice> noticeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<NoticeComment> noticeCommentList = new ArrayList<>();
 
 
     //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
