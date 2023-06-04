@@ -8,6 +8,7 @@ import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.comment.repository.NoticeCommentRepository;
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.notice.repository.NoticeRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -30,10 +31,11 @@ public class NoticeCommentService {
     private final AuthTokenProvider authTokenProvider;
     private final CustomerRepository customerRepository;
 
-    public void createComment(Long noticeId, NoticeCommentReqDTO noticeCommentReqDTO, HttpServletRequest request) throws NotFoundException {
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(NotFoundException::new);
+    public APIResponse<Void> createComment(Long noticeId,
+                                           NoticeCommentReqDTO noticeCommentReqDTO,
+                                           HttpServletRequest request){
 
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
         String customerId = findCustomerId(request);
         Customer customer = customerRepository.findById(customerId);
 
@@ -45,48 +47,46 @@ public class NoticeCommentService {
                 .build();
 
         noticeCommentRepository.save(noticeComment);
+
+        return APIResponse.success("공지 댓글 등록 성공", null);
     }
 
-    public void deleteComment(Long noticeId, Long commentId, HttpServletRequest request) throws NotFoundException {
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(NotFoundException::new);
+    public APIResponse<Void> deleteComment(Long commentId, HttpServletRequest request){
 
-        NoticeComment noticeComment = noticeCommentRepository.findById(commentId)
-                .orElseThrow(NotFoundException::new);
+        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
         String customerId = findCustomerId(request);
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(!isAdmin){
-
-        }
-        if(!customerId.equals(notice.getCustomer().getId())){
-
+        if(!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())){
+            return APIResponse.permissionDenied();
         }
 
         noticeCommentRepository.delete(noticeComment);
+
+        return APIResponse.success("공지 댓글 삭제 성공", null);
     }
 
-    public void updateComment(Long noticeId, Long commentId, NoticeCommentReqDTO noticeCommentReqDTO,
-                              HttpServletRequest request) throws NotFoundException {
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(NotFoundException::new);
+    public APIResponse<Void> updateComment(Long commentId, NoticeCommentReqDTO noticeCommentReqDTO,
+                              HttpServletRequest request){
 
-        NoticeComment noticeComment = noticeCommentRepository.findById(commentId)
-                .orElseThrow(NotFoundException::new);
+        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
         String customerId = findCustomerId(request);
 
         if(!customerId.equals(noticeComment.getCustomer().getId())){
-            throw new AccessDeniedException("You are not authorized to update this NoticeComment.");
+            return APIResponse.permissionDenied();
         }
 
         noticeComment.setTitle(noticeCommentReqDTO.getTitle());
         noticeComment.setContent(noticeCommentReqDTO.getContent());
 
         noticeCommentRepository.save(noticeComment);
+
+        return APIResponse.success("공지 댓글 수정 성공", null);
     }
+
 
     private String findCustomerId(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
