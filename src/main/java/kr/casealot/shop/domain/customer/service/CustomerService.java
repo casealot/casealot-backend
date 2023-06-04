@@ -10,7 +10,6 @@ import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.common.APIResponseHeader;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -32,8 +31,18 @@ public class CustomerService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
 
-    public Long join(CustomerDto customerDto) {
+    public APIResponse<Long> join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
+
+        // 아이디 중복 확인
+        if (customerRepository.existsCustomerById(customerDto.getId())) {
+            return APIResponse.incorrectID();
+        }
+
+        // 이메일 중복 확인
+        if (customerRepository.existsByEmail(customerDto.getEmail())) {
+            return APIResponse.duplicatedEmail();
+        }
 
         Customer customer = Customer.builder()
                 .id(customerDto.getId())
@@ -49,23 +58,24 @@ public class CustomerService {
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);
-        return savedCustomer.getSeq();
+
+        return APIResponse.success("customerId", savedCustomer.getSeq());
     }
 
-    public CustomerTokenDto login(CustomerLoginDto customerLoginDto) {
+    public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
-            throw new IllegalArgumentException("ID" + customerLoginDto.getId() + "인 사용자를 찾을 수 없습니다.");
+            return APIResponse.incorrectID();
         }
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(customerLoginDto.getPassword(), customer.getPassword())) {
-            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+            return APIResponse.incorrectPassword();
         }
 
         // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
-        Date jwtExpiry = new Date((System.currentTimeMillis() + 3600000) * 24);
+        Date jwtExpiry = new Date((System.currentTimeMillis() + 360000));
 
         // refreshToken 기간 2주 설정
         Date refreshExpiry = new Date((System.currentTimeMillis() + 3600000) * 24 * 14);
@@ -81,38 +91,55 @@ public class CustomerService {
         CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
         customerRefreshTokenRepository.save(customerRefreshToken);
 
-        return new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType());
+        return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType()));
     }
 
     //로그아웃
     @Transactional
-    public void logout(HttpServletRequest request) {
+    public APIResponse<String> logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
 
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
 
         Claims claims = authToken.getTokenClaims();
+        if (claims == null) {
+            return APIResponse.invalidAccessToken();
+        }
+
         String userId = claims.getSubject();
 
         System.out.println("ID: " + userId);
 
+        //회원탈퇴시에 refreshToken 삭제
+        //TODO: accessToken 사용불가하게 만들어야함.
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userId);
         if (customerRefreshToken != null) {
             customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
         }
+
+        return APIResponse.success("customerId", userId);
     }
 
+
     @Transactional
-    public long deleteCustomer(HttpServletRequest request) {
+    public APIResponse<String> deleteCustomer(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
 
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
 
         Claims claims = authToken.getTokenClaims();
+        if (claims == null) {
+            return APIResponse.invalidAccessToken();
+        }
         String userId = claims.getSubject();
+
+        //존재하는 회원인지 확인
+        if (customerRepository.existsCustomerById(userId)) {
+            return APIResponse.invalidAccessToken();
+        }
 
         System.out.println("ID: " + userId);
 
-        return customerRepository.deleteById(userId);
+        return APIResponse.success("customerId", userId);
     }
 }
