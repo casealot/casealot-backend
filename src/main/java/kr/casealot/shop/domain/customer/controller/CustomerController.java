@@ -22,26 +22,22 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/join")
-    public ResponseEntity<String> join(@RequestBody CustomerDto customerDto) {
-        return ResponseEntity.ok(customerService.join(customerDto) + " user join!");
+    public APIResponse<Long> join(@RequestBody CustomerDto customerDto) {
+        return customerService.join(customerDto);
     }
 
     @PostMapping("/login")
-    public CustomerTokenDto login(@RequestBody CustomerLoginDto customerLoginDto) {
+    public APIResponse<CustomerTokenDto> login(@RequestBody CustomerLoginDto customerLoginDto) {
         return customerService.login(customerLoginDto);
     }
 
-    @DeleteMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        customerService.logout(request);
-
-        return ResponseEntity.ok("logout okay");
+    @PostMapping("/logout")
+    public APIResponse<String> logout(HttpServletRequest request) {
+        return customerService.logout(request);
     }
 
-    @PostMapping("/quit")
-    public ResponseEntity<String> quit(HttpServletRequest request) {
-        customerService.deleteCustomer(request);
-
-        return ResponseEntity.ok("quit okay");
+    @DeleteMapping("/quit")
+    public APIResponse<String> quit(HttpServletRequest request) {
+        return customerService.deleteCustomer(request);
     }
 }
