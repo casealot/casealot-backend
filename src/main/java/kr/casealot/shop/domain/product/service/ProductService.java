@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.product.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.file.dto.UploadFileDTO;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
@@ -26,7 +25,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -78,20 +76,20 @@ public class ProductService {
 //    }
 
     @Transactional
-    public void deleteProduct(Long productId, HttpServletRequest request) throws NotFoundException {
+    public APIResponse deleteProduct(Long productId, HttpServletRequest request) throws NotFoundException {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(NotFoundException::new);
 
-        String customerId = findCustomerId(request);
-
-        boolean isAdmin = checkAdminRole(customerId);
-
-        if (!isAdmin) {
-            throw new AccessDeniedException("You are not authorized to delete this product.");
-        }
-
+        // TODO UUID로 상품이미지 제거 필요
+        // String customerId = findCustomerId(request);
+        //        boolean isAdmin = checkAdminRole(customerId);
+        //
+        //        if (!isAdmin) {
+        //            throw new AccessDeniedException("You are not authorized to delete this product.");
+        //        }
         productRepository.delete(product);
+        return APIResponse.success(API_NAME, productId);
     }
 
     public APIResponse findAllSearch(ProductDTO.GetRequest productReqDTO) {
