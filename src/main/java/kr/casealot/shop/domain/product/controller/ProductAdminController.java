@@ -8,10 +8,10 @@ import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
@@ -42,12 +42,12 @@ public class ProductAdminController {
 
 //  TODO 수정 해야함
 
-//    @DeleteMapping("/admin/product/{product_id}")
-//    public ResponseEntity<String> deleteProduct(
-//            @PathVariable("product_id") Long productId, HttpServletRequest request)
-//            throws ChangeSetPersister.NotFoundException {
-//        productService.deleteProduct(productId, request);
-//        return ResponseEntity.ok("delete product");
-//    }
+    @DeleteMapping("/product/{product_id}")
+    public APIResponse deleteProduct(
+            @PathVariable("product_id") Long productId, HttpServletRequest request)
+            throws ChangeSetPersister.NotFoundException {
+
+        return productService.deleteProduct(productId, request);
+    }
 
 }
