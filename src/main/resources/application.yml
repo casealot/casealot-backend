@@ -1,10 +1,14 @@
-server:
-  port: 8000
+
 
 spring:
   profiles:
     active: local
 ---
+server:
+  port: 8000
+  error:
+    include-stacktrace: never
+
 spring:
   config:
     activate:
@@ -72,6 +76,7 @@ spring:
     multipart:
       max-file-size: 10MB
 
+
 # jwt
 jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
 
@@ -110,6 +115,8 @@ logging:
 ---
 server:
   port: 8000
+  error:
+    include-stacktrace: never
 
 spring:
   config:

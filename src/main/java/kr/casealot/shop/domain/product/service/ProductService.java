@@ -9,7 +9,11 @@ import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.*;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
+import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
+import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
+import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
@@ -17,6 +21,7 @@ import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +30,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
@@ -46,52 +53,7 @@ public class ProductService {
     private final ReviewRepository reviewRepository;
     private final ReviewCommentRepository reviewCommentRepository;
 
-//    @Transactional
-//    public void updateProduct(Long productId, ProductDTO productDTO,
-//                              HttpServletRequest request) throws NotFoundException {
-//
-//        Product product = productRepository.findById(productId)
-//                .orElseThrow(NotFoundException::new);
-//
-//        String customerId = findCustomerId(request);
-//
-//        boolean isAdmin = checkAdminRole(customerId);
-//
-//        if (!isAdmin) {
-//            throw new AccessDeniedException("You are not authorized to update this Product.");
-//        }
-//
-//        product.setName(productDTO.getName());
-//        product.setContent(productDTO.getContent());
-//        product.setImg_B(productDTO.getImg_B());
-//        product.setImg_M(productDTO.getImg_M());
-//        product.setImg_S(productDTO.getImg_S());
-//        product.setPrice(productDTO.getPrice());
-//        product.setSale(productDTO.getSale());
-//        product.setColor(productDTO.getColor());
-//        product.setSeason(productDTO.getSeason());
-//        product.setType(productDTO.getType());
-//
-//        productRepository.save(product);
-//    }
-
     @Transactional
-    public APIResponse deleteProduct(Long productId, HttpServletRequest request) throws NotFoundException {
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(NotFoundException::new);
-
-        // TODO UUID로 상품이미지 제거 필요
-        // String customerId = findCustomerId(request);
-        //        boolean isAdmin = checkAdminRole(customerId);
-        //
-        //        if (!isAdmin) {
-        //            throw new AccessDeniedException("You are not authorized to delete this product.");
-        //        }
-        productRepository.delete(product);
-        return APIResponse.success(API_NAME, productId);
-    }
-
     public APIResponse findAllSearch(ProductDTO.GetRequest productReqDTO) {
 
         // query
@@ -123,69 +85,43 @@ public class ProductService {
 
         return APIResponse.success(API_NAME, response);
     }
+    @Transactional
+    public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
+        Product savedProduct = productRepository.findById(id).orElseThrow(
+                () -> new Exception("존재하지 않는 상품입니다."));
 
-    public Product findById(Long id) {
-        Product savedProduct = productRepository.findById(id).orElseGet(Product::new);
         // 상품 조회시 상품 조회 수 증가.
         savedProduct.setViews(savedProduct.getViews() + 1);
         productRepository.save(savedProduct);
-        return savedProduct;
-    }
 
-//    public ProductGetDTO convertToDTO(Product product) {
-//        List<ReviewResDTO> reviewList = new ArrayList<>();
-//        for (Review review : product.getReviews()) {
-//            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
-//            for (ReviewComment reviewComment : review.getReviewCommentList()) {
-//                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
-//                        .customerName(reviewComment.getCustomer().getName())
-//                        .reviewCommentText(reviewComment.getReviewCommentText())
-//                        .build();
-//                reviewCommentList.add(reviewCommentDTO);
-//            }
-//            ReviewResDTO reviewDTO = ReviewResDTO.builder()
-//                    .customerName(review.getCustomer().getName())
-//                    .rating(review.getRating())
-//                    .reviewText(review.getReviewText())
-//                    .reviewCommentList(reviewCommentList)
-//                    .build();
-//            reviewList.add(reviewDTO);
-//        }
-//
-//        return ProductGetDTO.builder()
-//                .id(product.getId())
-//                .userId(product.getId())
-//                .name(product.getName())
-//                .content(product.getContent())
-//                .price(product.getPrice())
-//                .views(product.getViews())
-//                .img_B(product.getImg_B())
-//                .img_M(product.getImg_M())
-//                .img_S(product.getImg_S())
-//                .sells(product.getSells())
-//                .sale(product.getSale())
-//                .color(product.getColor())
-//                .season(product.getSeason())
-//                .type(product.getType())
-//                .reviewList(reviewList)
-//                .build();
-//    }
+        // 리뷰 추가
+        List<ReviewResDTO> reviewList = new ArrayList<>();
+        for (Review review : savedProduct.getReviews()) {
+            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
+            for (ReviewComment reviewComment : review.getReviewCommentList()) {
+                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                        .customerName(reviewComment.getCustomer().getName())
+                        .reviewCommentText(reviewComment.getReviewCommentText())
+                        .build();
+                reviewCommentList.add(reviewCommentDTO);
+            }
+            ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                    .customerName(review.getCustomer().getName())
+                    .rating(review.getRating())
+                    .reviewText(review.getReviewText())
+                    .reviewCommentList(reviewCommentList)
+                    .build();
+            reviewList.add(reviewDTO);
+        }
 
-
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
-    }
-
-    private boolean checkAdminRole(String customerId) {
-        Customer customer = customerRepository.findById(customerId);
-        return customer.getRoleType() == ADMIN;
+        return APIResponse.success(ProductDTO.DetailResponse.builder()
+                .product(savedProduct)
+                .reviewList(reviewList)
+                .build());
     }
 
     @Transactional
-    public APIResponse createProduct(
+    public APIResponse<Product> createProduct(
             ProductDTO.CreateRequest createRequest) {
 
         Product saveProduct = Product.builder()
@@ -204,7 +140,9 @@ public class ProductService {
 
     @Transactional
     public APIResponse saveProductWithImage(Long id, UploadFile thumbnail, List<UploadFile> images) throws Exception {
-        Product savedProduct = productRepository.findById(id).orElseThrow(() -> new Exception("상품이 존재하지 않습니다."));
+
+        Product savedProduct = productRepository.findById(id)
+                .orElseThrow(() -> new Exception("존재하지 않는 상품입니다."));
 
         savedProduct.setThumbnail(thumbnail);
         savedProduct.setImages(images);
@@ -212,4 +150,48 @@ public class ProductService {
         savedProduct = productRepository.saveAndFlush(savedProduct);
         return APIResponse.success(API_NAME, savedProduct);
     }
+
+    @Transactional
+    public APIResponse deleteProduct(Long productId) throws Exception {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new Exception("존재하지 않는 상품입니다."));
+
+        // step1 : S3 업로드된 이미지 삭제
+        // step2 : DB에 저장된 이미지 메타정보 삭제
+        UploadFile thumbnailFile = product.getThumbnail();
+        if(Objects.nonNull(thumbnailFile)){
+            s3UploadService.deleteFileFromS3Bucket(thumbnailFile.getUrl());
+            uploadFileService.delete(thumbnailFile);
+        }
+
+        List<UploadFile> imagesFiles = product.getImages();
+        if(Objects.nonNull(imagesFiles)){
+            for(UploadFile image : imagesFiles){
+                s3UploadService.deleteFileFromS3Bucket(image.getUrl());
+                uploadFileService.delete(image);
+            }
+        }
+
+        productRepository.delete(product);
+        return APIResponse.delete();
+    }
+
+    public APIResponse<Product> updateProduct(ProductDTO.UpdateRequest updateRequest) {
+
+        Product updateProduct = Product.builder()
+                .id(updateRequest.getId())
+                .name(updateRequest.getName())
+                .content(updateRequest.getContent())
+                .price(updateRequest.getPrice())
+                .sale(updateRequest.getSale())
+                .color(updateRequest.getColor())
+                .season(updateRequest.getSeason())
+                .type(updateRequest.getType())
+                .build();
+
+        Product updatedProduct = productRepository.saveAndFlush(updateProduct);
+        return APIResponse.success(API_NAME, updatedProduct);
+    }
+
 }
