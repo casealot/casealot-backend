@@ -3,9 +3,8 @@ package kr.casealot.shop.domain.qna.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
-import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.dto.*;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
@@ -13,9 +12,7 @@ import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.*;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.*;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +45,7 @@ public class QnaService {
 
 
     @Transactional
-    public APIResponse createQna(QnaReqDTO qnaReqDTO, HttpServletRequest request) {
+    public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO, HttpServletRequest request) {
 
         String customerId = findCustomerId(request);
 
@@ -74,7 +71,7 @@ public class QnaService {
 
     // qna 수정
     @Transactional
-    public APIResponse updateQna(Long qnaId, QnaReqDTO qnaReqDTO, HttpServletRequest request){
+    public APIResponse<QnaResDTO> updateQna(Long qnaId, QnaReqDTO qnaReqDTO, HttpServletRequest request){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         String customerId = findCustomerId(request);
@@ -101,7 +98,7 @@ public class QnaService {
 
     // qna 조회
     @Transactional
-    public APIResponse getQna(Long qnaId){
+    public APIResponse<QnaDetailDTO> getQna(Long qnaId){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         // 조회수 증가
@@ -116,14 +113,16 @@ public class QnaService {
                 .build();
 
         List<QnaComment> qnaCommentList = qna.getQnaCommentList();
-        List<QnaCommentDTO> qnaCommentDTOList = new ArrayList<>();
+        List<QnaCommentResDTO> qnaCommentDTOList = new ArrayList<>();
 
         for (QnaComment qnaComment : qnaCommentList) {
-            QnaCommentDTO qnaCommentDTO = QnaCommentDTO.builder()
+            QnaCommentResDTO qnaCommentDTO = QnaCommentResDTO.builder()
                     .id(qnaComment.getId())
                     .customerId(qnaComment.getCustomer().getId())
                     .title(qnaComment.getTitle())
                     .content(qnaComment.getContent())
+                    .createdDt(qnaComment.getCreatedDt())
+                    .modifiedDt(qnaComment.getModifiedDt())
                     .build();
 
             qnaCommentDTOList.add(qnaCommentDTO);
@@ -137,7 +136,7 @@ public class QnaService {
 
     // qna 삭제
     @Transactional
-    public APIResponse deleteQna(Long qnaId, HttpServletRequest request){
+    public APIResponse<QnaResDTO> deleteQna(Long qnaId, HttpServletRequest request){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = findCustomerId(request);
 
@@ -178,7 +177,7 @@ public class QnaService {
         return APIResponse.success("qna", qnaResDTOList);
     }
 
-    private static QnaResDTO getQnaResDTO(Qna qna, String customerId) {
+    private QnaResDTO getQnaResDTO(Qna qna, String customerId) {
         QnaResDTO qnaResDTO = new QnaResDTO();
         qnaResDTO.setId(qna.getId());
         qnaResDTO.setCustomerId(customerId);

@@ -3,7 +3,8 @@ package kr.casealot.shop.domain.qna.comment.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentReqDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
@@ -13,13 +14,11 @@ import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
-import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +29,9 @@ public class QnaCommentService {
     private final CustomerRepository customerRepository;
     private final AuthTokenProvider authTokenProvider;
 
-    public APIResponse<Void> createQnaComment(Long qnaId,
-                                              QnaCommentDTO qnaCommentDto,
-                                              HttpServletRequest request){
+    public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
+                                                          QnaCommentReqDTO qnaCommentReqDTO,
+                                                          HttpServletRequest request){
 
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = findCustomerId(request);
@@ -47,16 +46,19 @@ public class QnaCommentService {
         QnaComment qnaComment = QnaComment.builder()
                 .qna(qna)
                 .customer(customer)
-                .title(qnaCommentDto.getTitle())
-                .content(qnaCommentDto.getContent())
+                .title(qnaCommentReqDTO.getTitle())
+                .content(qnaCommentReqDTO.getContent())
                 .build();
 
         qnaCommentRepository.save(qnaComment);
 
-        return APIResponse.success("공지 댓글 작성 성공", null);
+        QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
+
+        return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<Void> deleteComment(Long commentId, HttpServletRequest request){
+
+    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId, HttpServletRequest request){
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
         String customerId = findCustomerId(request);
@@ -69,10 +71,12 @@ public class QnaCommentService {
 
         qnaCommentRepository.delete(qnaComment);
 
-        return APIResponse.success("공지 댓글 삭제 성공", null);
+        QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
+
+        return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<Void> updateComment(Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
+    public APIResponse<QnaCommentResDTO> updateComment(Long commentId, QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 
@@ -82,12 +86,25 @@ public class QnaCommentService {
             return APIResponse.permissionDenied();
         }
 
-        qnaComment.setTitle(qnaCommentDTO.getTitle());
-        qnaComment.setContent(qnaCommentDTO.getContent());
+        qnaComment.setTitle(qnaCommentReqDTO.getTitle());
+        qnaComment.setContent(qnaCommentReqDTO.getContent());
 
         qnaCommentRepository.save(qnaComment);
 
-        return APIResponse.success("공지 댓글 수정 성공", null);
+        QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
+
+        return APIResponse.success("qna comment", qnaCommentResDTO);
+    }
+
+    private QnaCommentResDTO getQnaCommentResDTO(String customerId, QnaComment qnaComment) {
+        QnaCommentResDTO qnaCommentResDTO = new QnaCommentResDTO();
+        qnaCommentResDTO.setId(qnaComment.getId());
+        qnaCommentResDTO.setCustomerId(customerId);
+        qnaCommentResDTO.setTitle(qnaComment.getTitle());
+        qnaCommentResDTO.setContent(qnaComment.getContent());
+        qnaCommentResDTO.setCreatedDt(qnaComment.getCreatedDt());
+        qnaCommentResDTO.setModifiedDt(qnaComment.getModifiedDt());
+        return qnaCommentResDTO;
     }
 
     private String findCustomerId(HttpServletRequest request) {
