@@ -68,6 +68,9 @@ spring:
           tokenUri: https://kauth.kakao.com/oauth/token
           userInfoUri: https://kapi.kakao.com/v2/user/me
           userNameAttribute: id
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 # jwt
 jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
@@ -171,6 +174,9 @@ spring:
           tokenUri: https://kauth.kakao.com/oauth/token
           userInfoUri: https://kapi.kakao.com/v2/user/me
           userNameAttribute: id
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 # jwt
 jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
@@ -187,7 +193,7 @@ app:
     defaultRedirectUri: http://localhost:3000/oauth/redirect
 
 upload:
-  path: file:/home/ubuntu/images
+  path: upload/images
 
 # S3 config
 cloud:
@@ -199,3 +205,4 @@ cloud:
     credentials:
       accessKey: AKIAQZNBYTZUVITIRVOP
       secretKey: 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
+    url: http://casealot-storage.s3.ap-northeast-2.amazonaws.com/
