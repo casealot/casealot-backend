@@ -37,11 +37,11 @@ public class Product extends BaseTimeEntity {
     private String content;
 
     // 상품 이미지 프리뷰
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private UploadFile thumbnail;
 
     // 상품 > 디테일 이미지
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UploadFile> images = new ArrayList<>();
 
     @Column(name = "PRODUCT_PRICE")
