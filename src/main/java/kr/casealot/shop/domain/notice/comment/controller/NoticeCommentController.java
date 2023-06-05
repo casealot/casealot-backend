@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.notice.comment.controller;
 
+import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
 import kr.casealot.shop.domain.notice.comment.service.NoticeCommentService;
 import kr.casealot.shop.global.common.APIResponse;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
+@Api(tags = {"NOTICE COMMENT API"}, description = "NOTICE COMMENT 관련 API")
 @RequestMapping("/cal/v1")
 public class NoticeCommentController {
     private final NoticeCommentService noticeCommentService;

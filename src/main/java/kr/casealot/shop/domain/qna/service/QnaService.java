@@ -48,49 +48,60 @@ public class QnaService {
 
 
     @Transactional
-    public APIResponse<Void> createQna(QnaDTO qnaDTO, HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
+    public APIResponse createQna(QnaReqDTO qnaReqDTO, HttpServletRequest request) {
+
+        String customerId = findCustomerId(request);
+
+        if(customerId == null){
+            return APIResponse.invalidAccessToken();
+        }
 
         Customer customer = customerRepository.findById(customerId);
 
         Qna qna = Qna.builder()
-                .title(qnaDTO.getTitle())
-                .content(qnaDTO.getContent())
-                .photoUrl(qnaDTO.getPhotoUrl())
+                .title(qnaReqDTO.getTitle())
+                .content(qnaReqDTO.getContent())
                 .customer(customer)
                 .build();
 
         qnaRepository.save(qna);
 
-        return APIResponse.success("문의 작성 완료", null);
+        QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
+
+        return APIResponse.success("qna",qnaResDTO);
     }
 
 
     // qna 수정
     @Transactional
-    public APIResponse<Void> updateQna(Long qnaId, QnaDTO qnaDTO, HttpServletRequest request){
+    public APIResponse updateQna(Long qnaId, QnaReqDTO qnaReqDTO, HttpServletRequest request){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         String customerId = findCustomerId(request);
-        if (!customerId.equals(qna.getCustomer().getId())) {
+
+        Customer customer = customerRepository.findById(customerId);
+
+        if(customerId == null){
+            return APIResponse.invalidAccessToken();
+        }
+
+        if (!customerId.equals(customer.getId())) {
             return APIResponse.permissionDenied();
         }
 
-        qna.setTitle(qnaDTO.getTitle());
-        qna.setContent(qnaDTO.getContent());
-        qna.setPhotoUrl(qnaDTO.getPhotoUrl());
+        qna.setTitle(qnaReqDTO.getTitle());
+        qna.setContent(qnaReqDTO.getContent());
 
         qnaRepository.save(qna);
 
-        return APIResponse.success("문의 수정 성공", null);
+        QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
+
+        return APIResponse.success("qna", qnaResDTO);
     }
 
     // qna 조회
     @Transactional
-    public APIResponse<QnaDetailDTO> getQna(Long qnaId){
+    public APIResponse getQna(Long qnaId){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         // 조회수 증가
@@ -101,7 +112,6 @@ public class QnaService {
                 .customerId(qna.getCustomer().getId())
                 .title(qna.getTitle())
                 .content(qna.getContent())
-                .photoUrl(qna.getPhotoUrl())
                 .views(qna.getViews())
                 .build();
 
@@ -121,13 +131,13 @@ public class QnaService {
 
         qnaDetailDTO.setQnaCommentList(qnaCommentDTOList);
 
-        return APIResponse.success("문의 목록 조회 성공", qnaDetailDTO);
+        return APIResponse.success("qna", qnaDetailDTO);
     }
 
 
     // qna 삭제
     @Transactional
-    public APIResponse<Void> deleteQna(Long qnaId, HttpServletRequest request){
+    public APIResponse deleteQna(Long qnaId, HttpServletRequest request){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = findCustomerId(request);
 
@@ -139,29 +149,45 @@ public class QnaService {
 
         qnaRepository.delete(qna);
 
-        return APIResponse.success("문의 삭제 성공", null);
+        QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
+
+        return APIResponse.success("qna", qnaResDTO);
     }
 
     // qna 목록
-    @Transactional
-    public APIResponse<List<QnaDTO>> getQnaList(Pageable pageable) {
+    public APIResponse<List<QnaResDTO>> getQnaList(Pageable pageable) {
         Page<Qna> qnaPage = qnaRepository.findAll(pageable);
         List<Qna> qnaList = qnaPage.getContent();
 
-        List<QnaDTO> qnaDtoList = new ArrayList<>();
+        List<QnaResDTO> qnaResDTOList = new ArrayList<>();
+
         for (Qna qna : qnaList) {
-            QnaDTO qnaDTO = QnaDTO.builder()
+            String customerId = qna.getCustomer().getId();
+            QnaResDTO qnaResDTO = QnaResDTO.builder()
                     .id(qna.getId())
-                    .customerId(qna.getCustomer().getId())
+                    .customerId(customerId)
                     .title(qna.getTitle())
                     .content(qna.getContent())
-                    .photoUrl(qna.getPhotoUrl())
                     .views(qna.getViews())
+                    .createdDt(qna.getCreatedDt())
+                    .modifiedDt(qna.getModifiedDt())
                     .build();
-            qnaDtoList.add(qnaDTO);
+            qnaResDTOList.add(qnaResDTO);
         }
 
-        return APIResponse.success("문의 조회 성공", qnaDtoList);
+        return APIResponse.success("qna", qnaResDTOList);
+    }
+
+    private static QnaResDTO getQnaResDTO(Qna qna, String customerId) {
+        QnaResDTO qnaResDTO = new QnaResDTO();
+        qnaResDTO.setId(qna.getId());
+        qnaResDTO.setCustomerId(customerId);
+        qnaResDTO.setTitle(qna.getTitle());
+        qnaResDTO.setContent(qna.getContent());
+        qnaResDTO.setViews(qna.getViews());
+        qnaResDTO.setCreatedDt(qna.getCreatedDt());
+        qnaResDTO.setModifiedDt(qna.getModifiedDt());
+        return qnaResDTO;
     }
 
     private String findCustomerId(HttpServletRequest request) {
