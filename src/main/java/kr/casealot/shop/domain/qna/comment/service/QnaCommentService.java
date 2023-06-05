@@ -75,9 +75,9 @@ public class QnaCommentService {
         return APIResponse.success("공지 댓글 삭제 성공", null);
     }
 
-    public APIResponse<Void> updateComment(Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
+    public APIResponse<Void> updateComment(Long qnaId, Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
 
-        Qna qna = qnaCommentRepository.findById(commentId).orElseThrow();
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 
         String customerId = findCustomerId(request);

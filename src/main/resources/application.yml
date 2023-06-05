@@ -2,8 +2,13 @@ server:
   port: 8000
 
 spring:
-  profiles.active: local
-  
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   # Database 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -18,28 +23,17 @@ spring:
     generate-ddl: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         show_sql: true
         use_sql_comments: true
+    open-in-view: false
   # Security OAuth
   security:
     oauth2.client:
       registration:
-        google:
-          clientId: '{구글 client-id}'
-          clientSecret: '{구글 client-secret}'
-          scope:
-            - email
-            - profile
-        facebook:
-          clientId: '{페이스북 client-id}'
-          clientSecret: '{페이스북 client-secret}'
-          scope:
-            - email
-            - public_profile
         naver:
           clientId: '{네이버 client-id}'
           clientSecret: '{네이버 client-secret}'
@@ -75,7 +69,6 @@ spring:
           userInfoUri: https://kapi.kakao.com/v2/user/me
           userNameAttribute: id
 
-
 # jwt
 jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
 
@@ -92,3 +85,117 @@ app:
 
 upload:
   path: file://C:/images/
+
+cloud:
+  aws:
+    s3:
+      bucket: casealot-storage
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: AKIAQZNBYTZUVITIRVOP
+      secretKey: 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
+
+# 로컬 환경에서 aws 오류 제외
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+
+---
+server:
+  port: 8000
+
+spring:
+  config:
+    activate:
+      on-profile: develop
+  # Database 설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://casealotdb.cpckmnuvibee.ap-northeast-2.rds.amazonaws.com:3306/casealotDB?characterEncoding=UTF-8&servertimezone=asia/seoul&useSSl=false
+    username: admin
+    password: admin#12
+    hikari:
+      pool-name: jpa-hikari-pool
+      maximum-pool-size: 5
+  # JPA 설정
+  jpa:
+    generate-ddl: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+    open-in-view: false
+  # Security OAuth
+  security:
+    oauth2.client:
+      registration:
+        naver:
+          clientId: '{네이버 client-id}'
+          clientSecret: '{네이버 client-secret}'
+          clientAuthenticationMethod: post
+          authorizationGrantType: authorization_code
+          redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+          scope:
+            - nickname
+            - email
+            - profile_image
+          clientName: Naver
+        kakao:
+          clientId: 88c1619692f45a3a7c65e94206346da4
+          clientSecret: mDjShWDkXnOwNoSIj4kjvpcL6nACSKkz
+          clientAuthenticationMethod: post
+          authorizationGrantType: authorization_code
+          redirectUri: http://localhost:8000/login/oauth2/code/kakao
+          scope:
+            - profile_nickname
+            - profile_image
+            - account_email
+          clientName: Kakao
+      # Provider 설정
+      provider:
+        naver:
+          authorizationUri: https://nid.naver.com/oauth2.0/authorize
+          tokenUri: https://nid.naver.com/oauth2.0/token
+          userInfoUri: https://openapi.naver.com/v1/nid/me
+          userNameAttribute: response
+        kakao:
+          authorizationUri: https://kauth.kakao.com/oauth/authorize
+          tokenUri: https://kauth.kakao.com/oauth/token
+          userInfoUri: https://kapi.kakao.com/v2/user/me
+          userNameAttribute: id
+
+# jwt
+jwt.secret-key: casealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealotcasealot
+
+# 토큰 관련 secret Key 및 RedirectUri 설정
+app:
+  auth:
+    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+    tokenExpiry: 1800000
+    refreshTokenExpiry: 604800000
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth/redirect
+    defaultRedirectUri: http://localhost:3000/oauth/redirect
+
+upload:
+  path: file:/home/ubuntu/images
+
+# S3 config
+cloud:
+  aws:
+    s3:
+      bucket: casealot-storage
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: AKIAQZNBYTZUVITIRVOP
+      secretKey: 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

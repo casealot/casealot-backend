@@ -60,13 +60,9 @@ public class APIResponse<T> {
     public static <T> APIResponse<T> incorrectID() {
         return new APIResponse(new APIResponseHeader(FAILED, NOT_CORRECTED_ID), null);
     }
-
+  
     public static <T> APIResponse<T> duplicatedEmail() {
         return new APIResponse(new APIResponseHeader(FAILED, DUPLICATED_EMAIL), null);
     }
-
-    public static <T> APIResponse<T> notFound() {
-        return new APIResponse(new APIResponseHeader(NOT_FOUND, NOT_FOUND_MESSAGE), null);
-    }
-
+  
 }

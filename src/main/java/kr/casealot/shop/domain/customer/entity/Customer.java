@@ -1,8 +1,14 @@
 package kr.casealot.shop.domain.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
+import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.entity.Qna;
+import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
@@ -33,6 +39,9 @@ public class Customer extends BaseTimeEntity {
 
     @Column(name = "PASSWORD", length = 128)
     private String password;
+
+    @Column(name = "PHONE_NUMBER", length = 11)
+    private String phoneNumber;
 
     @Column(name = "EMAIL", length = 512, unique = true)
     private String email;
@@ -65,6 +74,25 @@ public class Customer extends BaseTimeEntity {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<QnaComment> qnaCommentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Notice> noticeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<NoticeComment> noticeCommentList = new ArrayList<>();
+
+
+    //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<Review> reviewList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<ReviewComment> reviewCommentList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer")
+    private List<Product> productList;
 
     /**
      * Create Customer for OAuth
@@ -81,6 +109,7 @@ public class Customer extends BaseTimeEntity {
             String name,
             String email,
             String emailVerifiedYn,
+            String profileImageUrl,
             ProviderType providerType,
             RoleType roleType
     ) {
@@ -94,12 +123,12 @@ public class Customer extends BaseTimeEntity {
         this.roleType = roleType;
     }
 
-
     @Builder
     public Customer(
             String id,
             String name,
             String password,
+            String phoneNumber,
             String email,
             String emailVerifiedYn,
             String profileImageUrl,
@@ -107,11 +136,13 @@ public class Customer extends BaseTimeEntity {
             RoleType roleType,
             String postNo,
             String address,
-            String addressDetail
+            String addressDetail,
+            List<Review> reviewList
     ) {
         this.id = id;
         this.name = name;
         this.password = password;
+        this.phoneNumber = phoneNumber;
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn;
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
@@ -120,6 +151,8 @@ public class Customer extends BaseTimeEntity {
         this.postNo = postNo;
         this.address = address;
         this.addressDetail = addressDetail;
+        // ? 이렇게 하는게 맞나
+        this.reviewList = reviewList;
     }
 
     public Customer(String id, String password) {
