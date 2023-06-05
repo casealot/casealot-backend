@@ -1,31 +1,14 @@
 package kr.casealot.shop.domain.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import kr.casealot.shop.domain.product.entity.Product;
 import lombok.*;
 
 import javax.persistence.Column;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDTO {
-//    private Long id;
-//    private Long userId;
-//    private String name;
-//    private String content;
-//
-//    private int price;
-//    private int views;
-//
-//    private String img_B;
-//    private String img_M;
-//    private String img_S;
-//
-//    private int sells;
-//    private int sale;
-//
-//    private String color;
-//    private String season;
-//    private String type;
-
     /**
      * 상품 등록 요청
      */
@@ -37,8 +20,8 @@ public class ProductDTO {
     public static class CreateRequest{
         private String name;
         private String content;
-        private String price;
-        private String sale;
+        private int price;
+        private int sale;
         private String color;
         private String season;
         private String type;
@@ -50,7 +33,7 @@ public class ProductDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateResponse{
-        private String id;
+        private Long id;
     }
 
     @Getter
@@ -59,7 +42,16 @@ public class ProductDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DetailRequest{
+        private String id;
+    }
 
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DetailResponse{
+        private String id;
     }
 
     /**
@@ -83,5 +75,16 @@ public class ProductDTO {
         private List<SortDTO> sort;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetResponse {
+        private List<Product> items = new ArrayList<>();
+        private Long count;
+        private Long totalPages;
+        private Long totalCount;
+    }
 
 }

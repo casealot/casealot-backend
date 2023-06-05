@@ -1,26 +1,15 @@
 package kr.casealot.shop.domain.product.controller;
 
-import kr.casealot.shop.domain.product.dto.ProductDTO;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import kr.casealot.shop.domain.product.dto.ProductGetDTO;
-import kr.casealot.shop.domain.product.dto.ProductResDTO;
-import kr.casealot.shop.domain.product.dto.ProductReqDTO;
+import kr.casealot.shop.domain.product.dto.ProductDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.service.ProductService;
+import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.data.domain.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
 
 @RestController
 @Slf4j
@@ -31,48 +20,16 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @ApiOperation(value = "ADMIN 상품 등록", notes = "상품을 등록한다.")
-    @PostMapping("/admin/product")
-    public ResponseEntity<String> createProduct(
-            @RequestBody ProductDTO.CreateRequest createRequest,
-            HttpServletRequest request){
-        //productService.createProduct(createRequest, request);
-        return ResponseEntity.ok("create product");
-    }
-
-    @PutMapping("/admin/product/{product_id}")
-    public ResponseEntity<String> updateProduct(@PathVariable("product_id") Long productId,
-                                                @RequestBody ProductDTO productDTO,
-                                                HttpServletRequest request) throws NotFoundException {
-
-        productService.updateProduct(productId, productDTO, request);
-
-        return ResponseEntity.ok("update product");
-    }
-
-    @DeleteMapping("/admin/product/{product_id}")
-    public ResponseEntity<String> deleteProduct(
-            @PathVariable("product_id") Long productId, HttpServletRequest request)
-            throws NotFoundException {
-
-        productService.deleteProduct(productId, request);
-        return ResponseEntity.ok("delete product");
-    }
-
-
-
-
     /**
      * 전체 상품 조회
      * @return
      */
     @GetMapping("/product")
     @ApiOperation(value = "상품 검색 및 조회", notes = "상품 정보를 갖고온다.")
-    public ResponseEntity<ProductResDTO> getProductList(
+    public APIResponse getProductList(
             @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO
             ) {
-        ProductResDTO productList = productService.findAllSearch(productReqDTO);
-        return ResponseEntity.ok(productList);
+        return productService.findAllSearch(productReqDTO);
     }
 
     /**
@@ -81,11 +38,11 @@ public class ProductController {
      * @return
      */
     @GetMapping("/product/{id}")
-    public ResponseEntity<ProductGetDTO> getProductDetail(
+    public APIResponse getProductDetail(
             @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) {
         Product product = productService.findById(id);
-        ProductGetDTO productDTO = productService.convertToDTO(product);
-        return ResponseEntity.ok(productDTO);
+        //productDTO = productService.convertToDTO(id);
+        return APIResponse.success("product",product);
     }
 
 
