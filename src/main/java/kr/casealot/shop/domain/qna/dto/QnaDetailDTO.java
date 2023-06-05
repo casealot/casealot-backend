@@ -16,7 +16,6 @@ public class QnaDetailDTO {
     private String customerId;
     private String title;
     private String content;
-    private String photoUrl;
     private int views;
     private List<QnaCommentDTO> qnaCommentList;
 }

@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.notice.controller;
 
+import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
@@ -19,6 +20,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.*;
 
 @RestController
 @RequiredArgsConstructor
+@Api(tags = {"NOTICE API"}, description = "NOTICE 관련 API")
 @RequestMapping("/cal/v1/notice")
 public class NoticeController {
     private final NoticeService noticeService;
