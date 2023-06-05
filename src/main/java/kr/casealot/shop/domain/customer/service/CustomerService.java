@@ -81,17 +81,31 @@ public class CustomerService {
         Date refreshExpiry = new Date((System.currentTimeMillis() + 3600000) * 24 * 14);
 
         // 토큰 생성 (jwt)
-        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), jwtExpiry);
-        AuthToken refToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), refreshExpiry);
+        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.ADMIN.getCode(), jwtExpiry);
 
         String accessToken = authToken.getToken();
-        String refreshToken = refToken.getToken();
 
-        // 토큰 생성 (refresh)
-        CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
-        customerRefreshTokenRepository.save(customerRefreshToken);
+        AuthToken refreshToken = authTokenProvider.createAuthToken(
+                RoleType.USER.getCode(),
+                refreshExpiry
+        );
 
-        return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, refreshToken, customer.getRoleType()));
+        // userId refresh token 으로 DB 확인
+        CustomerRefreshToken userRefreshToken = customerRefreshTokenRepository.findById(customer.getId());
+        if (userRefreshToken == null) {
+            // 없는 경우 새로 등록
+            userRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
+            customerRefreshTokenRepository.saveAndFlush(userRefreshToken);
+        } else {
+            // DB에 refresh 토큰 업데이트
+            userRefreshToken.setRefreshToken(refreshToken.getToken());
+        }
+
+//        // 토큰 생성 (refresh)
+//        CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
+//        customerRefreshTokenRepository.save(customerRefreshToken);
+
+        return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, userRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
 
     //로그아웃
