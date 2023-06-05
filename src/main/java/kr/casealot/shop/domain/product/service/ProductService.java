@@ -3,17 +3,17 @@ package kr.casealot.shop.domain.product.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.file.dto.UploadFileDTO;
+import kr.casealot.shop.domain.file.entity.UploadFile;
+import kr.casealot.shop.domain.file.service.S3UploadService;
+import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.*;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
-import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
-import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
-import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
-import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
-import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -26,11 +26,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
@@ -38,44 +38,16 @@ import static org.springframework.data.crossstore.ChangeSetPersister.*;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+    private final String API_NAME = "product";
 
+    private final S3UploadService s3UploadService;
+    private final UploadFileService uploadFileService;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final AuthTokenProvider authTokenProvider;
     private final ReviewRepository reviewRepository;
     private final ReviewCommentRepository reviewCommentRepository;
 
-//    @Transactional
-//    public void createProduct(ProductDTO productDTO, HttpServletRequest request) {
-//
-//        String token = HeaderUtil.getAccessToken(request);
-//        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-//        Claims claims = authToken.getTokenClaims();
-//        String customerId = claims.getSubject();
-//
-//        Customer customer = customerRepository.findById(customerId);
-//
-//        Product product = Product.builder()
-//                .name(productDTO.getName())
-//                .content(productDTO.getContent())
-//                .price(productDTO.getPrice())
-//                .views(productDTO.getViews())
-//                .img_B(productDTO.getImg_B())
-//                .img_M(productDTO.getImg_M())
-//                .img_S(productDTO.getImg_S())
-//                .sells(productDTO.getSells())
-//                .sale(productDTO.getSale())
-//                .sells(productDTO.getSells())
-//                .color(productDTO.getColor())
-//                .season(productDTO.getSeason())
-//                .type(productDTO.getType())
-//                .customer(customer)
-//                .build();
-//
-//        productRepository.save(product);
-//    }
-//
-//
 //    @Transactional
 //    public void updateProduct(Long productId, ProductDTO productDTO,
 //                              HttpServletRequest request) throws NotFoundException {
@@ -122,20 +94,20 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    public ProductResDTO findAllSearch(ProductDTO.GetRequest productReqDTO) {
+    public APIResponse findAllSearch(ProductDTO.GetRequest productReqDTO) {
 
         // query
         String query = productReqDTO.getQuery();
 
         // criteria query
-        Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery() ,productReqDTO.getFilter());
+        Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery(), productReqDTO.getFilter());
 
         // Sorting
         List<SortDTO> sortDTO = productReqDTO.getSort();
         List<Sort.Order> orders = new ArrayList<>();
-        if(null != sortDTO){
-            for(SortDTO dto : sortDTO){
-                orders.add(new Sort.Order(Sort.Direction.fromString(dto.getOption()),dto.getField()));
+        if (null != sortDTO) {
+            for (SortDTO dto : sortDTO) {
+                orders.add(new Sort.Order(Sort.Direction.fromString(dto.getOption()), dto.getField()));
             }
         }
 
@@ -144,11 +116,14 @@ public class ProductService {
                 , Sort.by(orders));
 
         Page<Product> products = productRepository.findAll(specification, pageable);
-        return ProductResDTO.builder()
+
+        ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
                 .items(products.getContent())
                 .count((long) products.getContent().size())
                 .totalCount(products.getTotalElements())
                 .totalPages((long) products.getTotalPages()).build();
+
+        return APIResponse.success(API_NAME, response);
     }
 
     public Product findById(Long id) {
@@ -211,4 +186,32 @@ public class ProductService {
         return customer.getRoleType() == ADMIN;
     }
 
+    @Transactional
+    public APIResponse createProduct(
+            ProductDTO.CreateRequest createRequest) {
+
+        Product saveProduct = Product.builder()
+                .name(createRequest.getName())
+                .content(createRequest.getContent())
+                .price(createRequest.getPrice())
+                .sale(createRequest.getSale())
+                .color(createRequest.getColor())
+                .season(createRequest.getSeason())
+                .type(createRequest.getType())
+                .build();
+
+        Product savedProduct = productRepository.saveAndFlush(saveProduct);
+        return APIResponse.success(API_NAME, savedProduct);
+    }
+
+    @Transactional
+    public APIResponse saveProductWithImage(Long id, UploadFile thumbnail, List<UploadFile> images) throws Exception {
+        Product savedProduct = productRepository.findById(id).orElseThrow(() -> new Exception("상품이 존재하지 않습니다."));
+
+        savedProduct.setThumbnail(thumbnail);
+        savedProduct.setImages(images);
+
+        savedProduct = productRepository.saveAndFlush(savedProduct);
+        return APIResponse.success(API_NAME, savedProduct);
+    }
 }

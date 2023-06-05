@@ -31,19 +31,18 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;
 
-    @Lob @Basic(fetch = FetchType.LAZY)
-    @Column(name = "PRODUCT_CONTENT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "project_id")
     private String content;
 
     // 상품 이미지 프리뷰
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "upload_file_id")
-    private UploadFile img_preview;
+    private UploadFile thumbnail;
 
-    //상품 > 디테일 이미지
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "upload_file_id")
-    private UploadFile img_detail;
+    // 상품 > 디테일 이미지
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<UploadFile> images = new ArrayList<>();
 
     @Column(name = "PRODUCT_PRICE")
     private int price;
@@ -72,13 +71,14 @@ public class Product extends BaseTimeEntity {
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
-    public Product(String name, String content, int price, int views, int sells, String color, String season) {
+    public Product(String name, String content, int price, int sale,
+                   String color, String season, String type) {
         this.name = name;
         this.content = content;
         this.price = price;
-        this.views = views;
-        this.sells = sells;
+        this.sale = sale;
         this.color = color;
         this.season = season;
+        this.type = type;
     }
 }
