@@ -89,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/health").permitAll()
                 .antMatchers("/cal/v1/auth/local").permitAll()
                 .antMatchers("/cal/v1/auth/signup").permitAll()
+                .antMatchers("/cal/v1/auth/refresh").permitAll()
                 .antMatchers("/cal/v1/product/**").hasAnyRole("USER","ADMIN")
                 .antMatchers("/cal/v1/product/review/**").hasAnyRole("USER","ADMIN")
                 .antMatchers("/cal/v1/notice/**").hasAnyRole("USER","ADMIN")
