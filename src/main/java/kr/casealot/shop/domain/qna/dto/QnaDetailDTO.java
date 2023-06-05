@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.qna.dto;
 
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import lombok.*;
 
 import java.util.List;
@@ -17,5 +16,5 @@ public class QnaDetailDTO {
     private String title;
     private String content;
     private int views;
-    private List<QnaCommentDTO> qnaCommentList;
+    private List<QnaCommentResDTO> qnaCommentList;
 }
