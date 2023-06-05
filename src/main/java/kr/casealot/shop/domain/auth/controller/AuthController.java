@@ -61,6 +61,7 @@ public class AuthController {
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
         if (authRefreshToken.validate()) {
+            System.out.println("만료된 토큰들어옴");
             return APIResponse.invalidRefreshToken();
         }
 
