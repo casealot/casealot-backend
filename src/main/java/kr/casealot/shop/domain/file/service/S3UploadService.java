@@ -86,6 +86,8 @@ public class S3UploadService {
             return amazonS3Client.getUrl(bucketName, fileName).toString();
         } catch (Exception e) {
             removeNewFile(file);
+            // TODO 나중에 지워야함
+            log.error("{}",e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
         }
     }
