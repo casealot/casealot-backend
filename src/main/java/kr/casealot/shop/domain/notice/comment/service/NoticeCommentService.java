@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
+import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.comment.repository.NoticeCommentRepository;
 import kr.casealot.shop.domain.notice.entity.Notice;
@@ -31,9 +32,9 @@ public class NoticeCommentService {
     private final AuthTokenProvider authTokenProvider;
     private final CustomerRepository customerRepository;
 
-    public APIResponse<Void> createComment(Long noticeId,
-                                           NoticeCommentReqDTO noticeCommentReqDTO,
-                                           HttpServletRequest request){
+    public APIResponse<NoticeCommentResDTO> createComment(Long noticeId,
+                                                          NoticeCommentReqDTO noticeCommentReqDTO,
+                                                          HttpServletRequest request){
 
         Notice notice = noticeRepository.findById(noticeId).orElseThrow();
         String customerId = findCustomerId(request);
@@ -48,10 +49,12 @@ public class NoticeCommentService {
 
         noticeCommentRepository.save(noticeComment);
 
-        return APIResponse.success("공지 댓글 등록 성공", null);
+        NoticeCommentResDTO noticeCommentResDTO = getNoticeCommentResDTO(customerId, noticeComment);
+
+        return APIResponse.success("notice comment", noticeCommentResDTO);
     }
 
-    public APIResponse<Void> deleteComment(Long commentId, HttpServletRequest request){
+    public APIResponse<NoticeCommentResDTO> deleteComment(Long commentId, HttpServletRequest request){
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
@@ -65,12 +68,13 @@ public class NoticeCommentService {
 
         noticeCommentRepository.delete(noticeComment);
 
-        return APIResponse.success("공지 댓글 삭제 성공", null);
+        NoticeCommentResDTO noticeCommentResDTO = getNoticeCommentResDTO(customerId, noticeComment);
+
+        return APIResponse.success("notice comment", noticeCommentResDTO);
     }
 
-    public APIResponse<Void> updateComment(Long commentId,
-                                           NoticeCommentReqDTO noticeCommentReqDTO,
-                                           HttpServletRequest request){
+    public APIResponse<NoticeCommentResDTO> updateComment(Long commentId, NoticeCommentReqDTO noticeCommentReqDTO,
+                                                          HttpServletRequest request){
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
@@ -85,7 +89,20 @@ public class NoticeCommentService {
 
         noticeCommentRepository.save(noticeComment);
 
-        return APIResponse.success("공지 댓글 수정 성공", null);
+        NoticeCommentResDTO noticeCommentResDTO = getNoticeCommentResDTO(customerId, noticeComment);
+
+        return APIResponse.success("notice comment", noticeCommentResDTO);
+    }
+
+    private NoticeCommentResDTO getNoticeCommentResDTO(String customerId, NoticeComment noticeComment) {
+        NoticeCommentResDTO qnaCommentResDTO = new NoticeCommentResDTO();
+        qnaCommentResDTO.setId(noticeComment.getId());
+        qnaCommentResDTO.setCustomerId(customerId);
+        qnaCommentResDTO.setTitle(noticeComment.getTitle());
+        qnaCommentResDTO.setContent(noticeComment.getContent());
+        qnaCommentResDTO.setCreatedDt(noticeComment.getCreatedDt());
+        qnaCommentResDTO.setModifiedDt(noticeComment.getModifiedDt());
+        return qnaCommentResDTO;
     }
 
 
