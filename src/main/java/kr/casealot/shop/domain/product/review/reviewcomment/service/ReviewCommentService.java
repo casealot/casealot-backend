@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReq
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -28,19 +29,24 @@ public class ReviewCommentService {
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public void createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
+    public APIResponse<Void> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
         Review review = reviewRepository.findBySeq(reviewSeq);
+        if (review == null) {
+            return APIResponse.notExistRequest();
+        }
         reviewCommentRepository.save(ReviewComment.builder()
                 .customer(customer)
                 .review(review)
                 .reviewCommentText(reviewCommentReqDTO.getReviewCommentText())
                 .build());
+
+        return APIResponse.success("리뷰 댓글 작성 성공", null);
     }
 
-    public void fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
+    public APIResponse<Void> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -50,15 +56,16 @@ public class ReviewCommentService {
             if (customerId.equals(reviewCustomerId)) {
                 review.setReviewCommentText(reviewCommentReqDTO.getReviewCommentText());
                 reviewCommentRepository.save(review);
+                return APIResponse.success("리뷰 댓글 수정 성공", null);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review comment.");
+                return APIResponse.permissionDenied();
             }
         } else {
-            throw new IllegalArgumentException("Review Comment not found with ID: " + reviewCommentId);
+            return APIResponse.notExistRequest();
         }
     }
 
-    public void deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
+    public APIResponse<Void> deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -67,11 +74,12 @@ public class ReviewCommentService {
             String reviewCommentCustomerId = reviewComment.getCustomer().getId();
             if (customerId.equals(reviewCommentCustomerId)) {
                 reviewCommentRepository.delete(reviewComment);
+                return APIResponse.success("리뷰 댓글 삭제 성공", null);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review comment.");
+                return APIResponse.permissionDenied();
             }
         } else {
-            throw new IllegalArgumentException("Review Comment not found with ID: " + reviewCommentId);
+            return APIResponse.notExistRequest();
         }
     }
 
