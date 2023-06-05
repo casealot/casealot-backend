@@ -193,7 +193,7 @@ app:
     defaultRedirectUri: http://localhost:3000/oauth/redirect
 
 upload:
-  path: upload/images
+  path: /images
 
 # S3 config
 cloud:
