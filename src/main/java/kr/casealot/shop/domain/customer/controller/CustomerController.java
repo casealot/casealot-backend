@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Slf4j
@@ -26,8 +27,10 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public APIResponse login(@RequestBody CustomerLoginDto customerLoginDto) {
-        return customerService.login(customerLoginDto);
+    public APIResponse login(@RequestBody CustomerLoginDto customerLoginDto
+            , HttpServletRequest request
+            , HttpServletResponse response) {
+        return customerService.login(customerLoginDto,request , response);
     }
 
     @DeleteMapping("/logout")
