@@ -201,7 +201,8 @@ cloud:
     s3:
       bucket: casealot-storage
     stack.auto: false
-    region.static: ap-northeast-2
+    region:
+      static: ap-northeast-2
     credentials:
       accessKey: AKIAQZNBYTZUVITIRVOP
       secretKey: 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
