@@ -98,7 +98,6 @@ cloud:
     credentials:
       accessKey: AKIAQZNBYTZUVITIRVOP
       secretKey: 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
-    url: http://casealot-storage.s3.ap-northeast-2.amazonaws.com/
 
 # 로컬 환경에서 aws 오류 제외
 logging:
@@ -207,4 +206,3 @@ cloud:
     credentials:
       accessKey: AKIAQZNBYTZUVITIRVOP
       secretKey: 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
-    url: http://casealot-storage.s3.ap-northeast-2.amazonaws.com/

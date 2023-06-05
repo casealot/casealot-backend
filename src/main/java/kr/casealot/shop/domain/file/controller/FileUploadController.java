@@ -10,10 +10,10 @@ import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -25,9 +25,6 @@ public class FileUploadController {
     private final ProductService productService;
     private final S3UploadService s3UploadService;
     private final UploadFileService uploadFileService;
-
-    @Value("${cloud.aws.url}")
-    private String awsUrl;
 
     @PostMapping("/{product_id}/image")
     @ApiOperation(value = "상품 이미지 업로드", notes = "상품의 이미지와 썸네일 이미지를 업로드한다.")
@@ -42,19 +39,19 @@ public class FileUploadController {
             String path = s3UploadService.uploadFile(thumbnailFile);
             thumbnail = uploadFileService.create(UploadFile.builder()
                             .name(thumbnailFile.getOriginalFilename())
-                            .url(awsUrl + path)
+                            .url(path)
                             .fileType(thumbnailFile.getContentType())
                             .fileSize(thumbnailFile.getSize())
                     .build());
         }
 
-        List<UploadFile> images = null;
+        List<UploadFile> images = new ArrayList<>();
         if(null != imagesFiles){
             for(MultipartFile imageFile : imagesFiles){
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
                         .name(thumbnailFile.getOriginalFilename())
-                        .url(awsUrl + path)
+                        .url(path)
                         .fileType(thumbnailFile.getContentType())
                         .fileSize(thumbnailFile.getSize())
                         .build()));
