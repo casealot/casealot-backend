@@ -54,7 +54,7 @@ public class CustomerService {
                 .postNo(customerDto.getPostNo())
                 .address(customerDto.getAddress())
                 .addressDetail(customerDto.getAddressDetail())
-                .roleType(RoleType.USER)
+                .roleType(RoleType.ADMIN)
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);
