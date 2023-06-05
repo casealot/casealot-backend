@@ -23,6 +23,7 @@ public class APIResponse<T> {
     private final static String NOT_CORRECTED_PASSWORD = "Bad Password.";
     private final static String NOT_CORRECTED_ID = "Bad ID.";
     private final static String DUPLICATED_EMAIL = "Duplicated Email.";
+    private final static String NOT_EXIST = "It's a request for doesn't exist";
 
     private final APIResponseHeader header;
     private final Map<String, T> body;
@@ -64,5 +65,8 @@ public class APIResponse<T> {
     public static <T> APIResponse<T> duplicatedEmail() {
         return new APIResponse(new APIResponseHeader(FAILED, DUPLICATED_EMAIL), null);
     }
-  
+
+    public static <T> APIResponse<T> notExistRequest() {
+        return new APIResponse(new APIResponseHeader(FAILED, NOT_EXIST), null);
+    }
 }

@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReq
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -28,19 +29,29 @@ public class ReviewCommentService {
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public void createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
         Review review = reviewRepository.findBySeq(reviewSeq);
-        reviewCommentRepository.save(ReviewComment.builder()
+        if (review == null) {
+            return APIResponse.notExistRequest();
+        }
+        ReviewComment reviewComment = reviewCommentRepository.save(ReviewComment.builder()
                 .customer(customer)
                 .review(review)
                 .reviewCommentText(reviewCommentReqDTO.getReviewCommentText())
                 .build());
+
+        ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+        reviewCommentRes.setCustomerName(customerId);
+        reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+        reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+        reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
+        return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
-    public void fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -49,16 +60,23 @@ public class ReviewCommentService {
             String reviewCustomerId = review.getCustomer().getId();
             if (customerId.equals(reviewCustomerId)) {
                 review.setReviewCommentText(reviewCommentReqDTO.getReviewCommentText());
-                reviewCommentRepository.save(review);
+                ReviewComment reviewComment = reviewCommentRepository.save(review);
+
+                ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+                reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
+                return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review comment.");
+                return APIResponse.permissionDenied();
             }
         } else {
-            throw new IllegalArgumentException("Review Comment not found with ID: " + reviewCommentId);
+            return APIResponse.notExistRequest();
         }
     }
 
-    public void deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -67,11 +85,18 @@ public class ReviewCommentService {
             String reviewCommentCustomerId = reviewComment.getCustomer().getId();
             if (customerId.equals(reviewCommentCustomerId)) {
                 reviewCommentRepository.delete(reviewComment);
+
+                ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+                reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
+                return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review comment.");
+                return APIResponse.permissionDenied();
             }
         } else {
-            throw new IllegalArgumentException("Review Comment not found with ID: " + reviewCommentId);
+            return APIResponse.notExistRequest();
         }
     }
 
@@ -86,6 +111,8 @@ public class ReviewCommentService {
         return ReviewCommentResDTO.builder()
                 .customerName(reviewComment.getCustomer().getName())
                 .reviewCommentText(reviewComment.getReviewCommentText())
+                .createdDt(reviewComment.getCreatedDt())
+                .modifiedDt(reviewComment.getModifiedDt())
                 .build();
     }
 

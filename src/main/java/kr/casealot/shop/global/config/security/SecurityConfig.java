@@ -87,18 +87,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().expressionHandler(expressionHandler())
                 .antMatchers("/health").permitAll()
-                .antMatchers("/cal/v1/auth/local").permitAll()
-                .antMatchers("/cal/v1/auth/signup").permitAll()
+                .antMatchers("/cal/v1/auth/**").permitAll()
                 .antMatchers("/cal/v1/product/**").permitAll()
                 .antMatchers("/cal/v1/notice/**").permitAll()
                 .antMatchers("/cal/v1/qna/**").permitAll()
-                .antMatchers("/cal/v1/customer/**").permitAll()
+                .antMatchers("/cal/v1/customer/join").permitAll()
+                .antMatchers("/cal/v1/customer/login").permitAll()
                 .antMatchers("/cal/v1/wish/**").permitAll()
                 .antMatchers("/cal/v1/cart/**").permitAll()
                 .antMatchers("/cal/v1/review/**").permitAll()
-                .antMatchers("/cal/v1/file/**").permitAll() //TODO 권한 적용 고민 해봐야함.
-                .antMatchers("/cal/v1/admin/**").hasAnyRole("ADMIN")
-                .antMatchers("/cal/v1/**").hasAnyRole("USER")
+                .antMatchers("/cal/v1/admin/**").permitAll() // TODO 일단 모든 권한 허용
+                .antMatchers("/cal/v1/file/**").permitAll() // TODO 권한 적용 고민 해봐야함.
+                .antMatchers("/cal/v1/**").hasAnyRole("USER","ADMIN")
                 .antMatchers("/",
                         "/error",
                         "/favicon.ico",

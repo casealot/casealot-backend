@@ -69,16 +69,16 @@ public class Customer extends BaseTimeEntity {
     private String addressDetail;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Qna> qnaList = new ArrayList<>();
+    private List<Qna> qnaList;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<QnaComment> qnaCommentList = new ArrayList<>();
+    private List<QnaComment> qnaCommentList;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Notice> noticeList = new ArrayList<>();
+    private List<Notice> noticeList;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<NoticeComment> noticeCommentList = new ArrayList<>();
+    private List<NoticeComment> noticeCommentList;
 
 
     //사용자가 사라져도, 리뷰는 탈퇴한 회원입니다. 를 남기기 위함

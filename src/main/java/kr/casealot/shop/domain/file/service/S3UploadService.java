@@ -1,6 +1,6 @@
 package kr.casealot.shop.domain.file.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import kr.casealot.shop.global.util.FileUtil;
@@ -20,18 +20,21 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UploadService {
-    private final AmazonS3Client amazonS3Client;
+public class S3UploadService {
+    private final AmazonS3 amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public String uploadFile(MultipartFile multipartFile, String dirName)
+    @Value("${upload.path}")
+    private String uploadPath;
+
+    public String uploadFile(MultipartFile multipartFile)
             throws Exception {
         // S3 버킷에 저장할 파일 주소 생성
         File file = convertMultiPartToFile(multipartFile)
                 .orElseThrow(() -> new Exception("Converting Uploaded File is Invalid"));
-        String fileName = dirName + "/" + FileUtil.generateSavedFileName(multipartFile.getOriginalFilename());
+        String fileName = uploadPath + "/" + FileUtil.generateSavedFileName(multipartFile.getOriginalFilename());
         // S3 버킷에 파일 저장
         String fileUrl = uploadFileToBucket(fileName, file);
 
@@ -78,13 +81,13 @@ public class UploadService {
      * @return S3 버킷에 저장한 파일 경로
      */
     private String uploadFileToBucket(String fileName, File file) {
-
-        // 파일 업로드
         try {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
             return amazonS3Client.getUrl(bucketName, fileName).toString();
         } catch (Exception e) {
             removeNewFile(file);
+            // TODO 나중에 지워야함
+            log.error("{}",e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
         }
     }

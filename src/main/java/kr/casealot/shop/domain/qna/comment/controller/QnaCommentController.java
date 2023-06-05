@@ -1,16 +1,15 @@
 package kr.casealot.shop.domain.qna.comment.controller;
 
 import io.swagger.annotations.Api;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentReqDTO;
+import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import kr.casealot.shop.domain.qna.comment.service.QnaCommentService;
+import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @RestController
 @Slf4j
@@ -22,39 +21,28 @@ public class QnaCommentController {
     private final QnaCommentService qnaCommentService;
 
     @PostMapping("/qna/{qna_id}/comments")
-    public ResponseEntity<String> createQnaComment(
+    public APIResponse<QnaCommentResDTO> createQnaComment(
             @PathVariable Long qna_id,
-            @RequestBody QnaCommentDTO qnaCommentDto, HttpServletRequest request
-    ) throws NotFoundException {
+            @RequestBody QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request){
 
-        qnaCommentService.createQnaComment(qna_id, qnaCommentDto, request);
-
-        return ResponseEntity.ok("create comment");
+        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request);
     }
 
     // 댓글 삭제
-    @DeleteMapping("/qna/{qna_id}/comments/{comment_id}")
-    public ResponseEntity<String> deleteComment(
-            @PathVariable("qna_id")Long qnaId,
+    @DeleteMapping("/qna/comments/{comment_id}")
+    public APIResponse<QnaCommentResDTO> deleteComment(
             @PathVariable("comment_id") Long commentId,
-            HttpServletRequest request
-    ) throws NotFoundException {
+            HttpServletRequest request){
 
-        qnaCommentService.deleteComment(qnaId, commentId, request);
-
-        return ResponseEntity.ok("delete comment");
+        return qnaCommentService.deleteComment(commentId, request);
     }
     // 댓글 수정
-    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
-    public ResponseEntity<String> updateComment(
-            @PathVariable("qna_id")Long qnaId,
+    @PutMapping("/qna/comments/{comment_id}")
+    public APIResponse<QnaCommentResDTO>  updateComment(
             @PathVariable("comment_id") Long commentId,
-            @RequestBody QnaCommentDTO qnaCommentDTO,
-            HttpServletRequest request
-    ) throws NotFoundException {
+            @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
+            HttpServletRequest request ){
 
-        qnaCommentService.updateComment(qnaId, commentId, qnaCommentDTO, request);
-
-        return ResponseEntity.ok("update comment");
+        return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request);
     }
 }

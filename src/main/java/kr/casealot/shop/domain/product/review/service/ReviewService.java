@@ -11,6 +11,7 @@ import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -29,10 +30,11 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
+
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public void createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
+    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
@@ -42,16 +44,28 @@ public class ReviewService {
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
 
-            reviewRepository.save(Review.builder()
+            Review review = reviewRepository.save(Review.builder()
                     .customer(customer)
                     .product(product)
                     .rating(reviewReqDTO.getRating())
                     .reviewText(reviewReqDTO.getReviewText())
                     .build());
+
+            ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setRating(review.getRating());
+            reviewResDTO.setReviewText(review.getReviewText());
+            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+            reviewResDTO.setCreatedDt(review.getCreatedDt());
+            reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+            return APIResponse.success("review", reviewResDTO);
+        } else {
+            return APIResponse.fail();
         }
     }
 
-    public void fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -63,14 +77,23 @@ public class ReviewService {
                 review.setReviewText(reviewReqDTO.getReviewText());
                 reviewRepository.save(review);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to modify this review.");
+                return APIResponse.permissionDenied();
             }
+            ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setRating(review.getRating());
+            reviewResDTO.setReviewText(review.getReviewText());
+            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+            reviewResDTO.setCreatedDt(review.getCreatedDt());
+            reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+            return APIResponse.success("review", reviewResDTO);
         } else {
-            throw new IllegalArgumentException("Review not found with ID: " + reviewId);
+            return APIResponse.permissionDenied();
         }
     }
 
-    public void deleteReview(Long reviewId, HttpServletRequest request) {
+    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -79,28 +102,37 @@ public class ReviewService {
             String reviewCustomerId = review.getCustomer().getId();
             if (customerId.equals(reviewCustomerId)) {
                 reviewRepository.delete(review);
+                ReviewResDTO reviewResDTO = new ReviewResDTO();
+                reviewResDTO.setCustomerName(review.getCustomer().getName());
+                reviewResDTO.setRating(review.getRating());
+                reviewResDTO.setReviewText(review.getReviewText());
+                reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+                reviewResDTO.setCreatedDt(review.getCreatedDt());
+                reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+                return APIResponse.success("review", reviewResDTO);
             } else {
-                throw new IllegalArgumentException("Unauthorized: You are not allowed to delete this review.");
+                return APIResponse.permissionDenied();
             }
         } else {
-            throw new IllegalArgumentException("Review not found with ID: " + reviewId);
+            return APIResponse.permissionDenied();
         }
     }
 
     @Transactional(readOnly = true)
-    public ReviewResDTO getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
+    public APIResponse<ReviewResDTO> getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
         Review review = reviewRepository.findById(reviewSeq)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
 
-        // Map Review entity to ReviewResDTO response object
         ReviewResDTO reviewResDTO = new ReviewResDTO();
         reviewResDTO.setCustomerName(review.getCustomer().getName());
         reviewResDTO.setRating(review.getRating());
         reviewResDTO.setReviewText(review.getReviewText());
-        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(reviewSeq));
-        // Map other properties as needed
+        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+        reviewResDTO.setCreatedDt(review.getCreatedDt());
+        reviewResDTO.setModifiedDt(review.getModifiedDt());
 
-        return reviewResDTO;
+        return APIResponse.success("review", reviewResDTO);
     }
 
     private String findCustomerId(HttpServletRequest request) {

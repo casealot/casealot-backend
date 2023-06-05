@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
@@ -30,18 +31,18 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;
 
-    @Lob @Basic(fetch = FetchType.LAZY)
-    @Column(name = "PRODUCT_CONTENT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "project_id")
     private String content;
 
-    @Column(name = "PRODUCT_IMG_B", length = 512)
-    private String img_B;
+    // 상품 이미지 프리뷰
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UploadFile thumbnail;
 
-    @Column(name = "PRODUCT_IMG_M", length = 512)
-    private String img_M;
-
-    @Column(name = "PRODUCT_IMG_S", length = 512)
-    private String img_S;
+    // 상품 > 디테일 이미지
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<UploadFile> images = new ArrayList<>();
 
     @Column(name = "PRODUCT_PRICE")
     private int price;
@@ -70,13 +71,14 @@ public class Product extends BaseTimeEntity {
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
-    public Product(String name, String content, int price, int views, int sells, String color, String season) {
+    public Product(String name, String content, int price, int sale,
+                   String color, String season, String type) {
         this.name = name;
         this.content = content;
         this.price = price;
-        this.views = views;
-        this.sells = sells;
+        this.sale = sale;
         this.color = color;
         this.season = season;
+        this.type = type;
     }
 }
