@@ -40,9 +40,8 @@ public class ProductController {
     @GetMapping("/product/{id}")
     public APIResponse getProductDetail(
             @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) {
-        Product product = productService.findById(id);
-        //productDTO = productService.convertToDTO(id);
-        return APIResponse.success("product",product);
+        productService.findById(id);
+        return productService.getProduct(id);
     }
 
 

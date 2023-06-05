@@ -9,6 +9,8 @@ import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.*;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
+import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
+import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
@@ -22,13 +24,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
@@ -92,7 +94,7 @@ public class ProductService {
         return APIResponse.success(API_NAME, productId);
     }
 
-    public APIResponse findAllSearch(ProductDTO.GetRequest productReqDTO) {
+    public APIResponse<ProductDTO.GetResponse> findAllSearch(ProductDTO.GetRequest productReqDTO) {
 
         // query
         String query = productReqDTO.getQuery();
@@ -131,6 +133,45 @@ public class ProductService {
         productRepository.save(savedProduct);
         return savedProduct;
     }
+
+    @Transactional
+    public APIResponse<ProductResDTO> getProduct(Long id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            List<ReviewResDTO> reviewResList = new ArrayList<>();
+
+            List<Review> reviews = reviewRepository.findByProductId(id);
+
+            for (Review review : reviews) {
+                ReviewResDTO reviewResDTO = ReviewResDTO.fromReview(review);
+                reviewResList.add(reviewResDTO);
+            }
+
+            ProductResDTO productRes = new ProductResDTO().builder()
+                    .name(product.getName())
+                    .content(product.getContent())
+                    .price(product.getPrice())
+                    .sale(product.getSale())
+                    .color(product.getColor())
+                    .season(product.getSeason())
+                    .type(product.getType())
+                    .views(product.getViews())
+                    .reviewList(reviewResList)
+                    .build();
+
+            return APIResponse.success(API_NAME, productRes);
+        } else {
+            return APIResponse.notExistRequest();
+        }
+    }
+
+
+
+
+
+
 
 //    public ProductGetDTO convertToDTO(Product product) {
 //        List<ReviewResDTO> reviewList = new ArrayList<>();

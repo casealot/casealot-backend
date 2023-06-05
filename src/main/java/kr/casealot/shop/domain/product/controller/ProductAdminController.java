@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
+import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class ProductAdminController {
 //  TODO 수정 해야함
 
     @DeleteMapping("/product/{product_id}")
-    public APIResponse deleteProduct(
+    public APIResponse<Product> deleteProduct(
             @PathVariable("product_id") Long productId, HttpServletRequest request)
             throws ChangeSetPersister.NotFoundException {
 
