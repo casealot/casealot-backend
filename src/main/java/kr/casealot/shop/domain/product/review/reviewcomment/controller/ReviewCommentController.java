@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.review.reviewcomment.controller;
 
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReqDTO;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +20,19 @@ public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
     @PostMapping("/create")
-    private APIResponse createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, @PathVariable long reviewSeq) {
+    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, @PathVariable long reviewSeq) {
         return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, request);
     }
 
     //수정
     @PutMapping("/fix/{reviewCommentId}")
-    private APIResponse createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
+    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
         return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, request);
     }
 
     //삭제
     @DeleteMapping("/delete/{reviewCommentId}")
-    private APIResponse deleteReview(@PathVariable Long reviewCommentId, HttpServletRequest request) {
+    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, HttpServletRequest request) {
         return reviewCommentService.deleteReviewComment(reviewCommentId, request);
     }
 }
