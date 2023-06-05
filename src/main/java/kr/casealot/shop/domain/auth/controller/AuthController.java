@@ -100,10 +100,11 @@ public class AuthController {
     }*/
 
     @PostMapping("/refresh")
-    public APIResponse refreshToken (HttpServletRequest request, @RequestBody RefreshTokenReqDTO refreshTokenReqDTO) {
+    public APIResponse refreshToken (HttpServletRequest request) throws Exception {
         // access token 확인
         String accessToken = HeaderUtil.getAccessToken(request);
         AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+
         if (!authToken.validate()) {
             return APIResponse.invalidAccessToken();
         }
@@ -117,9 +118,8 @@ public class AuthController {
         String userId = claims.getSubject();
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
-
-        // refresh token
-        String refreshToken = refreshTokenReqDTO.getRefreshToken();
+        // refresh token cookie에서 갖고옴
+        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN).orElseThrow(() -> new Exception("cookie token invalidate")).getValue();
 
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
