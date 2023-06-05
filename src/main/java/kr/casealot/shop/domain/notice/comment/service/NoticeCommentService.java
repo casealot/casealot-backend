@@ -68,8 +68,9 @@ public class NoticeCommentService {
         return APIResponse.success("공지 댓글 삭제 성공", null);
     }
 
-    public APIResponse<Void> updateComment(Long commentId, NoticeCommentReqDTO noticeCommentReqDTO,
-                              HttpServletRequest request){
+    public APIResponse<Void> updateComment(Long commentId,
+                                           NoticeCommentReqDTO noticeCommentReqDTO,
+                                           HttpServletRequest request){
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 

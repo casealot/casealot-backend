@@ -56,40 +56,35 @@ public class QnaCommentService {
         return APIResponse.success("공지 댓글 작성 성공", null);
     }
 
-    public APIResponse<Void> deleteComment(Long qnaId, Long commentId, HttpServletRequest request){
+    public APIResponse<Void> deleteComment(Long commentId, HttpServletRequest request){
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
         String customerId = findCustomerId(request);
-        String qnaCustomerId = qnaComment.getCustomer().getId();
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if (!(customerId.equals(qnaCustomerId) || !isAdmin)) {
+        if (!(customerId.equals(qnaComment.getCustomer().getId()) || !isAdmin)) {
             return APIResponse.permissionDenied();
         }
 
-        qna.getQnaCommentList().remove(qnaComment);
         qnaCommentRepository.delete(qnaComment);
 
         return APIResponse.success("공지 댓글 삭제 성공", null);
     }
 
-    public APIResponse<Void> updateComment(Long qnaId, Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
+    public APIResponse<Void> updateComment(Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 
         String customerId = findCustomerId(request);
-        String qnaCustomerId = qnaComment.getCustomer().getId();
 
-        if (!(customerId.equals(qnaCustomerId))) {
+        if (!(customerId.equals(qnaComment.getCustomer().getId()))) {
             return APIResponse.permissionDenied();
         }
 
         qnaComment.setTitle(qnaCommentDTO.getTitle());
         qnaComment.setContent(qnaCommentDTO.getContent());
-        qnaComment.setQna(qna);
+
         qnaCommentRepository.save(qnaComment);
 
         return APIResponse.success("공지 댓글 수정 성공", null);

@@ -31,22 +31,20 @@ public class QnaCommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/qna/{qna_id}/comments/{comment_id}")
+    @DeleteMapping("/qna/comments/{comment_id}")
     public APIResponse<Void> deleteComment(
-            @PathVariable("qna_id")Long qnaId,
             @PathVariable("comment_id") Long commentId,
             HttpServletRequest request){
 
-        return qnaCommentService.deleteComment(qnaId, commentId, request);
+        return qnaCommentService.deleteComment(commentId, request);
     }
     // 댓글 수정
-    @PutMapping("/qna/{qna_id}/comments/{comment_id}")
+    @PutMapping("/qna/comments/{comment_id}")
     public APIResponse<Void> updateComment(
-            @PathVariable("qna_id")Long qnaId,
             @PathVariable("comment_id") Long commentId,
             @RequestBody QnaCommentDTO qnaCommentDTO,
             HttpServletRequest request ){
 
-        return  qnaCommentService.updateComment(qnaId, commentId, qnaCommentDTO, request);
+        return  qnaCommentService.updateComment(commentId, qnaCommentDTO, request);
     }
 }
