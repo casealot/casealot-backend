@@ -26,14 +26,12 @@ public class Qna extends BaseTimeEntity {
 
     private String title;
     private String content;
-    private String photoUrl;
     private int views;
 
-    @Builder.Default
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL)
-    private List<QnaComment> qnaCommentList = new ArrayList<>();
+    private List<QnaComment> qnaCommentList;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 }
