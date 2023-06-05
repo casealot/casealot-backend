@@ -46,6 +46,8 @@ public class ReviewCommentService {
         ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
         reviewCommentRes.setCustomerName(customerId);
         reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+        reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+        reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
         return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
@@ -63,6 +65,8 @@ public class ReviewCommentService {
                 ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
                 reviewCommentRes.setCustomerName(customerId);
                 reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+                reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
                 return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
                 return APIResponse.permissionDenied();
@@ -85,6 +89,8 @@ public class ReviewCommentService {
                 ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
                 reviewCommentRes.setCustomerName(customerId);
                 reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
+                reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
                 return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
                 return APIResponse.permissionDenied();
@@ -105,6 +111,8 @@ public class ReviewCommentService {
         return ReviewCommentResDTO.builder()
                 .customerName(reviewComment.getCustomer().getName())
                 .reviewCommentText(reviewComment.getReviewCommentText())
+                .createdDt(reviewComment.getCreatedDt())
+                .modifiedDt(reviewComment.getModifiedDt())
                 .build();
     }
 

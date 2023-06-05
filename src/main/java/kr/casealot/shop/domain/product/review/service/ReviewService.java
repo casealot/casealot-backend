@@ -56,6 +56,8 @@ public class ReviewService {
             reviewResDTO.setRating(review.getRating());
             reviewResDTO.setReviewText(review.getReviewText());
             reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+            reviewResDTO.setCreatedDt(review.getCreatedDt());
+            reviewResDTO.setModifiedDt(review.getModifiedDt());
 
             return APIResponse.success("review", reviewResDTO);
         } else {
@@ -82,6 +84,8 @@ public class ReviewService {
             reviewResDTO.setRating(review.getRating());
             reviewResDTO.setReviewText(review.getReviewText());
             reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+            reviewResDTO.setCreatedDt(review.getCreatedDt());
+            reviewResDTO.setModifiedDt(review.getModifiedDt());
 
             return APIResponse.success("review", reviewResDTO);
         } else {
@@ -98,7 +102,15 @@ public class ReviewService {
             String reviewCustomerId = review.getCustomer().getId();
             if (customerId.equals(reviewCustomerId)) {
                 reviewRepository.delete(review);
-                return APIResponse.success("review", review);
+                ReviewResDTO reviewResDTO = new ReviewResDTO();
+                reviewResDTO.setCustomerName(review.getCustomer().getName());
+                reviewResDTO.setRating(review.getRating());
+                reviewResDTO.setReviewText(review.getReviewText());
+                reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+                reviewResDTO.setCreatedDt(review.getCreatedDt());
+                reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+                return APIResponse.success("review", reviewResDTO);
             } else {
                 return APIResponse.permissionDenied();
             }
@@ -116,7 +128,9 @@ public class ReviewService {
         reviewResDTO.setCustomerName(review.getCustomer().getName());
         reviewResDTO.setRating(review.getRating());
         reviewResDTO.setReviewText(review.getReviewText());
-        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(reviewSeq));
+        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+        reviewResDTO.setCreatedDt(review.getCreatedDt());
+        reviewResDTO.setModifiedDt(review.getModifiedDt());
 
         return APIResponse.success("review", reviewResDTO);
     }
