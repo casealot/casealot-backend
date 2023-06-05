@@ -8,6 +8,7 @@ import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -29,13 +30,19 @@ public class QnaCommentService {
     private final CustomerRepository customerRepository;
     private final AuthTokenProvider authTokenProvider;
 
-    public void createQnaComment(Long qnaId,
-                                 QnaCommentDTO qnaCommentDto,
-                                 HttpServletRequest request) throws NotFoundException {
+    public APIResponse<Void> createQnaComment(Long qnaId,
+                                              QnaCommentDTO qnaCommentDto,
+                                              HttpServletRequest request){
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = findCustomerId(request);
         Customer customer = customerRepository.findById(customerId);
+
+        boolean isAdmin = checkAdminRole(customerId);
+
+        if (!isAdmin) {
+            return APIResponse.permissionDenied();
+        }
 
         QnaComment qnaComment = QnaComment.builder()
                 .qna(qna)
@@ -45,42 +52,42 @@ public class QnaCommentService {
                 .build();
 
         qnaCommentRepository.save(qnaComment);
+
+        return APIResponse.success("공지 댓글 작성 성공", null);
     }
 
-    public void deleteComment(Long qnaId, Long commentId, HttpServletRequest request) throws NotFoundException {
+    public APIResponse<Void> deleteComment(Long commentId, HttpServletRequest request){
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
-        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
         String customerId = findCustomerId(request);
-        String qnaCustomerId = qnaComment.getCustomer().getId();
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if (!(customerId.equals(qnaCustomerId) || !isAdmin)) {
-            throw new AccessDeniedException("You are not authorized to delete this QnaComment.");
+        if (!(customerId.equals(qnaComment.getCustomer().getId()) || !isAdmin)) {
+            return APIResponse.permissionDenied();
         }
 
-        qna.getQnaCommentList().remove(qnaComment);
         qnaCommentRepository.delete(qnaComment);
 
+        return APIResponse.success("공지 댓글 삭제 성공", null);
     }
 
-    public void updateComment(Long qnaId, Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) throws NotFoundException {
+    public APIResponse<Void> updateComment(Long commentId, QnaCommentDTO qnaCommentDTO, HttpServletRequest request) {
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
-        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow(NotFoundException::new);
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 
         String customerId = findCustomerId(request);
-        String qnaCustomerId = qnaComment.getCustomer().getId();
 
-        if (!(customerId.equals(qnaCustomerId))) {
-            throw new AccessDeniedException("You are not authorized to update this QnaComment.");
+        if (!(customerId.equals(qnaComment.getCustomer().getId()))) {
+            return APIResponse.permissionDenied();
         }
 
         qnaComment.setTitle(qnaCommentDTO.getTitle());
         qnaComment.setContent(qnaCommentDTO.getContent());
-        qnaComment.setQna(qna);
+
         qnaCommentRepository.save(qnaComment);
+
+        return APIResponse.success("공지 댓글 수정 성공", null);
     }
 
     private String findCustomerId(HttpServletRequest request) {

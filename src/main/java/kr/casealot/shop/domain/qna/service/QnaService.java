@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.dto.*;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.oauth.token.*;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class QnaService {
 
 
     @Transactional
-    public void createQna(QnaDTO qnaDTO, HttpServletRequest request) {
+    public APIResponse<Void> createQna(QnaDTO qnaDTO, HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
         Claims claims = authToken.getTokenClaims();
@@ -63,17 +64,19 @@ public class QnaService {
                 .build();
 
         qnaRepository.save(qna);
+
+        return APIResponse.success("문의 작성 완료", null);
     }
 
 
     // qna 수정
     @Transactional
-    public void updateQna(Long qnaId, QnaDTO qnaDTO, HttpServletRequest request) throws NotFoundException {
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+    public APIResponse<Void> updateQna(Long qnaId, QnaDTO qnaDTO, HttpServletRequest request){
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         String customerId = findCustomerId(request);
         if (!customerId.equals(qna.getCustomer().getId())) {
-            throw new AccessDeniedException("You are not authorized to update this Qna.");
+            return APIResponse.permissionDenied();
         }
 
         qna.setTitle(qnaDTO.getTitle());
@@ -82,13 +85,13 @@ public class QnaService {
 
         qnaRepository.save(qna);
 
-
+        return APIResponse.success("문의 수정 성공", null);
     }
 
     // qna 조회
     @Transactional
-    public QnaDetailDTO getQna(Long qnaId) throws NotFoundException {
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+    public APIResponse<QnaDetailDTO> getQna(Long qnaId){
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
         // 조회수 증가
         qna.setViews(qna.getViews() + 1);
@@ -118,28 +121,30 @@ public class QnaService {
 
         qnaDetailDTO.setQnaCommentList(qnaCommentDTOList);
 
-        return qnaDetailDTO;
+        return APIResponse.success("문의 목록 조회 성공", qnaDetailDTO);
     }
 
 
     // qna 삭제
     @Transactional
-    public void deleteQna(Long qnaId, HttpServletRequest request) throws NotFoundException {
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow(NotFoundException::new);
+    public APIResponse<Void> deleteQna(Long qnaId, HttpServletRequest request){
+        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = findCustomerId(request);
 
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!(customerId.equals(qna.getCustomer().getId()) || !isAdmin)) {
-            throw new AccessDeniedException("You are not authorized to delete this Qna.");
+            return APIResponse.permissionDenied();
         }
 
         qnaRepository.delete(qna);
+
+        return APIResponse.success("문의 삭제 성공", null);
     }
 
     // qna 목록
     @Transactional
-    public List<QnaDTO> getQnaList(Pageable pageable) {
+    public APIResponse<List<QnaDTO>> getQnaList(Pageable pageable) {
         Page<Qna> qnaPage = qnaRepository.findAll(pageable);
         List<Qna> qnaList = qnaPage.getContent();
 
@@ -156,7 +161,7 @@ public class QnaService {
             qnaDtoList.add(qnaDTO);
         }
 
-        return qnaDtoList;
+        return APIResponse.success("문의 조회 성공", qnaDtoList);
     }
 
     private String findCustomerId(HttpServletRequest request) {
