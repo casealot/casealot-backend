@@ -29,7 +29,7 @@ public class NoticeComment extends BaseTimeEntity {
     private String content;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 

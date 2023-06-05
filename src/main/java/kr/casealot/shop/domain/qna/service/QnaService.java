@@ -48,7 +48,10 @@ public class QnaService {
 
     @Transactional
     public void createQna(QnaDTO qnaDTO, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
+        String token = HeaderUtil.getAccessToken(request);
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        Claims claims = authToken.getTokenClaims();
+        String customerId = claims.getSubject();
 
         Customer customer = customerRepository.findById(customerId);
 

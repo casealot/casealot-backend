@@ -2,7 +2,6 @@ package kr.casealot.shop.domain.notice.comment.controller;
 
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentReqDTO;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.service.NoticeCommentService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ public class NoticeCommentController {
     private final NoticeCommentService noticeCommentService;
 
     @PostMapping("/notice/{notice_id}/comments")
-    public APIResponse<NoticeCommentResDTO> createComment(
+    public APIResponse<Void> createComment(
             @PathVariable("notice_id") Long noticeId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
             HttpServletRequest request){
@@ -30,7 +29,7 @@ public class NoticeCommentController {
 
     // 댓글 삭제
     @DeleteMapping("/notice/comments/{comment_id}")
-    public APIResponse<NoticeCommentResDTO> deleteComment(
+    public APIResponse<Void> deleteComment(
             @PathVariable("comment_id") Long commentId,
             HttpServletRequest request
     ){
@@ -38,7 +37,7 @@ public class NoticeCommentController {
     }
     // 댓글 수정
     @PutMapping("/notice/comments/{comment_id}")
-    public APIResponse<NoticeCommentResDTO> updateComment(
+    public APIResponse<Void> updateComment(
             @PathVariable("comment_id") Long commentId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
             HttpServletRequest request){

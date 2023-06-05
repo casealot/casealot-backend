@@ -23,13 +23,14 @@ public class Notice extends BaseTimeEntity {
 
     private String title;
     private String content;
+    private String photoUrl;
     private int views;
 
     @Builder.Default
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
     private List<NoticeComment> noticeCommentList = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 }
