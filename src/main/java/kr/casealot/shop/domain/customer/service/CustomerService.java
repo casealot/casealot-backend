@@ -31,7 +31,7 @@ public class CustomerService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
 
-    public APIResponse<Long> join(CustomerDto customerDto) {
+    public APIResponse join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
         // 아이디 중복 확인
@@ -59,10 +59,10 @@ public class CustomerService {
 
         Customer savedCustomer = customerRepository.save(customer);
 
-        return APIResponse.success("customerId", savedCustomer.getSeq());
+        return APIResponse.success("customer", customer);
     }
 
-    public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto) {
+    public APIResponse login(CustomerLoginDto customerLoginDto) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
@@ -96,7 +96,7 @@ public class CustomerService {
 
     //로그아웃
     @Transactional
-    public APIResponse<String> logout(HttpServletRequest request) {
+    public APIResponse logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
 
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
@@ -118,7 +118,7 @@ public class CustomerService {
 
 
     @Transactional
-    public APIResponse<String> deleteCustomer(HttpServletRequest request) {
+    public APIResponse deleteCustomer(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
 
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
