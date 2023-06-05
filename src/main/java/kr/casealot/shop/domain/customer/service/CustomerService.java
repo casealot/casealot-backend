@@ -75,7 +75,7 @@ public class CustomerService {
         }
 
         // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
-        Date jwtExpiry = new Date((System.currentTimeMillis() + 360000));
+        Date jwtExpiry = new Date((System.currentTimeMillis() + 3600000));
 
         // refreshToken 기간 2주 설정
         Date refreshExpiry = new Date((System.currentTimeMillis() + 3600000) * 24 * 14);

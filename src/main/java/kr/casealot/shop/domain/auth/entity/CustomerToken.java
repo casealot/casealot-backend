@@ -1,8 +1,6 @@
 package kr.casealot.shop.domain.auth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import kr.casealot.shop.domain.customer.entity.Customer;
-import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 

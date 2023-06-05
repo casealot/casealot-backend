@@ -34,7 +34,7 @@ public class ReviewService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public APIResponse<Void> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
+    public APIResponse createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
@@ -44,19 +44,26 @@ public class ReviewService {
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
 
-            reviewRepository.save(Review.builder()
+            Review review = reviewRepository.save(Review.builder()
                     .customer(customer)
                     .product(product)
                     .rating(reviewReqDTO.getRating())
                     .reviewText(reviewReqDTO.getReviewText())
                     .build());
-            return APIResponse.success("리뷰 작성 완료",null);
-        }else{
+
+            ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setRating(review.getRating());
+            reviewResDTO.setReviewText(review.getReviewText());
+            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+
+            return APIResponse.success("review", reviewResDTO);
+        } else {
             return APIResponse.fail();
         }
     }
 
-    public APIResponse<Void> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+    public APIResponse fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -70,13 +77,19 @@ public class ReviewService {
             } else {
                 return APIResponse.permissionDenied();
             }
-            return APIResponse.success("리뷰 수정 완료",null);
+            ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setRating(review.getRating());
+            reviewResDTO.setReviewText(review.getReviewText());
+            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+
+            return APIResponse.success("review", reviewResDTO);
         } else {
             return APIResponse.permissionDenied();
         }
     }
 
-    public APIResponse<Void> deleteReview(Long reviewId, HttpServletRequest request) {
+    public APIResponse deleteReview(Long reviewId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -85,17 +98,17 @@ public class ReviewService {
             String reviewCustomerId = review.getCustomer().getId();
             if (customerId.equals(reviewCustomerId)) {
                 reviewRepository.delete(review);
+                return APIResponse.success("review", review);
             } else {
                 return APIResponse.permissionDenied();
             }
         } else {
             return APIResponse.permissionDenied();
         }
-        return APIResponse.success("리뷰 삭제 완료", null);
     }
 
     @Transactional(readOnly = true)
-    public APIResponse<ReviewResDTO> getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
+    public APIResponse getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
         Review review = reviewRepository.findById(reviewSeq)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
 
@@ -105,7 +118,7 @@ public class ReviewService {
         reviewResDTO.setReviewText(review.getReviewText());
         reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(reviewSeq));
 
-        return APIResponse.success("review",reviewResDTO);
+        return APIResponse.success("review", reviewResDTO);
     }
 
     private String findCustomerId(HttpServletRequest request) {

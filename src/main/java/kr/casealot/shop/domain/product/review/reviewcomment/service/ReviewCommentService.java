@@ -29,7 +29,7 @@ public class ReviewCommentService {
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public APIResponse<Void> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
+    public APIResponse createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
@@ -37,16 +37,19 @@ public class ReviewCommentService {
         if (review == null) {
             return APIResponse.notExistRequest();
         }
-        reviewCommentRepository.save(ReviewComment.builder()
+        ReviewComment reviewComment = reviewCommentRepository.save(ReviewComment.builder()
                 .customer(customer)
                 .review(review)
                 .reviewCommentText(reviewCommentReqDTO.getReviewCommentText())
                 .build());
 
-        return APIResponse.success("리뷰 댓글 작성 성공", null);
+        ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+        reviewCommentRes.setCustomerName(customerId);
+        reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+        return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
-    public APIResponse<Void> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
+    public APIResponse fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -55,8 +58,12 @@ public class ReviewCommentService {
             String reviewCustomerId = review.getCustomer().getId();
             if (customerId.equals(reviewCustomerId)) {
                 review.setReviewCommentText(reviewCommentReqDTO.getReviewCommentText());
-                reviewCommentRepository.save(review);
-                return APIResponse.success("리뷰 댓글 수정 성공", null);
+                ReviewComment reviewComment = reviewCommentRepository.save(review);
+
+                ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
                 return APIResponse.permissionDenied();
             }
@@ -65,7 +72,7 @@ public class ReviewCommentService {
         }
     }
 
-    public APIResponse<Void> deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
+    public APIResponse deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -74,7 +81,11 @@ public class ReviewCommentService {
             String reviewCommentCustomerId = reviewComment.getCustomer().getId();
             if (customerId.equals(reviewCommentCustomerId)) {
                 reviewCommentRepository.delete(reviewComment);
-                return APIResponse.success("리뷰 댓글 삭제 성공", null);
+
+                ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
+                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
+                return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
                 return APIResponse.permissionDenied();
             }

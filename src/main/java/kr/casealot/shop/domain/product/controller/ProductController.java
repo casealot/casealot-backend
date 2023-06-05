@@ -20,6 +20,32 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @PostMapping("/admin/product")
+    public ResponseEntity<String> createProduct(@RequestBody ProductDTO productDTO,
+                                                HttpServletRequest request){
+        productService.createProduct(productDTO, request);
+        return ResponseEntity.ok("create product");
+    }
+
+    @PutMapping("/admin/product/{product_id}")
+    public ResponseEntity<String> updateProduct(@PathVariable("product_id") Long productId,
+                                                @RequestBody ProductDTO productDTO,
+                                                HttpServletRequest request) throws NotFoundException {
+
+        productService.updateProduct(productId, productDTO, request);
+
+        return ResponseEntity.ok("update product");
+    }
+
+    @DeleteMapping("/admin/product/{product_id}")
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable("product_id") Long productId, HttpServletRequest request)
+            throws NotFoundException {
+
+        productService.deleteProduct(productId, request);
+        return ResponseEntity.ok("delete product");
+    }
+
     /**
      * 전체 상품 조회
      * @return
@@ -44,6 +70,4 @@ public class ProductController {
         //productDTO = productService.convertToDTO(id);
         return APIResponse.success("product",product);
     }
-
-
 }
