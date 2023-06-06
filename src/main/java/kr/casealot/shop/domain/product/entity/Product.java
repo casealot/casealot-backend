@@ -33,7 +33,7 @@ public class Product extends BaseTimeEntity {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "project_id")
+    @Column(name = "PRODUCT_CONTENT")
     private String content;
 
     // 상품 이미지 프리뷰
