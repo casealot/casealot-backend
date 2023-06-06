@@ -53,7 +53,7 @@ public class S3UploadService {
     public String deleteFileFromS3Bucket(String fileUrl) {
 
         // 삭제할 파일 이름
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        String fileName = uploadPath + "/" + fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
         // 파일 삭제
         amazonS3Client.deleteObject(bucketName, fileName);
