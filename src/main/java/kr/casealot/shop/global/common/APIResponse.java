@@ -79,7 +79,7 @@ public class APIResponse<T> {
     public static <T> APIResponse<T> incorrectID() {
         return new APIResponse(new APIResponseHeader(FAILED, NOT_CORRECTED_ID), null);
     }
-  
+
     public static <T> APIResponse<T> duplicatedEmail() {
         return new APIResponse(new APIResponseHeader(CONFLICT, DUPLICATED_EMAIL), null);
     }

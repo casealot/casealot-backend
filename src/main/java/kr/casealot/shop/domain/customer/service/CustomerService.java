@@ -34,9 +34,7 @@ public class CustomerService {
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
-
     private final static String REFRESH_TOKEN = "refresh_token";
-
 
     public APIResponse join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
@@ -83,19 +81,25 @@ public class CustomerService {
             return APIResponse.incorrectPassword();
         }
 
+        RoleType roleType = customer.getRoleType();
+
         Date now = new Date();
 
         // 토큰 생성 (jwt)
         // 토큰 유효 기간 설정 (30분 후)
         long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry();
-        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), new Date(jwtExpiry));
+
+        AuthToken authToken = authTokenProvider.createAuthToken(
+                customer.getId(),
+                roleType.getCode(),
+                new Date(jwtExpiry));
 
         String accessToken = authToken.getToken();
 
         // refreshToken 기간 7일
         long refreshExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = authTokenProvider.createAuthToken(
-                RoleType.USER.getCode(),
+                appProperties.getAuth().getTokenSecret(),
                 new Date(refreshExpiry)
         );
 

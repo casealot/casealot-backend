@@ -36,7 +36,6 @@ public class ProductDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateRequest{
-        private Long id;
         private String name;
         private String content;
         private int price;
