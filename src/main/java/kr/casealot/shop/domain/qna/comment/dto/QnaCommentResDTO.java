@@ -1,24 +1,20 @@
-package kr.casealot.shop.domain.qna.dto;
+package kr.casealot.shop.domain.qna.comment.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QnaDetailDTO {
+public class QnaCommentResDTO {
     private Long id;
     private String customerId;
     private String title;
     private String content;
-    private int views;
-    private List<QnaCommentResDTO> qnaCommentList;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDt;
 
