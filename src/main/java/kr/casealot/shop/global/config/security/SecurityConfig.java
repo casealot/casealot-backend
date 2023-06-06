@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(corsConfigurationSource())
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SpringSecurity에서 세션 관리 X
                 .and()
                 .csrf().disable()
                 .formLogin().disable()
@@ -86,17 +86,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                 .authorizeRequests().expressionHandler(expressionHandler())
-                .antMatchers("/health").permitAll()
-                .antMatchers("/cal/v1/auth/refresh").permitAll()
-                .antMatchers("/cal/v1/product/**").permitAll()
-                .antMatchers("/cal/v1/product/review/**").hasAnyRole("USER","ADMIN")
-                .antMatchers("/cal/v1/notice/**").hasAnyRole("USER","ADMIN")
-                .antMatchers("/cal/v1/qna/**").hasAnyRole("USER","ADMIN")
-                .antMatchers("/cal/v1/customer/join").permitAll()
-                .antMatchers("/cal/v1/customer/login").permitAll()
-                .antMatchers("/cal/v1/admin/**").hasAnyRole("ADMIN")
-                .antMatchers("/cal/v1/file/**").hasAnyRole("ADMIN")
-                .antMatchers("/cal/v1/**").hasAnyRole("USER","ADMIN")
+                .antMatchers(
+                        "/health",
+                        "/cal/v1/auth/refresh",
+                        "/cal/v1/product/**",
+                        "/cal/v1/customer/join",
+                        "/cal/v1/customer/login"
+                ).permitAll()
+                .antMatchers(
+                        "/cal/v1/product/review/**",
+                        "/cal/v1/notice/**",
+                        "/cal/v1/qna/**"
+                ).hasRole("USER")
+                .antMatchers(
+                        "/cal/v1/admin/**",
+                        "/cal/v1/file/**"
+                ).hasRole("ADMIN")
                 .antMatchers("/",
                         "/error",
                         "/favicon.ico",
