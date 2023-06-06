@@ -6,8 +6,7 @@ import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
-import kr.casealot.shop.domain.product.dto.ProductDTO;
-import kr.casealot.shop.domain.product.dto.SortDTO;
+import kr.casealot.shop.domain.product.dto.*;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
@@ -18,11 +17,8 @@ import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +26,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
-import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -102,6 +93,8 @@ public class ProductService {
                 ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
                         .customerName(reviewComment.getCustomer().getName())
                         .reviewCommentText(reviewComment.getReviewCommentText())
+                        .createdDt(reviewComment.getCreatedDt())
+                        .modifiedDt(reviewComment.getModifiedDt())
                         .build();
                 reviewCommentList.add(reviewCommentDTO);
             }
@@ -110,6 +103,8 @@ public class ProductService {
                     .rating(review.getRating())
                     .reviewText(review.getReviewText())
                     .reviewCommentList(reviewCommentList)
+                    .createdDt(review.getCreatedDt())
+                    .modifiedDt(review.getModifiedDt())
                     .build();
             reviewList.add(reviewDTO);
         }
@@ -177,10 +172,11 @@ public class ProductService {
         return APIResponse.delete();
     }
 
-    public APIResponse<Product> updateProduct(ProductDTO.UpdateRequest updateRequest) {
+    @Transactional
+    public APIResponse<Product> updateProduct(Long productId, ProductDTO.UpdateRequest updateRequest) {
 
         Product updateProduct = Product.builder()
-                .id(updateRequest.getId())
+                .id(productId)
                 .name(updateRequest.getName())
                 .content(updateRequest.getContent())
                 .price(updateRequest.getPrice())
