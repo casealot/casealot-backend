@@ -73,6 +73,8 @@ public class NoticeService {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .views(notice.getViews())
+                .createdDt(notice.getCreatedDt())
+                .modifiedDt(notice.getModifiedDt())
                 .build();
 
 
@@ -101,10 +103,7 @@ public class NoticeService {
     @Transactional
     public APIResponse<NoticeResDTO> createNotice(NoticeReqDTO noticeReqDTO, HttpServletRequest request) {
 
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        String customerId = claims.getSubject();
+        String customerId = findCustomerId(request);
 
         boolean isAdmin = checkAdminRole(customerId);
 

@@ -95,14 +95,14 @@ public class NoticeCommentService {
     }
 
     private NoticeCommentResDTO getNoticeCommentResDTO(String customerId, NoticeComment noticeComment) {
-        NoticeCommentResDTO qnaCommentResDTO = new NoticeCommentResDTO();
-        qnaCommentResDTO.setId(noticeComment.getId());
-        qnaCommentResDTO.setCustomerId(customerId);
-        qnaCommentResDTO.setTitle(noticeComment.getTitle());
-        qnaCommentResDTO.setContent(noticeComment.getContent());
-        qnaCommentResDTO.setCreatedDt(noticeComment.getCreatedDt());
-        qnaCommentResDTO.setModifiedDt(noticeComment.getModifiedDt());
-        return qnaCommentResDTO;
+        NoticeCommentResDTO noticeCommentResDTO = new NoticeCommentResDTO();
+        noticeCommentResDTO.setId(noticeComment.getId());
+        noticeCommentResDTO.setCustomerId(customerId);
+        noticeCommentResDTO.setTitle(noticeComment.getTitle());
+        noticeCommentResDTO.setContent(noticeComment.getContent());
+        noticeCommentResDTO.setCreatedDt(noticeComment.getCreatedDt());
+        noticeCommentResDTO.setModifiedDt(noticeComment.getModifiedDt());
+        return noticeCommentResDTO;
     }
 
 
