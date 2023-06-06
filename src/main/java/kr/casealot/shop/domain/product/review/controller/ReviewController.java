@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"REVIEW API"}, description = "리뷰 관련 API")
-@RequestMapping("/cal/v1/product/{id}/review")
+@RequestMapping("/cal/v1/product/review/{id}")
 public class ReviewController {
     private final ReviewService reviewService;
 
