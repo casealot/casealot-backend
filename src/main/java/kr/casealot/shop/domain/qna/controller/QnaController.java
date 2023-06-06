@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.qna.controller;
 
 import io.swagger.annotations.Api;
+import kr.casealot.shop.domain.qna.dto.QnaDetailDTO;
 import kr.casealot.shop.domain.qna.dto.QnaReqDTO;
 import kr.casealot.shop.domain.qna.dto.QnaResDTO;
 import kr.casealot.shop.domain.qna.service.QnaService;
@@ -31,7 +32,7 @@ public class QnaController {
 
 
     @PostMapping
-    public APIResponse createQna(@RequestBody QnaReqDTO qnaReqDTO,
+    public APIResponse<QnaResDTO> createQna(@RequestBody QnaReqDTO qnaReqDTO,
                                        HttpServletRequest request
     ) {
 
@@ -39,7 +40,7 @@ public class QnaController {
     }
 
     @PutMapping("/{qna_id}")
-    public APIResponse updateQna(@PathVariable("qna_id") Long qnaId,
+    public APIResponse<QnaResDTO> updateQna(@PathVariable("qna_id") Long qnaId,
                                        @RequestBody QnaReqDTO qnaReqDTO,
                                        HttpServletRequest request){
 
@@ -49,14 +50,14 @@ public class QnaController {
     }
 
     @GetMapping("/{qna_id}")
-    public APIResponse getQna(@PathVariable("qna_id") Long qnaId){
+    public APIResponse<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId){
 
 
         return qnaService.getQna(qnaId);
     }
 
     @DeleteMapping("/{qna_id}")
-    public APIResponse deleteQna(@PathVariable("qna_id") Long qnaId,
+    public APIResponse<QnaResDTO> deleteQna(@PathVariable("qna_id") Long qnaId,
                                        HttpServletRequest request){
 
         return qnaService.deleteQna(qnaId, request);

@@ -10,9 +10,11 @@ import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.config.properties.AppProperties;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
+import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,16 +22,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-    private final CustomerTokenRepository customerTokenRepository;
+    //private final CustomerTokenRepository customerTokenRepository;
+
+    private final AppProperties appProperties;
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
+
+    private final static String REFRESH_TOKEN = "refresh_token";
+
 
     public APIResponse join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
@@ -62,7 +72,9 @@ public class CustomerService {
         return APIResponse.success("customer", customer);
     }
 
-    public APIResponse login(CustomerLoginDto customerLoginDto) {
+    public APIResponse login(CustomerLoginDto customerLoginDto
+            , HttpServletRequest request
+            , HttpServletResponse response) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
@@ -74,20 +86,20 @@ public class CustomerService {
             return APIResponse.incorrectPassword();
         }
 
-        // 토큰 유효 기간 설정 (1시간 후) (테스트용 24시간으로 늘림)
-        Date jwtExpiry = new Date((System.currentTimeMillis() + 3600000));
-
-        // refreshToken 기간 2주 설정
-        Date refreshExpiry = new Date((System.currentTimeMillis() + 3600000) * 24 * 14);
+        Date now = new Date();
 
         // 토큰 생성 (jwt)
-        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.ADMIN.getCode(), jwtExpiry);
+        // 토큰 유효 기간 설정 (30분 후)
+        long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry();
+        AuthToken authToken = authTokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), new Date(jwtExpiry));
 
         String accessToken = authToken.getToken();
 
+        // refreshToken 기간 7일
+        long refreshExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = authTokenProvider.createAuthToken(
                 RoleType.USER.getCode(),
-                refreshExpiry
+                new Date(refreshExpiry)
         );
 
         // userId refresh token 으로 DB 확인
@@ -95,15 +107,16 @@ public class CustomerService {
         if (userRefreshToken == null) {
             // 없는 경우 새로 등록
             userRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
-            customerRefreshTokenRepository.saveAndFlush(userRefreshToken);
         } else {
-            // DB에 refresh 토큰 업데이트
+            // TODO DB에 refresh 토큰 업데이트
             userRefreshToken.setRefreshToken(refreshToken.getToken());
         }
 
-//        // 토큰 생성 (refresh)
-//        CustomerRefreshToken customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken);
-//        customerRefreshTokenRepository.save(customerRefreshToken);
+        customerRefreshTokenRepository.saveAndFlush(userRefreshToken);
+
+        int cookieMaxAge = (int) refreshExpiry;
+        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
+        CookieUtil.addCookie(response, REFRESH_TOKEN, userRefreshToken.getRefreshToken(), cookieMaxAge);
 
         return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, userRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
