@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.notice.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -29,7 +28,7 @@ public class NoticeComment extends BaseTimeEntity {
     private String content;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 

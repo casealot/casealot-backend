@@ -29,7 +29,7 @@ public class ReviewCommentService {
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public APIResponse createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
@@ -51,7 +51,7 @@ public class ReviewCommentService {
         return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
-    public APIResponse fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
@@ -76,7 +76,7 @@ public class ReviewCommentService {
         }
     }
 
-    public APIResponse deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
+    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);

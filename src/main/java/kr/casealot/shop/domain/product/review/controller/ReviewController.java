@@ -24,24 +24,24 @@ public class ReviewController {
 
     //생성
     @PostMapping("/create")
-    private APIResponse createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, @PathVariable Long id) {
+    private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, @PathVariable Long id) {
         return reviewService.createReview(reviewReqDTO, request, id);
     }
 
     //수정
     @PutMapping("/fix/{reviewId}")
-    private APIResponse createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+    private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         return reviewService.fixReview(reviewId,reviewReqDTO, request);
     }
 
     //삭제
     @DeleteMapping("/delete/{reviewId}")
-    private APIResponse deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
+    private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
         return reviewService.deleteReview(reviewId, request);
     }
 
     @GetMapping("/view/{reviewId}")
-    private APIResponse viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
+    private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
         return reviewService.getReview(reviewId);
     }
 }

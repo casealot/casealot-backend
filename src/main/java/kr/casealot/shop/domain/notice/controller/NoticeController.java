@@ -4,19 +4,16 @@ import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
-import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.notice.service.NoticeService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
+import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,24 +38,24 @@ public class NoticeController {
 
     // 공지 작성
     @PostMapping
-    public APIResponse<Void> createNotice(@RequestBody NoticeReqDTO noticeReqDTO, HttpServletRequest request){
+    public APIResponse<NoticeResDTO> createNotice(@RequestBody NoticeReqDTO noticeReqDTO, HttpServletRequest request){
 
         return noticeService.createNotice(noticeReqDTO, request);
     }
 
     // 공지 수정
     @PutMapping("/{notice_id}")
-    public APIResponse<Void> updateNotice(@PathVariable("notice_id") Long noticeId,
-                                          @RequestBody NoticeReqDTO noticeReqDTO,
-                                          HttpServletRequest request) throws NotFoundException {
+    public APIResponse<NoticeResDTO> updateNotice(@PathVariable("notice_id") Long noticeId,
+                                                  @RequestBody NoticeReqDTO noticeReqDTO,
+                                                  HttpServletRequest request) throws NotFoundException {
 
         return noticeService.updateNotice(noticeId, noticeReqDTO, request);
     }
 
     // 공지 삭제
     @DeleteMapping("/{notice_id}")
-    public APIResponse<Void> deleteNotice(@PathVariable("notice_id") Long noticeId,
-                                               HttpServletRequest request) throws NotFoundException {
+    public APIResponse<NoticeResDTO> deleteNotice(@PathVariable("notice_id") Long noticeId,
+                                                  HttpServletRequest request) throws NotFoundException {
 
 
         return noticeService.deleteNotice(noticeId, request);

@@ -1,7 +1,5 @@
 package kr.casealot.shop.domain.product.review.dto;
 
-import kr.casealot.shop.global.entity.BaseTimeEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

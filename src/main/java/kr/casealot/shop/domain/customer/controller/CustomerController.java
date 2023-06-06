@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.customer.controller;
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
-import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
