@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import kr.casealot.shop.domain.product.entity.Product;
 import lombok.*;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -6,7 +6,8 @@ import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
-import kr.casealot.shop.domain.product.dto.*;
+import kr.casealot.shop.domain.product.dto.ProductDTO;
+import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
+import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @Service
 @RequiredArgsConstructor

@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.qna.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import java.time.LocalDateTime;
