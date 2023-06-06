@@ -23,6 +23,6 @@ public class UploadFileService {
 
     @Transactional
     public void delete(UploadFile uploadFile) {
-        uploadFileRepository.deleteById(UUID.fromString(uploadFile.getUuid()));
+        uploadFileRepository.deleteByUuid(uploadFile.getUuid());
     }
 }
