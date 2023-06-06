@@ -26,7 +26,7 @@ public class ProductController {
      */
     @PostMapping("/product")
     @ApiOperation(value = "상품 검색 및 조회", notes = "상품 정보를 갖고온다.")
-    public APIResponse getProductList(
+    public APIResponse<ProductDTO.GetResponse> getProductList(
             @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO
     ) {
         return productService.findAllSearch(productReqDTO);
