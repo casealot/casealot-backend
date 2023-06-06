@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -26,31 +27,23 @@ public class ProductDTO {
         private String type;
     }
 
+    /**
+     * 상품 등록 요청
+     */
     @Getter
     @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateResponse{
+    public static class UpdateRequest{
         private Long id;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DetailRequest{
-        private String id;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DetailResponse{
-        private String id;
+        private String name;
+        private String content;
+        private int price;
+        private int sale;
+        private String color;
+        private String season;
+        private String type;
     }
 
     /**
@@ -84,6 +77,17 @@ public class ProductDTO {
         private Long count;
         private Long totalPages;
         private Long totalCount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DetailResponse {
+        private Product product;
+
+        private List<ReviewResDTO> reviewList;
     }
 
 }
