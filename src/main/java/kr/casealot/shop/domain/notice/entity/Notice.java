@@ -2,7 +2,6 @@ package kr.casealot.shop.domain.notice.entity;
 
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 

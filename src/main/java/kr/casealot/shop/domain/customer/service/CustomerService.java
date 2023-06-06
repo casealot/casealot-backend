@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.customer.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
-import kr.casealot.shop.domain.auth.repository.CustomerTokenRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
@@ -24,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
-
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor

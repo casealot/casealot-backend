@@ -3,12 +3,8 @@ package kr.casealot.shop.domain.product.review.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
-import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 
