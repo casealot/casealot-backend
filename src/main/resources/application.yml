@@ -16,7 +16,7 @@ spring:
   # Database 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/casealotDB?characterEncoding=UTF-8&servertimezone=asia/seoul&useSSl=false
+    url: jdbc:mysql://localhost:3306/cal?characterEncoding=UTF-8&servertimezone=asia/seoul&useSSl=false
     username: root
     password: 1234
     hikari:

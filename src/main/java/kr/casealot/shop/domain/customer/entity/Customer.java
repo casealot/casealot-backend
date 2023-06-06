@@ -4,18 +4,17 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.entity.Notice;
-import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
-import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
+import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
+import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import kr.casealot.shop.global.oauth.entity.ProviderType;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

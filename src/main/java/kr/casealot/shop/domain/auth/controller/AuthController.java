@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.auth.controller;
 
 import io.jsonwebtoken.Claims;
-import kr.casealot.shop.domain.auth.dto.RefreshTokenReqDTO;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
@@ -14,11 +13,11 @@ import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @RestController
@@ -60,6 +59,7 @@ public class AuthController {
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
         if (authRefreshToken.validate()) {
+            System.out.println("만료된 토큰들어옴");
             return APIResponse.invalidRefreshToken();
         }
 

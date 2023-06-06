@@ -34,7 +34,7 @@ public class ReviewService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public APIResponse createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
+    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
         String customerId = findCustomerId(request);
 
         Customer customer = customerRepository.findById(customerId);
@@ -65,7 +65,7 @@ public class ReviewService {
         }
     }
 
-    public APIResponse fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
+    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -93,7 +93,7 @@ public class ReviewService {
         }
     }
 
-    public APIResponse deleteReview(Long reviewId, HttpServletRequest request) {
+    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, HttpServletRequest request) {
         String customerId = findCustomerId(request);
 
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
@@ -120,7 +120,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public APIResponse getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
+    public APIResponse<ReviewResDTO> getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
         Review review = reviewRepository.findById(reviewSeq)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
 

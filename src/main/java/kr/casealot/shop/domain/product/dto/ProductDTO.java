@@ -5,7 +5,6 @@ import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
