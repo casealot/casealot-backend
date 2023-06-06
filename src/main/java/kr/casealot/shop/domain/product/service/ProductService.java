@@ -1,12 +1,11 @@
 package kr.casealot.shop.domain.product.service;
 
-import io.jsonwebtoken.Claims;
-import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
-import kr.casealot.shop.domain.product.dto.*;
+import kr.casealot.shop.domain.product.dto.ProductDTO;
+import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
@@ -35,20 +34,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ProductService {
     private final String API_NAME = "product";
-
     private final S3UploadService s3UploadService;
     private final UploadFileService uploadFileService;
     private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
-    private final ReviewRepository reviewRepository;
-    private final ReviewCommentRepository reviewCommentRepository;
 
     @Transactional
-    public APIResponse findAllSearch(ProductDTO.GetRequest productReqDTO) {
-
-        // query
-        String query = productReqDTO.getQuery();
+    public APIResponse<ProductDTO.GetResponse> findAllSearch(ProductDTO.GetRequest productReqDTO) {
 
         // criteria query
         Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery(), productReqDTO.getFilter());
@@ -134,7 +125,7 @@ public class ProductService {
     }
 
     @Transactional
-    public APIResponse saveProductWithImage(Long id, UploadFile thumbnail, List<UploadFile> images) throws Exception {
+    public APIResponse<Product> saveProductWithImage(Long id, UploadFile thumbnail, List<UploadFile> images) throws Exception {
 
         Product savedProduct = productRepository.findById(id)
                 .orElseThrow(() -> new Exception("존재하지 않는 상품입니다."));
