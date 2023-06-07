@@ -6,17 +6,16 @@ import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
-import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +24,6 @@ public class CartService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
-
-    public CartService(CartRepository cartRepository, CustomerRepository customerRepository, ProductRepository productRepository, CartItemRepository cartItemRepository) {
-        this.cartRepository = cartRepository;
-        this.customerRepository = customerRepository;
-        this.productRepository = productRepository;
-        this.cartItemRepository = cartItemRepository;
-    }
 
     @Transactional
     public APIResponse<Cart> addItemToCart(Principal principal, Long productId, int quantity) {
@@ -43,13 +35,21 @@ public class CartService {
             return APIResponse.permissionDenied();
         }
 
-        Cart cart = cartRepository.findByCustomerId(customer.getSeq());
-
+        Cart cart = cartRepository.findByCustomerId(principal.getName());
         if (cart == null) {
             cart = Cart.createCart(customer);
         }
 
-        CartItem cartItem = cart.getCartItemByProduct(product);
+        List<CartItem> cartItems = cart.getCartItems();
+        CartItem cartItem = null;
+        if (cartItems != null) {
+            for (CartItem item : cartItems) {
+                if (item.getProduct().equals(product)) {
+                    cartItem = item;
+                    break;
+                }
+            }
+        }
 
         if (cartItem == null) {
             cartItem = new CartItem();
@@ -64,6 +64,9 @@ public class CartService {
         cart.setQuantity(cart.getQuantity() + quantity);
 
         cartRepository.save(cart);
-        return APIResponse.success("cart",cart);
+//        cartItemRepository.save(cartItem);
+
+        return APIResponse.success("cart", cart);
     }
 }
+

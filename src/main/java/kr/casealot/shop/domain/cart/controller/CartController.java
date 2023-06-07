@@ -28,6 +28,5 @@ public class CartController {
             @RequestParam int quantity
     ) {
         return cartService.addItemToCart(principal, productId, quantity);
-
     }
 }
