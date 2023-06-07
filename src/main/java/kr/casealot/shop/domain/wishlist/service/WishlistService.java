@@ -34,7 +34,7 @@ public class WishlistService {
 //    private final AuthTokenProvider authTokenProvider;
     private final CustomerRepository customerRepository;
 
-    public APIResponse<WishlistResDTO> addWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
+    public APIResponse<WishlistResDTO> addProductToWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
 
         String customerId = principal.getName();
 
@@ -71,6 +71,32 @@ public class WishlistService {
         wishlistRepository.save(wishlist);
 
         return APIResponse.success("wishlist", wishlistResDTO);
+    }
+
+    public APIResponse<WishlistResDTO> deleteProductToWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
+
+        String customerId = principal.getName();
+        Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
+        Product product = productRepository.findById(wishlistReqDTO.getProductId()).orElseThrow();
+
+        List<WishlistItem> wishlistItems = wishlist.getWishlistItemList();
+        wishlistItems.removeIf(item -> item.getProduct().getId().equals(product.getId()));
+
+
+        WishlistItem wishlistItemToDelete = wishlistItemRepository.findByProductAndWishlist(product, wishlist);
+        if (wishlistItemToDelete != null) {
+            wishlistItemRepository.delete(wishlistItemToDelete);
+
+            WishlistResDTO wishlistResDTO = WishlistResDTO.builder()
+                    .customerId(customerId)
+                    .productId(product.getId())
+                    .productName(product.getName())
+                    .build();
+
+            return APIResponse.success("wishlist", wishlistResDTO);
+        } else {
+            return APIResponse.notExistRequest();
+        }
     }
 
     public static Wishlist createWishlist(Customer customer){
