@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "wishlist_item")
-public class WishlistItem extends BaseTimeEntity {
+public class WishlistItem{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +23,7 @@ public class WishlistItem extends BaseTimeEntity {
     @JoinColumn(name = "wishlist_id")
     private Wishlist wishlist;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private Product product;
 }
