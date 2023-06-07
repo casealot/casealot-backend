@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -38,26 +39,30 @@ public class NoticeController {
 
     // 공지 작성
     @PostMapping
-    public APIResponse<NoticeResDTO> createNotice(@RequestBody NoticeReqDTO noticeReqDTO, HttpServletRequest request){
+    public APIResponse<NoticeResDTO> createNotice(@RequestBody NoticeReqDTO noticeReqDTO,
+                                                  HttpServletRequest request,
+                                                  Principal principal){
 
-        return noticeService.createNotice(noticeReqDTO, request);
+        return noticeService.createNotice(noticeReqDTO, request, principal);
     }
 
     // 공지 수정
     @PutMapping("/{notice_id}")
     public APIResponse<NoticeResDTO> updateNotice(@PathVariable("notice_id") Long noticeId,
                                                   @RequestBody NoticeReqDTO noticeReqDTO,
-                                                  HttpServletRequest request) throws NotFoundException {
+                                                  HttpServletRequest request,
+                                                  Principal principal){
 
-        return noticeService.updateNotice(noticeId, noticeReqDTO, request);
+        return noticeService.updateNotice(noticeId, noticeReqDTO, request, principal);
     }
 
     // 공지 삭제
     @DeleteMapping("/{notice_id}")
     public APIResponse<NoticeResDTO> deleteNotice(@PathVariable("notice_id") Long noticeId,
-                                                  HttpServletRequest request) throws NotFoundException {
+                                                  HttpServletRequest request,
+                                                  Principal principal){
 
 
-        return noticeService.deleteNotice(noticeId, request);
+        return noticeService.deleteNotice(noticeId, request, principal);
     }
 }
