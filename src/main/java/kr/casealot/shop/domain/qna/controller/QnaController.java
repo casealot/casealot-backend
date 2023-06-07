@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -33,20 +34,21 @@ public class QnaController {
 
     @PostMapping
     public APIResponse<QnaResDTO> createQna(@RequestBody QnaReqDTO qnaReqDTO,
-                                       HttpServletRequest request
-    ) {
+                                            HttpServletRequest request,
+                                            Principal principal) {
 
-        return qnaService.createQna(qnaReqDTO, request);
+        return qnaService.createQna(qnaReqDTO, request, principal);
     }
 
     @PutMapping("/{qna_id}")
     public APIResponse<QnaResDTO> updateQna(@PathVariable("qna_id") Long qnaId,
                                        @RequestBody QnaReqDTO qnaReqDTO,
-                                       HttpServletRequest request){
+                                       HttpServletRequest request,
+                                       Principal principal){
 
 
 
-        return qnaService.updateQna(qnaId, qnaReqDTO, request);
+        return qnaService.updateQna(qnaId, qnaReqDTO, request, principal);
     }
 
     @GetMapping("/{qna_id}")
@@ -58,9 +60,10 @@ public class QnaController {
 
     @DeleteMapping("/{qna_id}")
     public APIResponse<QnaResDTO> deleteQna(@PathVariable("qna_id") Long qnaId,
-                                       HttpServletRequest request){
+                                            HttpServletRequest request,
+                                            Principal principal){
 
-        return qnaService.deleteQna(qnaId, request);
+        return qnaService.deleteQna(qnaId, request, principal);
     }
 
     @GetMapping("/list")

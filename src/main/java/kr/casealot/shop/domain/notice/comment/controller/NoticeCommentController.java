@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,26 +22,29 @@ public class NoticeCommentController {
     public APIResponse<NoticeCommentResDTO> createComment(
             @PathVariable("notice_id") Long noticeId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
-            HttpServletRequest request){
+            HttpServletRequest request,
+            Principal principal){
 
-        return noticeCommentService.createComment(noticeId, noticeCommentReqDTO, request);
+        return noticeCommentService.createComment(noticeId, noticeCommentReqDTO, request, principal);
     }
 
     // 댓글 삭제
     @DeleteMapping("/notice/comments/{comment_id}")
     public APIResponse<NoticeCommentResDTO> deleteComment(
             @PathVariable("comment_id") Long commentId,
-            HttpServletRequest request
+            HttpServletRequest request,
+            Principal principal
     ){
-        return noticeCommentService.deleteComment(commentId, request);
+        return noticeCommentService.deleteComment(commentId, request, principal);
     }
     // 댓글 수정
     @PutMapping("/notice/comments/{comment_id}")
     public APIResponse<NoticeCommentResDTO> updateComment(
             @PathVariable("comment_id") Long commentId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
-            HttpServletRequest request){
+            HttpServletRequest request,
+            Principal principal){
 
-        return noticeCommentService.updateComment(commentId, noticeCommentReqDTO, request);
+        return noticeCommentService.updateComment(commentId, noticeCommentReqDTO, request, principal);
     }
 }

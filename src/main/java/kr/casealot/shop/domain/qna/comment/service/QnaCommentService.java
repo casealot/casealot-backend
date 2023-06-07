@@ -33,7 +33,8 @@ public class QnaCommentService {
 
     public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
                                                           QnaCommentReqDTO qnaCommentReqDTO,
-                                                          HttpServletRequest request, Principal principal) {
+                                                          HttpServletRequest request,
+                                                          Principal principal) {
 
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
         String customerId = principal.getName();
@@ -59,7 +60,9 @@ public class QnaCommentService {
         return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId, HttpServletRequest request, Principal principal) {
+    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId,
+                                                       HttpServletRequest request,
+                                                       Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
         String customerId = principal.getName();
@@ -77,7 +80,10 @@ public class QnaCommentService {
         return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> updateComment(Long commentId, QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request, Principal principal) {
+    public APIResponse<QnaCommentResDTO> updateComment(Long commentId,
+                                                       QnaCommentReqDTO qnaCommentReqDTO,
+                                                       HttpServletRequest request,
+                                                       Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 

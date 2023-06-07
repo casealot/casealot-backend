@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.security.Principal;
+
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 
 @Service
@@ -26,15 +28,15 @@ public class NoticeCommentService {
 
     private final NoticeCommentRepository noticeCommentRepository;
     private final NoticeRepository noticeRepository;
-    private final AuthTokenProvider authTokenProvider;
     private final CustomerRepository customerRepository;
 
     public APIResponse<NoticeCommentResDTO> createComment(Long noticeId,
                                                           NoticeCommentReqDTO noticeCommentReqDTO,
-                                                          HttpServletRequest request){
+                                                          HttpServletRequest request,
+                                                          Principal principal){
 
         Notice notice = noticeRepository.findById(noticeId).orElseThrow();
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
         NoticeComment noticeComment = NoticeComment.builder()
@@ -51,11 +53,13 @@ public class NoticeCommentService {
         return APIResponse.success("notice comment", noticeCommentResDTO);
     }
 
-    public APIResponse<NoticeCommentResDTO> deleteComment(Long commentId, HttpServletRequest request){
+    public APIResponse<NoticeCommentResDTO> deleteComment(Long commentId,
+                                                          HttpServletRequest request,
+                                                          Principal principal){
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -70,12 +74,14 @@ public class NoticeCommentService {
         return APIResponse.success("notice comment", noticeCommentResDTO);
     }
 
-    public APIResponse<NoticeCommentResDTO> updateComment(Long commentId, NoticeCommentReqDTO noticeCommentReqDTO,
-                                                          HttpServletRequest request){
+    public APIResponse<NoticeCommentResDTO> updateComment(Long commentId,
+                                                          NoticeCommentReqDTO noticeCommentReqDTO,
+                                                          HttpServletRequest request,
+                                                          Principal principal){
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         if(!customerId.equals(noticeComment.getCustomer().getId())){
             return APIResponse.permissionDenied();
@@ -102,13 +108,6 @@ public class NoticeCommentService {
         return noticeCommentResDTO;
     }
 
-
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
-    }
 
     private boolean checkAdminRole(String customerId) {
         Customer customer = customerRepository.findById(customerId);
