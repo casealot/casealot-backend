@@ -28,6 +28,7 @@ public class APIResponse<T> {
     private final static String NOT_CORRECTED_ID = "Bad ID.";
     private final static String DUPLICATED_EMAIL = "Duplicated Email.";
     private final static String NOT_EXIST = "It's a request for doesn't exist";
+    private final static String ALREADY_EXIST = "이미 있음";
 
     private final APIResponseHeader header;
     private final T body;
@@ -86,6 +87,10 @@ public class APIResponse<T> {
 
     public static <T> APIResponse<T> notExistRequest() {
         return new APIResponse(new APIResponseHeader(NOT_FOUND, NOT_EXIST), null);
+    }
+
+    public static <T> APIResponse<T> alreadyExistRequest() {
+        return new APIResponse(new APIResponseHeader(400, ALREADY_EXIST), null);
     }
 
 }
