@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "wishlist")
-public class Wishlist extends BaseTimeEntity {
+public class Wishlist{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +24,6 @@ public class Wishlist extends BaseTimeEntity {
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 
-    @OneToMany(mappedBy = "wishlist")
+    @OneToMany(mappedBy = "wishlist", fetch = FetchType.EAGER)
     private List<WishlistItem> wishlistItemList;
 }

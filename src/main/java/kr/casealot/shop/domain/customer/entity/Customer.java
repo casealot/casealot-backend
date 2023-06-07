@@ -94,7 +94,7 @@ public class Customer extends BaseTimeEntity {
     @OneToMany(mappedBy = "customer")
     private List<Product> productList;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Wishlist wishList;
 
     /**
