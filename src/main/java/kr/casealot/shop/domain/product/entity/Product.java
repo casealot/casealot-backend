@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.entity.Review;
+import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
@@ -69,6 +70,9 @@ public class Product extends BaseTimeEntity {
     @JsonBackReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<WishlistItem> wishlistItemList = new ArrayList<>();
 
     @Builder
     public Product(String name, String content, int price, int sale,
