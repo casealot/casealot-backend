@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.notice.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -28,6 +29,7 @@ public class Notice extends BaseTimeEntity {
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
     private List<NoticeComment> noticeCommentList = new ArrayList<>();
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;

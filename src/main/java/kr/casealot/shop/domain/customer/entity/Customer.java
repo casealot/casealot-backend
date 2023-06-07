@@ -67,15 +67,19 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Qna> qnaList;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<QnaComment> qnaCommentList;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Notice> noticeList;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<NoticeComment> noticeCommentList;
 
