@@ -33,19 +33,19 @@ public class CartItem extends BaseTimeEntity {
     @JoinColumn(name="PRODUCT_ID")
     private Product product;
 
-    private int count; // 상품 개수
+    private int quantity; // 상품 개수
 
     public static CartItem createCartItem(Cart cart, Product product, int amount) {
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setProduct(product);
-        cartItem.setCount(amount);
+        cartItem.setQuantity(amount);
         return cartItem;
     }
 
     // 이미 담겨있는 물건 또 담을 경우 수량 증가
     public void addCount(int count) {
-        this.count += count;
+        this.quantity += count;
     }
 }
 
