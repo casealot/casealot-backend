@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.qna.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -27,6 +28,7 @@ public class QnaComment extends BaseTimeEntity {
     private String title;
     private String content;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
