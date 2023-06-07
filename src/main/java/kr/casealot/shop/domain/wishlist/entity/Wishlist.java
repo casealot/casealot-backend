@@ -6,6 +6,7 @@ import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,10 +21,11 @@ public class Wishlist{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
 
+    @Builder.Default
     @OneToMany(mappedBy = "wishlist", fetch = FetchType.EAGER)
-    private List<WishlistItem> wishlistItemList;
+    private List<WishlistItem> wishlistItemList = new ArrayList<>();
 }
