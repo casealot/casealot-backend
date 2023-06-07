@@ -22,28 +22,28 @@ public class QnaCommentController {
     private final QnaCommentService qnaCommentService;
 
     @PostMapping("/qna/{qna_id}/comments")
-    public APIResponse<QnaCommentResDTO> createQnaComment(
-            @PathVariable Long qna_id,
-            @RequestBody QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request, Principal principal){
+    public APIResponse<QnaCommentResDTO> createQnaComment(@PathVariable Long qna_id,
+                                                          @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
+                                                          HttpServletRequest request,
+                                                          Principal principal){
 
-        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request,principal);
+        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request, principal);
     }
 
     // 댓글 삭제
     @DeleteMapping("/qna/comments/{comment_id}")
-    public APIResponse<QnaCommentResDTO> deleteComment(
-            @PathVariable("comment_id") Long commentId,
-            HttpServletRequest request,Principal principal){
+    public APIResponse<QnaCommentResDTO> deleteComment(@PathVariable("comment_id") Long commentId,
+                                                       HttpServletRequest request,
+                                                       Principal principal){
 
-        return qnaCommentService.deleteComment(commentId, request,principal);
+        return qnaCommentService.deleteComment(commentId, request, principal);
     }
     // 댓글 수정
     @PutMapping("/qna/comments/{comment_id}")
-    public APIResponse<QnaCommentResDTO> updateComment(
-            @PathVariable("comment_id") Long commentId,
-            @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
-            HttpServletRequest request,Principal principal){
+    public APIResponse<QnaCommentResDTO> updateComment( @PathVariable("comment_id") Long commentId,
+                                                        @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
+                                                        HttpServletRequest request,Principal principal){
 
-        return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request,principal);
+        return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request, principal);
     }
 }

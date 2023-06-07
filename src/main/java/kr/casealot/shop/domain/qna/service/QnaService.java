@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +46,11 @@ public class QnaService {
 
 
     @Transactional
-    public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO, HttpServletRequest request) {
+    public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO,
+                                            HttpServletRequest request,
+                                            Principal principal) {
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         if(customerId == null){
             return APIResponse.invalidAccessToken();
@@ -71,10 +74,13 @@ public class QnaService {
 
     // qna 수정
     @Transactional
-    public APIResponse<QnaResDTO> updateQna(Long qnaId, QnaReqDTO qnaReqDTO, HttpServletRequest request){
+    public APIResponse<QnaResDTO> updateQna(Long qnaId,
+                                            QnaReqDTO qnaReqDTO,
+                                            HttpServletRequest request,
+                                            Principal principal){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         Customer customer = customerRepository.findById(customerId);
 
@@ -138,9 +144,11 @@ public class QnaService {
 
     // qna 삭제
     @Transactional
-    public APIResponse<QnaResDTO> deleteQna(Long qnaId, HttpServletRequest request){
+    public APIResponse<QnaResDTO> deleteQna(Long qnaId,
+                                            HttpServletRequest request,
+                                            Principal principal){
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -189,13 +197,6 @@ public class QnaService {
         qnaResDTO.setCreatedDt(qna.getCreatedDt());
         qnaResDTO.setModifiedDt(qna.getModifiedDt());
         return qnaResDTO;
-    }
-
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
     }
 
     private boolean checkAdminRole(String customerId) {
