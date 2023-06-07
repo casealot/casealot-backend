@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,10 +30,8 @@ public class ReviewCommentService {
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
-
-        Customer customer = customerRepository.findById(customerId);
+    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request, Principal principal) {
+        Customer customer = customerRepository.findById(principal.getName());
         Review review = reviewRepository.findBySeq(reviewSeq);
         if (review == null) {
             return APIResponse.notExistRequest();
@@ -44,26 +43,26 @@ public class ReviewCommentService {
                 .build());
 
         ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
-        reviewCommentRes.setCustomerName(customerId);
+        reviewCommentRes.setId(reviewComment.getSeq());
+        reviewCommentRes.setCustomerName(reviewComment.getCustomer().getName());
         reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
         reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
         reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
         return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
-    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
-
+    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, Principal principal) {
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
         if (optionalReviewComment.isPresent()) {
             ReviewComment review = optionalReviewComment.get();
             String reviewCustomerId = review.getCustomer().getId();
-            if (customerId.equals(reviewCustomerId)) {
+            if (principal.getName().equals(reviewCustomerId)) {
                 review.setReviewCommentText(reviewCommentReqDTO.getReviewCommentText());
                 ReviewComment reviewComment = reviewCommentRepository.save(review);
 
                 ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
-                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setId(reviewComment.getSeq());
+                reviewCommentRes.setCustomerName(reviewComment.getCustomer().getName());
                 reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
                 reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
                 reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
@@ -76,18 +75,17 @@ public class ReviewCommentService {
         }
     }
 
-    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
-
+    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, HttpServletRequest request, Principal principal) {
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
         if (optionalReviewComment.isPresent()) {
             ReviewComment reviewComment = optionalReviewComment.get();
             String reviewCommentCustomerId = reviewComment.getCustomer().getId();
-            if (customerId.equals(reviewCommentCustomerId)) {
+            if (principal.getName().equals(reviewCommentCustomerId)) {
                 reviewCommentRepository.delete(reviewComment);
 
                 ReviewCommentResDTO reviewCommentRes = new ReviewCommentResDTO();
-                reviewCommentRes.setCustomerName(customerId);
+                reviewCommentRes.setId(reviewComment.getSeq());
+                reviewCommentRes.setCustomerName(principal.getName());
                 reviewCommentRes.setReviewCommentText(reviewComment.getReviewCommentText());
                 reviewCommentRes.setCreatedDt(reviewComment.getCreatedDt());
                 reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
@@ -109,17 +107,11 @@ public class ReviewCommentService {
 
     private ReviewCommentResDTO mapToDto(ReviewComment reviewComment) {
         return ReviewCommentResDTO.builder()
+                .id(reviewComment.getSeq())
                 .customerName(reviewComment.getCustomer().getName())
                 .reviewCommentText(reviewComment.getReviewCommentText())
                 .createdDt(reviewComment.getCreatedDt())
                 .modifiedDt(reviewComment.getModifiedDt())
                 .build();
-    }
-
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 // /cal/v1/product/{id}
 
@@ -24,24 +25,24 @@ public class ReviewController {
 
     //생성
     @PostMapping("/create")
-    private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, @PathVariable Long id) {
-        return reviewService.createReview(reviewReqDTO, request, id);
+    private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, @PathVariable Long id, Principal principal) {
+        return reviewService.createReview(reviewReqDTO, request, id, principal);
     }
 
     //수정
     @PutMapping("/fix/{reviewId}")
-    private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
-        return reviewService.fixReview(reviewId,reviewReqDTO, request);
+    private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, Principal principal) {
+        return reviewService.fixReview(reviewId, reviewReqDTO, request, principal);
     }
 
     //삭제
     @DeleteMapping("/delete/{reviewId}")
-    private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
-        return reviewService.deleteReview(reviewId, request);
+    private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, HttpServletRequest request, Principal principal) {
+        return reviewService.deleteReview(reviewId, request, principal);
     }
 
     @GetMapping("/view/{reviewId}")
-    private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId) throws ChangeSetPersister.NotFoundException {
-        return reviewService.getReview(reviewId);
+    private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId, Principal principal) throws ChangeSetPersister.NotFoundException {
+        return reviewService.getReview(reviewId, principal);
     }
 }

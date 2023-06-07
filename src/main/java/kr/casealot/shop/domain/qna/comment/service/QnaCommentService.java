@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.security.Principal;
+
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 
 @Service
@@ -31,10 +33,10 @@ public class QnaCommentService {
 
     public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
                                                           QnaCommentReqDTO qnaCommentReqDTO,
-                                                          HttpServletRequest request){
+                                                          HttpServletRequest request, Principal principal) {
 
         Qna qna = qnaRepository.findById(qnaId).orElseThrow();
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
         boolean isAdmin = checkAdminRole(customerId);
@@ -57,10 +59,10 @@ public class QnaCommentService {
         return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId, HttpServletRequest request){
+    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId, HttpServletRequest request, Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -75,11 +77,11 @@ public class QnaCommentService {
         return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> updateComment(Long commentId, QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request) {
+    public APIResponse<QnaCommentResDTO> updateComment(Long commentId, QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request, Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         if (!(customerId.equals(qnaComment.getCustomer().getId()))) {
             return APIResponse.permissionDenied();
@@ -96,12 +98,6 @@ public class QnaCommentService {
         return APIResponse.success("qna comment", qnaCommentResDTO);
     }
 
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
-    }
 
     private boolean checkAdminRole(String customerId) {
         Customer customer = customerRepository.findById(customerId);
