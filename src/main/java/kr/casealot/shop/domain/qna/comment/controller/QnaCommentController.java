@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 @RestController
 @Slf4j
@@ -23,26 +24,26 @@ public class QnaCommentController {
     @PostMapping("/qna/{qna_id}/comments")
     public APIResponse<QnaCommentResDTO> createQnaComment(
             @PathVariable Long qna_id,
-            @RequestBody QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request){
+            @RequestBody QnaCommentReqDTO qnaCommentReqDTO, HttpServletRequest request, Principal principal){
 
-        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request);
+        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request,principal);
     }
 
     // 댓글 삭제
     @DeleteMapping("/qna/comments/{comment_id}")
     public APIResponse<QnaCommentResDTO> deleteComment(
             @PathVariable("comment_id") Long commentId,
-            HttpServletRequest request){
+            HttpServletRequest request,Principal principal){
 
-        return qnaCommentService.deleteComment(commentId, request);
+        return qnaCommentService.deleteComment(commentId, request,principal);
     }
     // 댓글 수정
     @PutMapping("/qna/comments/{comment_id}")
     public APIResponse<QnaCommentResDTO> updateComment(
             @PathVariable("comment_id") Long commentId,
             @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
-            HttpServletRequest request ){
+            HttpServletRequest request,Principal principal){
 
-        return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request);
+        return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request,principal);
     }
 }

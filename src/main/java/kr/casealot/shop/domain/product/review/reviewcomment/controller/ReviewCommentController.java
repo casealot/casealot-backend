@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 @RestController
 @Slf4j
@@ -20,19 +21,19 @@ public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
     @PostMapping("/create")
-    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, @PathVariable long reviewSeq) {
-        return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, request);
+    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, @PathVariable long reviewSeq, Principal principal) {
+        return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, request, principal);
     }
 
     //수정
     @PutMapping("/fix/{reviewCommentId}")
-    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request) {
-        return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, request);
+    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, Principal principal) {
+        return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, request, principal);
     }
 
     //삭제
     @DeleteMapping("/delete/{reviewCommentId}")
-    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, HttpServletRequest request) {
-        return reviewCommentService.deleteReviewComment(reviewCommentId, request);
+    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, HttpServletRequest request, Principal principal) {
+        return reviewCommentService.deleteReviewComment(reviewCommentId, request, principal);
     }
 }
