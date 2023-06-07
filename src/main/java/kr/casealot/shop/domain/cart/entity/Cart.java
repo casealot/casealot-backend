@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.customer.entity.Customer;
-import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,14 +31,14 @@ public class Cart {
     private Customer customer;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
-    private int quantity; //장바구니에 담긴 총 상품 수
+//    private int quantity; //장바구니에 담긴 총 상품 수
 
     public static Cart createCart(Customer customer) {
         Cart cart = new Cart();
-        cart.setQuantity(0);
+//        cart.setQuantity(0);
         cart.setCustomer(customer);
         return cart;
     }

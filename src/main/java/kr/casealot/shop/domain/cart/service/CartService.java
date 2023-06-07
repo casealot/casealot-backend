@@ -62,9 +62,11 @@ public class CartService {
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
         }
 
-        cart.setQuantity(cart.getQuantity() + quantity);
+//        cart.setQuantity(cart.getQuantity() + quantity);
 
         CartResDto cartResDto = new CartResDto().builder()
+                .cartId(cart.getSeq())
+//                .cartItemId(cartItem.getSeq())
                 .productName(product.getName())
                 .quantity(quantity)
                 .build();
@@ -72,6 +74,27 @@ public class CartService {
         cartRepository.save(cart);
 
         return APIResponse.success("cart", cartResDto);
+    }
+
+    @Transactional
+    public APIResponse<Cart> clearCart(Principal principal) {
+        Customer customer = customerRepository.findCustomerById(principal.getName());
+        if (customer == null) {
+            // Handle customer not found exception
+            return APIResponse.fail();
+        }
+
+        Cart cart = cartRepository.findByCustomerId(principal.getName());
+        if (cart == null) {
+            // Handle cart not found exception
+            return APIResponse.fail();
+        }
+
+        cartRepository.deleteCartItemsByCart(cart); // 관련된 cart_item 삭제
+
+        cartRepository.delete(cart); // cart 삭제
+
+        return APIResponse.success("cart", cart);
     }
 }
 
