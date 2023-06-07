@@ -82,6 +82,7 @@ public class ProductService {
             List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
             for (ReviewComment reviewComment : review.getReviewCommentList()) {
                 ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                        .id(reviewComment.getSeq())
                         .customerName(reviewComment.getCustomer().getName())
                         .reviewCommentText(reviewComment.getReviewCommentText())
                         .createdDt(reviewComment.getCreatedDt())
@@ -90,6 +91,7 @@ public class ProductService {
                 reviewCommentList.add(reviewCommentDTO);
             }
             ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                    .id(review.getSeq())
                     .customerName(review.getCustomer().getName())
                     .rating(review.getRating())
                     .reviewText(review.getReviewText())

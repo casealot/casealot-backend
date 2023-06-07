@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReviewResDTO {
+    private Long id;
     private String customerName; //고객 이름
     private Double rating; //별점
     private String reviewText; //리뷰 내용
