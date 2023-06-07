@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.wishlist.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
@@ -26,6 +27,7 @@ public class Wishlist{
     private Customer customer;
 
     @Builder.Default
+    @JsonBackReference
     @OneToMany(mappedBy = "wishlist", fetch = FetchType.EAGER)
     private List<WishlistItem> wishlistItemList = new ArrayList<>();
 }
