@@ -28,7 +28,7 @@ public class Cart {
     private Long seq;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="CUSTOMER_ID")
+    @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
     @JsonBackReference
