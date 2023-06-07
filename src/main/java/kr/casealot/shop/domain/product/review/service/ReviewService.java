@@ -16,15 +16,19 @@ import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReviewService {
     private final AuthTokenProvider authTokenProvider;
     private final ReviewRepository reviewRepository;
@@ -34,10 +38,8 @@ public class ReviewService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id) {
-        String customerId = findCustomerId(request);
-
-        Customer customer = customerRepository.findById(customerId);
+    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id, Principal principal) {
+        Customer customer = customerRepository.findById(principal.getName());
 
         Optional<Product> productOptional = productRepository.findById(id);
 
@@ -52,6 +54,7 @@ public class ReviewService {
                     .build());
 
             ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setId(review.getSeq());
             reviewResDTO.setCustomerName(review.getCustomer().getName());
             reviewResDTO.setRating(review.getRating());
             reviewResDTO.setReviewText(review.getReviewText());
@@ -65,14 +68,12 @@ public class ReviewService {
         }
     }
 
-    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
-
+    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request, Principal principal) {
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
             String reviewCustomerId = review.getCustomer().getId();
-            if (customerId.equals(reviewCustomerId)) {
+            if (principal.getName().equals(reviewCustomerId)) {
                 review.setRating(reviewReqDTO.getRating());
                 review.setReviewText(reviewReqDTO.getReviewText());
                 reviewRepository.save(review);
@@ -80,7 +81,8 @@ public class ReviewService {
                 return APIResponse.permissionDenied();
             }
             ReviewResDTO reviewResDTO = new ReviewResDTO();
-            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setId(review.getSeq());
+            reviewResDTO.setCustomerName(principal.getName());
             reviewResDTO.setRating(review.getRating());
             reviewResDTO.setReviewText(review.getReviewText());
             reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
@@ -93,17 +95,16 @@ public class ReviewService {
         }
     }
 
-    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, HttpServletRequest request) {
-        String customerId = findCustomerId(request);
-
+    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, HttpServletRequest request, Principal principal) {
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
             String reviewCustomerId = review.getCustomer().getId();
-            if (customerId.equals(reviewCustomerId)) {
+            if (principal.getName().equals(reviewCustomerId)) {
                 reviewRepository.delete(review);
                 ReviewResDTO reviewResDTO = new ReviewResDTO();
-                reviewResDTO.setCustomerName(review.getCustomer().getName());
+                reviewResDTO.setId(review.getSeq());
+                reviewResDTO.setCustomerName(principal.getName());
                 reviewResDTO.setRating(review.getRating());
                 reviewResDTO.setReviewText(review.getReviewText());
                 reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
@@ -120,25 +121,26 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public APIResponse<ReviewResDTO> getReview(Long reviewSeq) throws ChangeSetPersister.NotFoundException {
-        Review review = reviewRepository.findById(reviewSeq)
-                .orElseThrow(ChangeSetPersister.NotFoundException::new);
+    public APIResponse<ReviewResDTO> getReview(Long reviewSeq, Principal principal){
+        Optional<Review> reviewOptional = reviewRepository.findById(reviewSeq);
 
-        ReviewResDTO reviewResDTO = new ReviewResDTO();
-        reviewResDTO.setCustomerName(review.getCustomer().getName());
-        reviewResDTO.setRating(review.getRating());
-        reviewResDTO.setReviewText(review.getReviewText());
-        reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-        reviewResDTO.setCreatedDt(review.getCreatedDt());
-        reviewResDTO.setModifiedDt(review.getModifiedDt());
+        if (reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
 
-        return APIResponse.success("review", reviewResDTO);
-    }
+            ReviewResDTO reviewResDTO = new ReviewResDTO();
+            reviewResDTO.setId(review.getSeq());
+            reviewResDTO.setCustomerName(review.getCustomer().getName());
+            reviewResDTO.setRating(review.getRating());
+            reviewResDTO.setReviewText(review.getReviewText());
+            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+            reviewResDTO.setCreatedDt(review.getCreatedDt());
+            reviewResDTO.setModifiedDt(review.getModifiedDt());
 
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
+            return APIResponse.success("review", reviewResDTO);
+        } else {
+            // Optional이 비어있을 경우에 대한 처리
+            log.warn("이건 오류다.");
+            return APIResponse.notExistRequest();
+        }
     }
 }
