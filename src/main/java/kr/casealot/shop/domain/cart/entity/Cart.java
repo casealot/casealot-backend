@@ -33,13 +33,22 @@ public class Cart extends BaseTimeEntity {
     @OneToMany
     private List<CartItem> cartItems;
 
-    private int count; //장바구니에 담긴 총 상품 수
+    private int quantity; //장바구니에 담긴 총 상품 수
 
     public static Cart createCart(Customer customer) {
         Cart cart = new Cart();
-        cart.setCount(0);
+        cart.setQuantity(0);
         cart.setCustomer(customer);
         return cart;
+    }
+
+    public CartItem getCartItemByProduct(Product product) {
+        for (CartItem item : cartItems) {
+            if (item.getProduct().equals(product)) {
+                return item;
+            }
+        }
+        return null;
     }
 }
 
