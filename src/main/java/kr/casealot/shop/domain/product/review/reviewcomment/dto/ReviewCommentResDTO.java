@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewCommentResDTO {
+    private Long id;
     private String customerName; //작성자 이름
     private String reviewCommentText; //리뷰 댓글 내용
 
