@@ -28,7 +28,7 @@ public class CartItemService {
     // Reduce the quantity of a cart item
     @Transactional
     public APIResponse<List<CartResDto>> reduceCartItemQuantity(Principal principal, Long cartItemId, int quantity) {
-        Customer customer =  customerRepository.findCustomerById(principal.getName());
+        Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             // Handle customer not found exception
             return APIResponse.fail();
@@ -63,7 +63,7 @@ public class CartItemService {
 
     @Transactional
     public APIResponse<List<CartResDto>> removeCartItem(Principal principal, Long cartItemId) {
-        Customer customer =  customerRepository.findCustomerById(principal.getName());
+        Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             // Handle customer not found exception
             return APIResponse.fail();
@@ -91,20 +91,20 @@ public class CartItemService {
     }
 
 
-
     // Retrieve the cart items and return a list of CartResDto
     private List<CartResDto> getCartResDtoList(Long cartId) {
         Optional<Cart> cart = cartRepository.findById(cartId);
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         return cartItems.stream()
-                .map(cartItem -> new CartResDto(cartItem.getProduct().getName(), cartItem.getQuantity()))
+                .map(cartItem -> new CartResDto(cartId, cartItem.getProduct().getName(), cartItem.getQuantity()))
+//                .map(cartItem -> new CartResDto(cartId, cartItem.getSeq(), cartItem.getProduct().getName(), cartItem.getQuantity()))
                 .collect(Collectors.toList());
     }
 
     // Helper method to retrieve a specific cart item from the cart
     private CartItem getCartItemFromCart(Cart cart, Long cartItemId) {
         return cart.getCartItems().stream()
-                .filter(cartItem -> cartItem.getSeq().equals(cartItemId))
+                .filter(cartItem -> cartItem.getProduct().getId().equals(cartItemId))
                 .findFirst()
                 .orElse(null);
     }
