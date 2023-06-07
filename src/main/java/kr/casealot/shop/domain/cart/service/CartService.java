@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.cart.service;
 
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
+import kr.casealot.shop.domain.cart.dto.CartResDto;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -26,7 +27,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
 
     @Transactional
-    public APIResponse<Cart> addItemToCart(Principal principal, Long productId, int quantity) {
+    public APIResponse<CartResDto> addItemToCart(Principal principal, Long productId, int quantity) {
         Customer customer = customerRepository.findById(principal.getName());
         Product product = productRepository.findById(productId).orElse(null);
 
@@ -63,10 +64,14 @@ public class CartService {
 
         cart.setQuantity(cart.getQuantity() + quantity);
 
-        cartRepository.save(cart);
-//        cartItemRepository.save(cartItem);
+        CartResDto cartResDto = new CartResDto().builder()
+                .productName(product.getName())
+                .quantity(quantity)
+                .build();
 
-        return APIResponse.success("cart", cart);
+        cartRepository.save(cart);
+
+        return APIResponse.success("cart", cartResDto);
     }
 }
 

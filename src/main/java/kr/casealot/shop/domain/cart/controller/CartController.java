@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.cart.controller;
 
 import io.swagger.annotations.Api;
+import kr.casealot.shop.domain.cart.dto.CartResDto;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.service.CartService;
 import kr.casealot.shop.global.common.APIResponse;
@@ -22,7 +23,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/{customerId}/items")
-    public APIResponse<Cart> addItemToCart(
+    public APIResponse<CartResDto> addItemToCart(
             Principal principal,
             @RequestParam Long productId,
             @RequestParam int quantity
