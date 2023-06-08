@@ -87,7 +87,7 @@ public class CustomerService {
 
         // 토큰 생성 (jwt)
         // 토큰 유효 기간 설정 (30분 후)
-        long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry();
+        long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry() + 10000000;
 
         AuthToken authToken = authTokenProvider.createAuthToken(
                 customer.getId(),
