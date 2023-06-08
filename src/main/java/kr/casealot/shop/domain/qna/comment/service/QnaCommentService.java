@@ -29,14 +29,17 @@ public class QnaCommentService {
     private final QnaCommentRepository qnaCommentRepository;
     private final QnaRepository qnaRepository;
     private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
 
     public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
                                                           QnaCommentReqDTO qnaCommentReqDTO,
                                                           HttpServletRequest request,
                                                           Principal principal) {
 
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
+        Qna qna = qnaRepository.findById(qnaId).orElse(null);
+
+        if(qna == null){
+            return APIResponse.notExistRequest();
+        }
         String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
@@ -64,12 +67,17 @@ public class QnaCommentService {
                                                        HttpServletRequest request,
                                                        Principal principal) {
 
-        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
+
+        if(qnaComment == null){
+            return APIResponse.notExistRequest();
+        }
+
         String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if (!(customerId.equals(qnaComment.getCustomer().getId()) || !isAdmin)) {
+        if (!isAdmin) {
             return APIResponse.permissionDenied();
         }
 
@@ -85,11 +93,17 @@ public class QnaCommentService {
                                                        HttpServletRequest request,
                                                        Principal principal) {
 
-        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElseThrow();
+        QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
+
+        if(qnaComment == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
-        if (!(customerId.equals(qnaComment.getCustomer().getId()))) {
+        boolean isAdmin = checkAdminRole(customerId);
+
+        if (!isAdmin) {
             return APIResponse.permissionDenied();
         }
 

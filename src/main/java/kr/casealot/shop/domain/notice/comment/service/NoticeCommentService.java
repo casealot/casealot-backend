@@ -35,7 +35,12 @@ public class NoticeCommentService {
                                                           HttpServletRequest request,
                                                           Principal principal){
 
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
+
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
+
         String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
@@ -57,7 +62,11 @@ public class NoticeCommentService {
                                                           HttpServletRequest request,
                                                           Principal principal){
 
-        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
+        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
+
+        if(noticeComment == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
@@ -79,7 +88,11 @@ public class NoticeCommentService {
                                                           HttpServletRequest request,
                                                           Principal principal){
 
-        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElseThrow();
+        NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
+
+        if(noticeComment == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
