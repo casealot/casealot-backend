@@ -26,6 +26,7 @@ import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 @Service
 @RequiredArgsConstructor
 public class QnaService {
+    private final String API_NAME = "qna";
 
     private final QnaRepository qnaRepository;
     private final CustomerRepository customerRepository;
@@ -68,7 +69,7 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success("qna",qnaResDTO);
+        return APIResponse.success(API_NAME,qnaResDTO);
     }
 
 
@@ -103,7 +104,7 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success("qna", qnaResDTO);
+        return APIResponse.success(API_NAME, qnaResDTO);
     }
 
     // qna 조회
@@ -145,7 +146,7 @@ public class QnaService {
 
         qnaDetailDTO.setQnaCommentList(qnaCommentDTOList);
 
-        return APIResponse.success("qna", qnaDetailDTO);
+        return APIResponse.success(API_NAME, qnaDetailDTO);
     }
 
 
@@ -172,7 +173,7 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success("qna", qnaResDTO);
+        return APIResponse.success(API_NAME, qnaResDTO);
     }
 
     // qna 목록
@@ -196,7 +197,7 @@ public class QnaService {
             qnaResDTOList.add(qnaResDTO);
         }
 
-        return APIResponse.success("qna", qnaResDTOList);
+        return APIResponse.success(API_NAME, qnaResDTOList);
     }
 
     private static QnaResDTO getQnaResDTO(Qna qna, String customerId) {
