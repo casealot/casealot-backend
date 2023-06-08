@@ -123,7 +123,11 @@ public class CartService {
                     productCartDTO.setName(cartItem.getProduct().getName());
                     productCartDTO.setPrice(cartItem.getProduct().getPrice());
                     productCartDTO.setQuantity(cartItem.getQuantity());
-                    productCartDTO.setThumbnail(cartItem.getProduct().getThumbnail());
+                    if(cartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(cartItem.getProduct().getThumbnail().getUrl());
+                    }
                     productCartDTO.setContent(cartItem.getProduct().getContent());
                     productCartDTO.setColor(cartItem.getProduct().getColor());
                     productCartDTO.setSeason(cartItem.getProduct().getSeason());

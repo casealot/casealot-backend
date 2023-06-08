@@ -13,7 +13,7 @@ public class ProductCartDTO {
     private String name;
     private int price;
     private int quantity;
-    private UploadFile thumbnail;
+    private String thumbnail ="";
     private String content;
     private String color;
     private String season;
