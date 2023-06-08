@@ -2,7 +2,7 @@ package kr.casealot.shop.domain.cart.cartitem.service;
 
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
-import kr.casealot.shop.domain.cart.dto.CartResDto;
+import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class CartItemService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public APIResponse<List<CartResDto>> reduceCartItemQuantity(Principal principal, Long cartItemId) {
+    public APIResponse<List<CartResDTO>> reduceCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             return APIResponse.nullCheckPlease();
@@ -53,13 +52,13 @@ public class CartItemService {
         }
 
         // Retrieve the updated cart items after modification
-        List<CartResDto> cartResDtoList = getCartResDtoList(cart.getSeq());
+        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDtoList);
+        return APIResponse.success("cart", cartResDTOList);
     }
 
     @Transactional
-    public APIResponse<List<CartResDto>> addCartItemQuantity(Principal principal, Long cartItemId) {
+    public APIResponse<List<CartResDTO>> addCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             return APIResponse.nullCheckPlease();
@@ -81,13 +80,13 @@ public class CartItemService {
         cartItemRepository.save(cartItem);
 
         // Retrieve the updated cart items after modification
-        List<CartResDto> cartResDtoList = getCartResDtoList(cart.getSeq());
+        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDtoList);
+        return APIResponse.success("cart", cartResDTOList);
     }
 
     @Transactional
-    public APIResponse<List<CartResDto>> removeCartItem(Principal principal, Long cartItemId) {
+    public APIResponse<List<CartResDTO>> removeCartItem(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             log.warn("customer is null");
@@ -110,17 +109,17 @@ public class CartItemService {
         cartItemRepository.delete(cartItem);
 
         // Retrieve the updated cart items after removal
-        List<CartResDto> cartResDtoList = getCartResDtoList(cart.getSeq());
+        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDtoList);
+        return APIResponse.success("cart", cartResDTOList);
     }
 
 
-    private List<CartResDto> getCartResDtoList(Long cartId) {
+    private List<CartResDTO> getCartResDtoList(Long cartId) {
         Optional<Cart> cart = cartRepository.findById(cartId);
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         return cartItems.stream()
-                .map(cartItem -> new CartResDto(cartId, cartItem.getProduct().getName(), cartItem.getQuantity()))
+                .map(cartItem -> new CartResDTO(cartId, cartItem.getProduct().getName(), cartItem.getQuantity()))
 //                .map(cartItem -> new CartResDto(cartId, cartItem.getSeq(), cartItem.getProduct().getName(), cartItem.getQuantity()))
                 .collect(Collectors.toList());
     }
