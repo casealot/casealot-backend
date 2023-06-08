@@ -19,10 +19,10 @@ import java.security.Principal;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/items")
+    @PostMapping("/items/{productId}")
     public APIResponse<CartResDTO> addItemToCart(
             Principal principal,
-            @RequestParam Long productId
+            @PathVariable Long productId
     ) {
         return cartService.addItemToCart(principal, productId);
     }
