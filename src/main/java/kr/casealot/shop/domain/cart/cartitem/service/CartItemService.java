@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CartItemService {
+    private final String API_NAME = "cart";
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final CustomerRepository customerRepository;
@@ -51,10 +52,9 @@ public class CartItemService {
             cartItemRepository.save(cartItem);
         }
 
-        // Retrieve the updated cart items after modification
         List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDTOList);
+        return APIResponse.success(API_NAME, cartResDTOList);
     }
 
     @Transactional
@@ -79,10 +79,9 @@ public class CartItemService {
         cartItem.setQuantity(currentQuantity + 1);
         cartItemRepository.save(cartItem);
 
-        // Retrieve the updated cart items after modification
         List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDTOList);
+        return APIResponse.success(API_NAME, cartResDTOList);
     }
 
     @Transactional
@@ -108,10 +107,9 @@ public class CartItemService {
         cart.getCartItems().remove(cartItem);
         cartItemRepository.delete(cartItem);
 
-        // Retrieve the updated cart items after removal
         List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
 
-        return APIResponse.success("cart", cartResDTOList);
+        return APIResponse.success(API_NAME, cartResDTOList);
     }
 
 

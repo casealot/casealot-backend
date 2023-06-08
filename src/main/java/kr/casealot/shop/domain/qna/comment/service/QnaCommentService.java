@@ -25,6 +25,8 @@ import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 @Service
 @RequiredArgsConstructor
 public class QnaCommentService {
+    private final String API_NAME = "qna comment";
+
 
     private final QnaCommentRepository qnaCommentRepository;
     private final QnaRepository qnaRepository;
@@ -60,7 +62,7 @@ public class QnaCommentService {
 
         QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
 
-        return APIResponse.success("qna comment", qnaCommentResDTO);
+        return APIResponse.success(API_NAME, qnaCommentResDTO);
     }
 
     public APIResponse<QnaCommentResDTO> deleteComment(Long commentId,
@@ -85,7 +87,7 @@ public class QnaCommentService {
 
         QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
 
-        return APIResponse.success("qna comment", qnaCommentResDTO);
+        return APIResponse.success(API_NAME, qnaCommentResDTO);
     }
 
     public APIResponse<QnaCommentResDTO> updateComment(Long commentId,
@@ -115,7 +117,7 @@ public class QnaCommentService {
 
         QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
 
-        return APIResponse.success("qna comment", qnaCommentResDTO);
+        return APIResponse.success(API_NAME, qnaCommentResDTO);
     }
 
 
