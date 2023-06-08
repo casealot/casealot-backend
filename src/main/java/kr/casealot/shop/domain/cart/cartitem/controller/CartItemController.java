@@ -19,20 +19,20 @@ import java.util.List;
 public class CartItemController {
     private final CartItemService cartItemService;
 
-    @PostMapping("/{cartItemId}/reduce")
+    @PostMapping("/reduce/{cartItemId}")
     public APIResponse<List<CartResDto>> reduceCartItemQuantity(Principal principal,
-                                                                @PathVariable Long cartItemId,
-                                                                @RequestParam("quantity") int quantity) {
-        return cartItemService.reduceCartItemQuantity(principal, cartItemId, quantity);
+                                                                @PathVariable Long cartItemId) {
+        return cartItemService.reduceCartItemQuantity(principal, cartItemId);
     }
 
-    @PostMapping("/{cartItemId}/add")
+    //카트 상품 증가
+    @PostMapping("/add/{cartItemId}")
     public APIResponse<List<CartResDto>> addCartItemQuantity(Principal principal,
-                                                                @PathVariable Long cartItemId,
-                                                                @RequestParam("quantity") int quantity) {
-        return cartItemService.addCartItemQuantity(principal, cartItemId, quantity);
+                                                                @PathVariable Long cartItemId) {
+        return cartItemService.addCartItemQuantity(principal, cartItemId);
     }
 
+    //단일 삭제
     @DeleteMapping("/{cartItemId}")
     public APIResponse<List<CartResDto>> removeCartItem(Principal principal,
                                                         @PathVariable Long cartItemId) {

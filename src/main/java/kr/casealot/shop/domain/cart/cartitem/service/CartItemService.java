@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,38 +21,34 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CartItemService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final CustomerRepository customerRepository;
 
-    // Reduce the quantity of a cart item
     @Transactional
-    public APIResponse<List<CartResDto>> reduceCartItemQuantity(Principal principal, Long cartItemId, int quantity) {
+    public APIResponse<List<CartResDto>> reduceCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
-            // Handle customer not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         Cart cart = cartRepository.findByCustomerId(customer.getId());
         if (cart == null) {
-            // Handle cart not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         CartItem cartItem = getCartItemFromCart(cart, cartItemId);
         if (cartItem == null) {
-            // Handle cart item not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         int currentQuantity = cartItem.getQuantity();
-        if (currentQuantity <= quantity) {
-            // Remove the cart item if the requested quantity is greater than or equal to the current quantity
-            cartItemRepository.delete(cartItem);
+        if (currentQuantity <= 1) {
+            removeCartItem(principal, cartItemId);
         } else {
-            cartItem.setQuantity(currentQuantity - quantity);
+            cartItem.setQuantity(currentQuantity - 1);
             cartItemRepository.save(cartItem);
         }
 
@@ -62,28 +59,25 @@ public class CartItemService {
     }
 
     @Transactional
-    public APIResponse<List<CartResDto>> addCartItemQuantity(Principal principal, Long cartItemId, int quantity) {
+    public APIResponse<List<CartResDto>> addCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
-            // Handle customer not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         Cart cart = cartRepository.findByCustomerId(customer.getId());
         if (cart == null) {
-            // Handle cart not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         CartItem cartItem = getCartItemFromCart(cart, cartItemId);
         if (cartItem == null) {
-            // Handle cart item not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         int currentQuantity = cartItem.getQuantity();
 
-        cartItem.setQuantity(currentQuantity + quantity);
+        cartItem.setQuantity(currentQuantity + 1);
         cartItemRepository.save(cartItem);
 
         // Retrieve the updated cart items after modification
@@ -96,20 +90,20 @@ public class CartItemService {
     public APIResponse<List<CartResDto>> removeCartItem(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
-            // Handle customer not found exception
-            return APIResponse.fail();
+            log.warn("customer is null");
+            return APIResponse.nullCheckPlease();
         }
 
         Cart cart = cartRepository.findByCustomerId(customer.getId());
         if (cart == null) {
-            // Handle cart not found exception
-            return APIResponse.fail();
+            log.warn("cart is null");
+            return APIResponse.nullCheckPlease();
         }
 
         CartItem cartItem = getCartItemFromCart(cart, cartItemId);
         if (cartItem == null) {
-            // Handle cart item not found exception
-            return APIResponse.fail();
+            log.warn("cartItem is null");
+            return APIResponse.nullCheckPlease();
         }
 
         cart.getCartItems().remove(cartItem);
@@ -122,7 +116,6 @@ public class CartItemService {
     }
 
 
-    // Retrieve the cart items and return a list of CartResDto
     private List<CartResDto> getCartResDtoList(Long cartId) {
         Optional<Cart> cart = cartRepository.findById(cartId);
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
@@ -132,11 +125,17 @@ public class CartItemService {
                 .collect(Collectors.toList());
     }
 
-    // Helper method to retrieve a specific cart item from the cart
     private CartItem getCartItemFromCart(Cart cart, Long cartItemId) {
-        return cart.getCartItems().stream()
-                .filter(cartItem -> cartItem.getProduct().getId().equals(cartItemId))
-                .findFirst()
-                .orElse(null);
+        if (cart == null || cart.getCartItems() == null) {
+            return null;
+        }
+
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getProduct().getId().equals(cartItemId)) {
+                return cartItem;
+            }
+        }
+
+        return null;
     }
 }
