@@ -78,7 +78,11 @@ public class QnaService {
                                             QnaReqDTO qnaReqDTO,
                                             HttpServletRequest request,
                                             Principal principal){
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
+        Qna qna = qnaRepository.findById(qnaId).orElse(null);
+
+        if(qna == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
@@ -105,8 +109,11 @@ public class QnaService {
     // qna 조회
     @Transactional
     public APIResponse<QnaDetailDTO> getQna(Long qnaId){
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
+        Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
+        if(qna == null){
+            return APIResponse.notExistRequest();
+        }
         // 조회수 증가
         qna.setViews(qna.getViews() + 1);
 
@@ -147,7 +154,12 @@ public class QnaService {
     public APIResponse<QnaResDTO> deleteQna(Long qnaId,
                                             HttpServletRequest request,
                                             Principal principal){
-        Qna qna = qnaRepository.findById(qnaId).orElseThrow();
+        Qna qna = qnaRepository.findById(qnaId).orElse(null);
+
+        if(qna == null){
+            return APIResponse.notExistRequest();
+        }
+
         String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);

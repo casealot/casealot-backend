@@ -61,7 +61,11 @@ public class NoticeService {
 
     @Transactional
     public APIResponse<NoticeDetailDTO> getNotice(Long noticeId){
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
+
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
 
         notice.setViews(notice.getViews() + 1);
 
@@ -131,7 +135,11 @@ public class NoticeService {
                                                   NoticeReqDTO noticeReqDTO,
                                                   HttpServletRequest request,
                                                   Principal principal){
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
+
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
@@ -156,7 +164,11 @@ public class NoticeService {
     public APIResponse<NoticeResDTO> deleteNotice(Long noticeId,
                                                   HttpServletRequest request,
                                                   Principal principal){
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
+
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
 
         String customerId = principal.getName();
 
