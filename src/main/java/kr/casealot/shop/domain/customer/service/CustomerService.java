@@ -27,8 +27,9 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
+    private final String API_NAME = "customer";
+
     private final CustomerRepository customerRepository;
-    //private final CustomerTokenRepository customerTokenRepository;
 
     private final AppProperties appProperties;
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
@@ -64,7 +65,7 @@ public class CustomerService {
 
         Customer savedCustomer = customerRepository.save(customer);
 
-        return APIResponse.success("customer", customer);
+        return APIResponse.success(API_NAME, customer);
     }
 
     public APIResponse login(CustomerLoginDto customerLoginDto

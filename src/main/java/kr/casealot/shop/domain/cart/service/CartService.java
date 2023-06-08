@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CartService {
+    private final String API_NAME = "cart";
+
     private final CartRepository cartRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
@@ -74,7 +76,7 @@ public class CartService {
 
         cartRepository.save(cart);
 
-        return APIResponse.success("cart", cartResDto);
+        return APIResponse.success(API_NAME, cartResDto);
     }
 
     @Transactional
@@ -93,7 +95,7 @@ public class CartService {
 
         cartRepository.delete(cart); // cart 삭제
 
-        return APIResponse.success("cart", principal.getName() +" cart is clean");
+        return APIResponse.success(API_NAME, principal.getName() +" cart is clean");
     }
 
     @Transactional
@@ -130,7 +132,7 @@ public class CartService {
                 })
                 .collect(Collectors.toList()));
 
-        return APIResponse.success("cart", cartGetDto);
+        return APIResponse.success(API_NAME, cartGetDto);
     }
 }
 

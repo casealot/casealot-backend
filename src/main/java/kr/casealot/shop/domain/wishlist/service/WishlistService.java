@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WishlistService {
-
+    private final String API_NAME = "wishlist";
     private final WishlistRepository wishlistRepository;
     private final WishlistItemRepository wishlistItemRepository;
     private final ProductRepository productRepository;
@@ -68,7 +68,7 @@ public class WishlistService {
 
         wishlistRepository.save(wishlist);
 
-        return APIResponse.success("wishlist", wishlistResDTO);
+        return APIResponse.success(API_NAME, wishlistResDTO);
     }
 
     @Transactional
@@ -92,7 +92,7 @@ public class WishlistService {
                     .productName(product.getName())
                     .build();
 
-            return APIResponse.success("wishlist", wishlistResDTO);
+            return APIResponse.success(API_NAME, wishlistResDTO);
         } else {
             return APIResponse.notExistRequest();
         }
@@ -121,7 +121,7 @@ public class WishlistService {
 
             wishlistItemResDTOList.add(wishlistItemResDTO);
         }
-        return APIResponse.success("wishlist", wishlistItemResDTOList);
+        return APIResponse.success(API_NAME, wishlistItemResDTOList);
     }
 
     @Transactional
