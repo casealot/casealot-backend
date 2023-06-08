@@ -2,11 +2,13 @@ package kr.casealot.shop.domain.cart.service;
 
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
-import kr.casealot.shop.domain.cart.dto.CartResDto;
+import kr.casealot.shop.domain.cart.dto.CartGetDTO;
+import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.product.dto.ProductCartDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
@@ -15,8 +17,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +29,12 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
 
     @Transactional
-    public APIResponse<CartResDto> addItemToCart(Principal principal, Long productId, int quantity) {
+    public APIResponse<CartResDTO> addItemToCart(Principal principal, Long productId) {
         Customer customer = customerRepository.findById(principal.getName());
         Product product = productRepository.findById(productId).orElse(null);
 
         if (customer == null || product == null) {
-            // 필요한 예외 처리
-            return APIResponse.permissionDenied();
+            return APIResponse.nullCheckPlease();
         }
 
         Cart cart = cartRepository.findByCustomerId(principal.getName());
@@ -55,20 +56,20 @@ public class CartService {
         if (cartItem == null) {
             cartItem = new CartItem();
             cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
+            cartItem.setQuantity(1);
             cartItem.setCart(cart);
             cart.getCartItems().add(cartItem);
         } else {
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
         }
 
 //        cart.setQuantity(cart.getQuantity() + quantity);
 
-        CartResDto cartResDto = new CartResDto().builder()
+        CartResDTO cartResDto = new CartResDTO().builder()
                 .cartId(cart.getSeq())
 //                .cartItemId(cartItem.getSeq())
                 .productName(product.getName())
-                .quantity(quantity)
+                .quantity(cartItem.getQuantity())
                 .build();
 
         cartRepository.save(cart);
@@ -77,24 +78,59 @@ public class CartService {
     }
 
     @Transactional
-    public APIResponse<Cart> clearCart(Principal principal) {
+    public APIResponse<String> clearCart(Principal principal) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
-            // Handle customer not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         Cart cart = cartRepository.findByCustomerId(principal.getName());
         if (cart == null) {
-            // Handle cart not found exception
-            return APIResponse.fail();
+            return APIResponse.nullCheckPlease();
         }
 
         cartRepository.deleteCartItemsByCart(cart); // 관련된 cart_item 삭제
 
         cartRepository.delete(cart); // cart 삭제
 
-        return APIResponse.success("cart", cart);
+        return APIResponse.success("cart", principal.getName() +" cart is clean");
+    }
+
+    @Transactional
+    public APIResponse<CartGetDTO> getCart(Principal principal) {
+        String customerId = principal.getName(); // 현재 사용자의 ID
+
+        Customer customer = customerRepository.findCustomerById(customerId);
+        if (customer == null) {
+            return APIResponse.nullCheckPlease();
+        }
+
+        Cart cart = customer.getCartList();
+        if (cart == null) {
+            return APIResponse.nullCheckPlease();
+        }
+
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(cartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(cartItem.getProduct().getId());
+                    productCartDTO.setName(cartItem.getProduct().getName());
+                    productCartDTO.setPrice(cartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(cartItem.getQuantity());
+                    productCartDTO.setThumbnail(cartItem.getProduct().getThumbnail());
+                    productCartDTO.setContent(cartItem.getProduct().getContent());
+                    productCartDTO.setColor(cartItem.getProduct().getColor());
+                    productCartDTO.setSeason(cartItem.getProduct().getSeason());
+                    productCartDTO.setType(cartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
+
+        return APIResponse.success("cart", cartGetDto);
     }
 }
 

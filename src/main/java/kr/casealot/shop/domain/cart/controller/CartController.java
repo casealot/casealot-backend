@@ -1,8 +1,8 @@
 package kr.casealot.shop.domain.cart.controller;
 
 import io.swagger.annotations.Api;
-import kr.casealot.shop.domain.cart.dto.CartResDto;
-import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.cart.dto.CartGetDTO;
+import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.service.CartService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +19,21 @@ import java.security.Principal;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/{customerId}/items")
-    public APIResponse<CartResDto> addItemToCart(
+    @PostMapping("/items")
+    public APIResponse<CartResDTO> addItemToCart(
             Principal principal,
-            @RequestParam Long productId,
-            @RequestParam int quantity
+            @RequestParam Long productId
     ) {
-        return cartService.addItemToCart(principal, productId, quantity);
+        return cartService.addItemToCart(principal, productId);
     }
 
     @DeleteMapping("/clear")
-    public APIResponse<Cart> clearCart(Principal principal) {
+    public APIResponse<String> clearCart(Principal principal) {
         return cartService.clearCart(principal);
+    }
+
+    @GetMapping
+    public APIResponse<CartGetDTO> getCart(Principal principal) {
+        return cartService.getCart(principal);
     }
 }

@@ -7,9 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartResDto {
+public class CartResDTO {
     private Long cartId;
-//    private Long cartItemId;
+//    private Long productId;
     private String productName;
     private int quantity;
 }
