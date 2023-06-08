@@ -15,7 +15,7 @@ public class WishlistItemResDTO {
     private Long id;
     private String name;
     private int price;
-    private UploadFile thumbnail;
+    private String thumbnail;
     private String content;
     private String color;
     private String season;

@@ -112,7 +112,7 @@ public class WishlistService {
                     .id(product.getId())
                     .name(product.getName())
                     .price(product.getPrice())
-                    .thumbnail(product.getThumbnail())
+                    .thumbnail(product.getThumbnail().getUrl())
                     .content(product.getContent())
                     .color(product.getColor())
                     .season(product.getSeason())
