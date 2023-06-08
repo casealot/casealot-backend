@@ -16,12 +16,12 @@ import java.security.Principal;
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"QNA COMMENT API"}, description = "QNA COMMENT 관련 API")
-@RequestMapping("/cal/v1")
+@RequestMapping("/cal/v1/admin/qna")
 public class QnaCommentController {
 
     private final QnaCommentService qnaCommentService;
 
-    @PostMapping("/qna/{qna_id}/comments")
+    @PostMapping("/{qna_id}/comments")
     public APIResponse<QnaCommentResDTO> createQnaComment(@PathVariable Long qna_id,
                                                           @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
                                                           HttpServletRequest request,
@@ -31,7 +31,7 @@ public class QnaCommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/qna/comments/{comment_id}")
+    @DeleteMapping("/comments/{comment_id}")
     public APIResponse<QnaCommentResDTO> deleteComment(@PathVariable("comment_id") Long commentId,
                                                        HttpServletRequest request,
                                                        Principal principal){
@@ -39,10 +39,11 @@ public class QnaCommentController {
         return qnaCommentService.deleteComment(commentId, request, principal);
     }
     // 댓글 수정
-    @PutMapping("/qna/comments/{comment_id}")
+    @PutMapping("/comments/{comment_id}")
     public APIResponse<QnaCommentResDTO> updateComment( @PathVariable("comment_id") Long commentId,
                                                         @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
-                                                        HttpServletRequest request,Principal principal){
+                                                        HttpServletRequest request,
+                                                        Principal principal){
 
         return  qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request, principal);
     }
