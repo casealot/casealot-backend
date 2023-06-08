@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.wishlist.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.entity.Product;
@@ -9,20 +8,18 @@ import kr.casealot.shop.domain.wishlist.dto.WishlistReqDTO;
 import kr.casealot.shop.domain.wishlist.dto.WishlistResDTO;
 import kr.casealot.shop.domain.wishlist.entity.Wishlist;
 import kr.casealot.shop.domain.wishlist.repository.WishlistRepository;
+import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemResDTO;
 import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.domain.wishlist.wishlistItem.repository.WishlistItemRepository;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +31,8 @@ public class WishlistService {
 //    private final AuthTokenProvider authTokenProvider;
     private final CustomerRepository customerRepository;
 
-    public APIResponse<WishlistResDTO> addWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
+    @Transactional
+    public APIResponse<WishlistResDTO> addProductToWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
 
         String customerId = principal.getName();
 
@@ -73,7 +71,61 @@ public class WishlistService {
         return APIResponse.success("wishlist", wishlistResDTO);
     }
 
-    public static Wishlist createWishlist(Customer customer){
+    @Transactional
+    public APIResponse<WishlistResDTO> deleteProductToWishlist(WishlistReqDTO wishlistReqDTO, HttpServletRequest request, Principal principal) {
+
+        String customerId = principal.getName();
+        Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
+        Product product = productRepository.findById(wishlistReqDTO.getProductId()).orElseThrow();
+
+        List<WishlistItem> wishlistItems = wishlist.getWishlistItemList();
+        wishlistItems.removeIf(item -> item.getProduct().getId().equals(product.getId()));
+
+
+        WishlistItem wishlistItemToDelete = wishlistItemRepository.findByProductAndWishlist(product, wishlist);
+        if (wishlistItemToDelete != null) {
+            wishlistItemRepository.delete(wishlistItemToDelete);
+
+            WishlistResDTO wishlistResDTO = WishlistResDTO.builder()
+                    .customerId(customerId)
+                    .productId(product.getId())
+                    .productName(product.getName())
+                    .build();
+
+            return APIResponse.success("wishlist", wishlistResDTO);
+        } else {
+            return APIResponse.notExistRequest();
+        }
+    }
+
+    public APIResponse<List<WishlistItemResDTO>> getWishlistItems(Principal principal) {
+
+        String customerId = principal.getName();
+        Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
+        List<WishlistItem> wishlistItems = wishlist.getWishlistItemList();
+
+        List<WishlistItemResDTO> wishlistItemResDTOList = new ArrayList<>();
+
+        for (WishlistItem wishlistItem : wishlistItems) {
+            Product product = wishlistItem.getProduct();
+            WishlistItemResDTO wishlistItemResDTO = WishlistItemResDTO.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .thumbnail(product.getThumbnail())
+                    .content(product.getContent())
+                    .color(product.getColor())
+                    .season(product.getSeason())
+                    .type(product.getType())
+                    .build();
+
+            wishlistItemResDTOList.add(wishlistItemResDTO);
+        }
+        return APIResponse.success("wishlist", wishlistItemResDTOList);
+    }
+
+    @Transactional
+    public Wishlist createWishlist(Customer customer){
         Wishlist wishlist = new Wishlist();
         wishlist.setCustomer(customer);
 

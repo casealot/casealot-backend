@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,6 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final CustomerRepository customerRepository;
 
-    private final AuthTokenProvider authTokenProvider;
 
 
     public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
@@ -61,7 +61,11 @@ public class NoticeService {
 
     @Transactional
     public APIResponse<NoticeDetailDTO> getNotice(Long noticeId){
-        Notice notice = noticeRepository.findById(noticeId) .orElseThrow();
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
+
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
 
         notice.setViews(notice.getViews() + 1);
 
@@ -99,9 +103,11 @@ public class NoticeService {
 
 
     @Transactional
-    public APIResponse<NoticeResDTO> createNotice(NoticeReqDTO noticeReqDTO, HttpServletRequest request) {
+    public APIResponse<NoticeResDTO> createNotice(NoticeReqDTO noticeReqDTO,
+                                                  HttpServletRequest request,
+                                                  Principal principal) {
 
-        String customerId = findCustomerId(request);
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -125,10 +131,17 @@ public class NoticeService {
     }
 
     @Transactional
-    public APIResponse<NoticeResDTO> updateNotice(Long noticeId, NoticeReqDTO noticeReqDTO, HttpServletRequest request){
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+    public APIResponse<NoticeResDTO> updateNotice(Long noticeId,
+                                                  NoticeReqDTO noticeReqDTO,
+                                                  HttpServletRequest request,
+                                                  Principal principal){
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        String customerId = findCustomerId(request);
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
+
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -148,10 +161,16 @@ public class NoticeService {
 
 
     @Transactional
-    public APIResponse<NoticeResDTO> deleteNotice(Long noticeId, HttpServletRequest request){
-        Notice notice = noticeRepository.findById(noticeId).orElseThrow();
+    public APIResponse<NoticeResDTO> deleteNotice(Long noticeId,
+                                                  HttpServletRequest request,
+                                                  Principal principal){
+        Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        String customerId = findCustomerId(request);
+        if(notice == null){
+            return APIResponse.notExistRequest();
+        }
+
+        String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -178,12 +197,6 @@ public class NoticeService {
         return noticeResDTO;
     }
 
-    private String findCustomerId(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
-        Claims claims = authToken.getTokenClaims();
-        return claims.getSubject();
-    }
 
     private boolean checkAdminRole(String customerId) {
         Customer customer = customerRepository.findById(customerId);

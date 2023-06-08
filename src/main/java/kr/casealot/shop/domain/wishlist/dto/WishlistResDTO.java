@@ -3,6 +3,8 @@ package kr.casealot.shop.domain.wishlist.dto;
 import kr.casealot.shop.domain.product.entity.Product;
 import lombok.*;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -14,3 +16,4 @@ public class WishlistResDTO {
     private Long productId;
     private String productName;
 }
+

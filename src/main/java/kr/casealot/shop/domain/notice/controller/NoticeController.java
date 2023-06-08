@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -20,6 +21,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundExc
 @Api(tags = {"NOTICE API"}, description = "NOTICE 관련 API")
 @RequestMapping("/cal/v1/notice")
 public class NoticeController {
+
     private final NoticeService noticeService;
 
     // 공지 전체 조회
@@ -34,30 +36,5 @@ public class NoticeController {
     public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId) throws NotFoundException {
 
         return noticeService.getNotice(noticeId);
-    }
-
-    // 공지 작성
-    @PostMapping
-    public APIResponse<NoticeResDTO> createNotice(@RequestBody NoticeReqDTO noticeReqDTO, HttpServletRequest request){
-
-        return noticeService.createNotice(noticeReqDTO, request);
-    }
-
-    // 공지 수정
-    @PutMapping("/{notice_id}")
-    public APIResponse<NoticeResDTO> updateNotice(@PathVariable("notice_id") Long noticeId,
-                                                  @RequestBody NoticeReqDTO noticeReqDTO,
-                                                  HttpServletRequest request) throws NotFoundException {
-
-        return noticeService.updateNotice(noticeId, noticeReqDTO, request);
-    }
-
-    // 공지 삭제
-    @DeleteMapping("/{notice_id}")
-    public APIResponse<NoticeResDTO> deleteNotice(@PathVariable("notice_id") Long noticeId,
-                                                  HttpServletRequest request) throws NotFoundException {
-
-
-        return noticeService.deleteNotice(noticeId, request);
     }
 }
