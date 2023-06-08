@@ -14,7 +14,7 @@ import java.security.Principal;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@Api(tags = {"CART API"}, description = "유저 관련 API")
+@Api(tags = {"CART API"}, description = "카트 관련 API")
 @RequestMapping("/cal/v1/cart")
 public class CartController {
     private final CartService cartService;

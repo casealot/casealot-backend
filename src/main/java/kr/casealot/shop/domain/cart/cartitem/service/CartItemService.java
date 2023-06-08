@@ -62,6 +62,37 @@ public class CartItemService {
     }
 
     @Transactional
+    public APIResponse<List<CartResDto>> addCartItemQuantity(Principal principal, Long cartItemId, int quantity) {
+        Customer customer = customerRepository.findCustomerById(principal.getName());
+        if (customer == null) {
+            // Handle customer not found exception
+            return APIResponse.fail();
+        }
+
+        Cart cart = cartRepository.findByCustomerId(customer.getId());
+        if (cart == null) {
+            // Handle cart not found exception
+            return APIResponse.fail();
+        }
+
+        CartItem cartItem = getCartItemFromCart(cart, cartItemId);
+        if (cartItem == null) {
+            // Handle cart item not found exception
+            return APIResponse.fail();
+        }
+
+        int currentQuantity = cartItem.getQuantity();
+
+        cartItem.setQuantity(currentQuantity + quantity);
+        cartItemRepository.save(cartItem);
+
+        // Retrieve the updated cart items after modification
+        List<CartResDto> cartResDtoList = getCartResDtoList(cart.getSeq());
+
+        return APIResponse.success("cart", cartResDtoList);
+    }
+
+    @Transactional
     public APIResponse<List<CartResDto>> removeCartItem(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
