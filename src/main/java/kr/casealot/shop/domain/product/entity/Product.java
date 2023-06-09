@@ -71,9 +71,6 @@ public class Product extends BaseTimeEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<WishlistItem> wishlistItemList = new ArrayList<>();
 
     @Builder
     public Product(String name, String content, int price, int sale,
