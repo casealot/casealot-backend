@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.cart.cartitem.controller;
 
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.cart.cartitem.service.CartItemService;
+import kr.casealot.shop.domain.cart.dto.CartGetDTO;
 import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,21 +19,21 @@ public class CartItemController {
     private final CartItemService cartItemService;
 
     @PostMapping("/reduce/{cartItemId}")
-    public APIResponse<List<CartResDTO>> reduceCartItemQuantity(Principal principal,
-                                                                @PathVariable Long cartItemId) {
+    public APIResponse<CartGetDTO> reduceCartItemQuantity(Principal principal,
+                                                          @PathVariable Long cartItemId) {
         return cartItemService.reduceCartItemQuantity(principal, cartItemId);
     }
 
     //카트 상품 증가
     @PostMapping("/add/{cartItemId}")
-    public APIResponse<List<CartResDTO>> addCartItemQuantity(Principal principal,
+    public APIResponse<CartGetDTO> addCartItemQuantity(Principal principal,
                                                              @PathVariable Long cartItemId) {
         return cartItemService.addCartItemQuantity(principal, cartItemId);
     }
 
     //단일 삭제
     @DeleteMapping("/{cartItemId}")
-    public APIResponse<List<CartResDTO>> removeCartItem(Principal principal,
+    public APIResponse<CartGetDTO> removeCartItem(Principal principal,
                                                         @PathVariable Long cartItemId) {
         return cartItemService.removeCartItem(principal, cartItemId);
     }
