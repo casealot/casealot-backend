@@ -33,6 +33,6 @@ public class CartItem{
     @JoinColumn(name="PRODUCT_ID")
     private Product product;
 
-    private int quantity; // 상품 총 개수
+    private int quantity; // 상품 개수
 }
 
