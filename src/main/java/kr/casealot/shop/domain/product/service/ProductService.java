@@ -179,13 +179,18 @@ public class ProductService {
     @Transactional
     public APIResponse modifyProductWithImage(Long id, MultipartFile thumbnailFile,
                                               List<MultipartFile> imagesFiles) throws Exception {
-
         Product savedProduct = productRepository.findById(id)
                 .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
 
         UploadFile thumbnail = null;
         if(null != thumbnailFile){
-            deleteProduct(id);
+            //기존에 이미지가 있다면 삭제
+            UploadFile savedThumbnailFile = savedProduct.getThumbnail();
+            if(null != savedThumbnailFile){
+                s3UploadService.deleteFileFromS3Bucket(savedThumbnailFile.getUrl());
+                uploadFileService.delete(savedThumbnailFile);
+            }
+
             String path = s3UploadService.uploadFile(thumbnailFile);
             thumbnail = uploadFileService.create(UploadFile.builder()
                     .name(thumbnailFile.getOriginalFilename())
@@ -199,7 +204,15 @@ public class ProductService {
         List<UploadFile> images = null;
         if(null != imagesFiles){
             images = new ArrayList<>();
-            deleteProduct(id);
+            //기존에 이미지가 있다면 삭제
+            List<UploadFile> savedImagesFile = savedProduct.getImages();
+            if(null != savedImagesFile){
+                for(UploadFile savedImage : savedImagesFile){
+                    s3UploadService.deleteFileFromS3Bucket(savedImage.getUrl());
+                    uploadFileService.delete(savedImage);
+                }
+            }
+
             for(MultipartFile imageFile : imagesFiles){
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
