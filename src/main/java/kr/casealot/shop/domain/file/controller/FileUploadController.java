@@ -42,7 +42,7 @@ public class FileUploadController {
     }
 
     @PutMapping("/{product_id}/image")
-    @ApiOperation(value = "상품 이미지 업로드", notes = "상품의 이미지와 썸네일 이미지를 업로드한다.")
+    @ApiOperation(value = "상품 이미지 업로드 수정", notes = "기존에 등록되어있는 이미지는 삭제하고 새로 이미지를 업로드한다.")
     public APIResponse modifyUploadedImage(
             @ApiParam(value = "상품 ID") @PathVariable("product_id") Long id,
             @ApiParam(value = "상품 썸네일 이미지") @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile,
