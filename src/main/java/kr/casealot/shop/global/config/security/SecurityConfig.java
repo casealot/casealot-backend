@@ -96,7 +96,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/cal/v1/product/review/**",
                         "/cal/v1/wishlist/**",
-                        "/cal/v1/wishlist-item/**",
                         "/cal/v1/notice/**",
                         "/cal/v1/qna/**",
                         "/cal/v1/cart/**"
