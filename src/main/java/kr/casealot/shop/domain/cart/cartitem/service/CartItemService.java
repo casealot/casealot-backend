@@ -2,11 +2,13 @@ package kr.casealot.shop.domain.cart.cartitem.service;
 
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
+import kr.casealot.shop.domain.cart.dto.CartGetDTO;
 import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.product.dto.ProductCartDTO;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +30,7 @@ public class CartItemService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public APIResponse<List<CartResDTO>> reduceCartItemQuantity(Principal principal, Long cartItemId) {
+    public APIResponse<CartGetDTO> reduceCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             return APIResponse.nullCheckPlease();
@@ -52,13 +54,39 @@ public class CartItemService {
             cartItemRepository.save(cartItem);
         }
 
-        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
+//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
+//
+//        return APIResponse.success(API_NAME, cartResDTOList);
 
-        return APIResponse.success(API_NAME, cartResDTOList);
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(myCartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(myCartItem.getProduct().getId());
+                    productCartDTO.setName(myCartItem.getProduct().getName());
+                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(myCartItem.getQuantity());
+                    if(myCartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
+                    }
+                    productCartDTO.setContent(myCartItem.getProduct().getContent());
+                    productCartDTO.setColor(myCartItem.getProduct().getColor());
+                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
+                    productCartDTO.setType(myCartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
+
+        return APIResponse.success(API_NAME, cartGetDto);
     }
 
     @Transactional
-    public APIResponse<List<CartResDTO>> addCartItemQuantity(Principal principal, Long cartItemId) {
+    public APIResponse<CartGetDTO> addCartItemQuantity(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             return APIResponse.nullCheckPlease();
@@ -78,14 +106,39 @@ public class CartItemService {
 
         cartItem.setQuantity(currentQuantity + 1);
         cartItemRepository.save(cartItem);
+//
+//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
+//
+//        return APIResponse.success(API_NAME, cartResDTOList);
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(myCartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(myCartItem.getProduct().getId());
+                    productCartDTO.setName(myCartItem.getProduct().getName());
+                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(myCartItem.getQuantity());
+                    if(myCartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
+                    }
+                    productCartDTO.setContent(myCartItem.getProduct().getContent());
+                    productCartDTO.setColor(myCartItem.getProduct().getColor());
+                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
+                    productCartDTO.setType(myCartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
 
-        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
-
-        return APIResponse.success(API_NAME, cartResDTOList);
+        return APIResponse.success(API_NAME, cartGetDto);
     }
 
     @Transactional
-    public APIResponse<List<CartResDTO>> removeCartItem(Principal principal, Long cartItemId) {
+    public APIResponse<CartGetDTO> removeCartItem(Principal principal, Long cartItemId) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
             log.warn("customer is null");
@@ -106,10 +159,35 @@ public class CartItemService {
 
         cart.getCartItems().remove(cartItem);
         cartItemRepository.delete(cartItem);
+//
+//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
+//
+//        return APIResponse.success(API_NAME, cartResDTOList);
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(myCartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(myCartItem.getProduct().getId());
+                    productCartDTO.setName(myCartItem.getProduct().getName());
+                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(myCartItem.getQuantity());
+                    if(myCartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
+                    }
+                    productCartDTO.setContent(myCartItem.getProduct().getContent());
+                    productCartDTO.setColor(myCartItem.getProduct().getColor());
+                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
+                    productCartDTO.setType(myCartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
 
-        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
-
-        return APIResponse.success(API_NAME, cartResDTOList);
+        return APIResponse.success(API_NAME, cartGetDto);
     }
 
 
