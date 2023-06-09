@@ -113,7 +113,7 @@ public class ProductService {
 
     @Transactional
     public APIResponse<Product> createProduct(
-            ProductDTO.CreateRequest createRequest) {
+            ProductDTO.Request createRequest) {
 
 
         if (productRepository.findByName(createRequest.getName()) == null) {
@@ -257,7 +257,7 @@ public class ProductService {
     }
 
     @Transactional
-    public APIResponse<Product> updateProduct(Long productId, ProductDTO.UpdateRequest updateRequest) throws Exception {
+    public APIResponse<Product> updateProduct(Long productId, ProductDTO.Request updateRequest) throws Exception {
 
         Product savedProduct = productRepository.findById(productId).orElseThrow(
                 () -> new NotExistProduct("존재하지 않는 상품입니다.")

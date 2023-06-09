@@ -22,7 +22,7 @@ public class ProductAdminController {
     @ApiOperation(value = "ADMIN 상품 등록", notes = "상품을 등록한다.")
     @PostMapping
     public APIResponse<Product> createProduct(
-           @ApiParam(value = "상품 등록 요청 DTO") @RequestBody ProductDTO.CreateRequest createRequest)  {
+           @ApiParam(value = "상품 등록 요청 DTO") @RequestBody ProductDTO.Request createRequest)  {
         return productService.createProduct(createRequest);
     }
 
@@ -30,7 +30,7 @@ public class ProductAdminController {
     @PutMapping("/{id}")
     public APIResponse<Product> updateProduct(
             @PathVariable Long id,
-            @ApiParam(value = "상품 수정 요청 DTO") @RequestBody ProductDTO.UpdateRequest updateRequest) throws Exception {
+            @ApiParam(value = "상품 수정 요청 DTO") @RequestBody ProductDTO.Request updateRequest) throws Exception {
         return productService.updateProduct(id, updateRequest);
     }
 
