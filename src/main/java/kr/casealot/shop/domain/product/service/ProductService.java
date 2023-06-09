@@ -67,6 +67,7 @@ public class ProductService {
 
         return APIResponse.success(API_NAME, response);
     }
+
     @Transactional
     public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
@@ -112,18 +113,24 @@ public class ProductService {
     public APIResponse<Product> createProduct(
             ProductDTO.CreateRequest createRequest) {
 
-        Product saveProduct = Product.builder()
-                .name(createRequest.getName())
-                .content(createRequest.getContent())
-                .price(createRequest.getPrice())
-                .sale(createRequest.getSale())
-                .color(createRequest.getColor())
-                .season(createRequest.getSeason())
-                .type(createRequest.getType())
-                .build();
 
-        Product savedProduct = productRepository.saveAndFlush(saveProduct);
-        return APIResponse.success(API_NAME, savedProduct);
+        if (productRepository.findByName(createRequest.getName()) == null) {
+            Product saveProduct = Product.builder()
+                    .name(createRequest.getName())
+                    .content(createRequest.getContent())
+                    .price(createRequest.getPrice())
+                    .sale(createRequest.getSale())
+                    .color(createRequest.getColor())
+                    .season(createRequest.getSeason())
+                    .type(createRequest.getType())
+                    .build();
+            Product savedProduct = productRepository.saveAndFlush(saveProduct);
+            return APIResponse.success(API_NAME, savedProduct);
+        }else{
+            return APIResponse.productNameDuplicated();
+        }
+
+
     }
 
     @Transactional
@@ -148,14 +155,14 @@ public class ProductService {
         // step1 : S3 업로드된 이미지 삭제
         // step2 : DB에 저장된 이미지 메타정보 삭제
         UploadFile thumbnailFile = product.getThumbnail();
-        if(Objects.nonNull(thumbnailFile)){
+        if (Objects.nonNull(thumbnailFile)) {
             s3UploadService.deleteFileFromS3Bucket(thumbnailFile.getUrl());
             uploadFileService.delete(thumbnailFile);
         }
 
         List<UploadFile> imagesFiles = product.getImages();
-        if(Objects.nonNull(imagesFiles)){
-            for(UploadFile image : imagesFiles){
+        if (Objects.nonNull(imagesFiles)) {
+            for (UploadFile image : imagesFiles) {
                 s3UploadService.deleteFileFromS3Bucket(image.getUrl());
                 uploadFileService.delete(image);
             }

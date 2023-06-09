@@ -30,6 +30,7 @@ public class APIResponse<T> {
     private final static String NOT_EXIST = "It's a request for doesn't exist";
     private final static String ALREADY_EXIST = "이미 있음";
     private final static String NULL_CHECK = "Please check null";
+    private final static String DUPLICATED_PRODUCT = "Product Name is Duplicated";
 
     private final APIResponseHeader header;
     private final T body;
@@ -96,6 +97,10 @@ public class APIResponse<T> {
 
     public static <T> APIResponse<T> nullCheckPlease() {
         return new APIResponse(new APIResponseHeader(FAILED, NULL_CHECK), null);
+    }
+
+    public static <T> APIResponse<T> productNameDuplicated() {
+        return new APIResponse(new APIResponseHeader(FAILED, DUPLICATED_PRODUCT), null);
     }
 
 }
