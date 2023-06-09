@@ -29,7 +29,7 @@ public class CartService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public APIResponse<CartResDTO> addItemToCart(Principal principal, Long productId) {
+    public APIResponse<CartGetDTO> addItemToCart(Principal principal, Long productId) {
         Customer customer = customerRepository.findById(principal.getName());
         Product product = productRepository.findById(productId).orElse(null);
 
@@ -63,20 +63,47 @@ public class CartService {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         }
 
-
-        CartResDTO cartResDto = new CartResDTO().builder()
-                .cartId(cart.getSeq())
-                .productName(product.getName())
-                .quantity(cartItem.getQuantity())
-                .build();
-
         cartRepository.save(cart);
 
-        return APIResponse.success(API_NAME, cartResDto);
+//        CartResDTO cartResDto = new CartResDTO().builder()
+//                .cartId(cart.getSeq())
+//                .productName(product.getName())
+//                .quantity(cartItem.getQuantity())
+//                .build();
+
+//        return APIResponse.success(API_NAME, cartResDto);
+
+
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(myCartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(myCartItem.getProduct().getId());
+                    productCartDTO.setName(myCartItem.getProduct().getName());
+                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(myCartItem.getQuantity());
+                    if(myCartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
+                    }
+                    productCartDTO.setContent(myCartItem.getProduct().getContent());
+                    productCartDTO.setColor(myCartItem.getProduct().getColor());
+                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
+                    productCartDTO.setType(myCartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
+
+        return APIResponse.success(API_NAME, cartGetDto);
+
     }
 
     @Transactional
-    public APIResponse<CartResDTO> addManyItemToCart(Principal principal, Long productId, int quantity) {
+    public APIResponse<CartGetDTO> addManyItemToCart(Principal principal, Long productId, int quantity) {
         Customer customer = customerRepository.findById(principal.getName());
         Product product = productRepository.findById(productId).orElse(null);
 
@@ -110,16 +137,42 @@ public class CartService {
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
         }
 
-
-        CartResDTO cartResDto = new CartResDTO().builder()
-                .cartId(cart.getSeq())
-                .productName(product.getName())
-                .quantity(cartItem.getQuantity())
-                .build();
-
         cartRepository.save(cart);
 
-        return APIResponse.success(API_NAME, cartResDto);
+//        CartResDTO cartResDto = new CartResDTO().builder()
+//                .cartId(cart.getSeq())
+//                .productName(product.getName())
+//                .quantity(cartItem.getQuantity())
+//                .build();
+//
+//
+//
+//        return APIResponse.success(API_NAME, cartResDto);
+        CartGetDTO cartGetDto = new CartGetDTO();
+        cartGetDto.setCustomerSeq(customer.getSeq());
+        cartGetDto.setCustomerName(customer.getName());
+        cartGetDto.setCartId(cart.getSeq());
+        cartGetDto.setProducts(cart.getCartItems().stream()
+                .map(myCartItem -> {
+                    ProductCartDTO productCartDTO = new ProductCartDTO();
+                    productCartDTO.setId(myCartItem.getProduct().getId());
+                    productCartDTO.setName(myCartItem.getProduct().getName());
+                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
+                    productCartDTO.setQuantity(myCartItem.getQuantity());
+                    if(myCartItem.getProduct().getThumbnail() == null){
+                        productCartDTO.setThumbnail(null);
+                    }else{
+                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
+                    }
+                    productCartDTO.setContent(myCartItem.getProduct().getContent());
+                    productCartDTO.setColor(myCartItem.getProduct().getColor());
+                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
+                    productCartDTO.setType(myCartItem.getProduct().getType());
+                    return productCartDTO;
+                })
+                .collect(Collectors.toList()));
+
+        return APIResponse.success(API_NAME, cartGetDto);
     }
 
     @Transactional

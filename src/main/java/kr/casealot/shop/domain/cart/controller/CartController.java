@@ -20,12 +20,12 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/items/{productId}")
-    public APIResponse<CartResDTO> addItemToCart(Principal principal, @PathVariable Long productId) {
+    public APIResponse<CartGetDTO> addItemToCart(Principal principal, @PathVariable Long productId) {
         return cartService.addItemToCart(principal, productId);
     }
 
     @PostMapping("/items/{productId}/{quantity}")
-    public APIResponse<CartResDTO> addManyItemToCart(Principal principal, @PathVariable Long productId, @PathVariable int quantity) {
+    public APIResponse<CartGetDTO> addManyItemToCart(Principal principal, @PathVariable Long productId, @PathVariable int quantity) {
         return cartService.addManyItemToCart(principal, productId, quantity);
     }
 
