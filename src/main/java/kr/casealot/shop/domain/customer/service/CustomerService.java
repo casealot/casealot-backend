@@ -16,16 +16,19 @@ import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService {
     private final String API_NAME = "customer";
 
@@ -37,7 +40,7 @@ public class CustomerService {
     private final AuthTokenProvider authTokenProvider;
     private final static String REFRESH_TOKEN = "refresh_token";
 
-    public APIResponse join(CustomerDto customerDto) {
+    public APIResponse<String> join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
         // 아이디 중복 확인
@@ -63,12 +66,12 @@ public class CustomerService {
                 .roleType(RoleType.USER)
                 .build();
 
-        Customer savedCustomer = customerRepository.save(customer);
+        customerRepository.save(customer);
 
-        return APIResponse.success(API_NAME, customer);
+        return APIResponse.success(API_NAME, customer.getId() + " join success!");
     }
 
-    public APIResponse login(CustomerLoginDto customerLoginDto
+    public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto
             , HttpServletRequest request
             , HttpServletResponse response) {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
@@ -125,7 +128,7 @@ public class CustomerService {
 
     //로그아웃
     @Transactional
-    public APIResponse logout(HttpServletRequest request) {
+    public APIResponse<String> logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
 
         AuthToken authToken = authTokenProvider.convertAuthToken(token);
@@ -142,29 +145,16 @@ public class CustomerService {
             customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
         }
 
-        return APIResponse.success("customerId", userId);
+        return APIResponse.success("customerId", userId + " user logout!");
     }
 
 
     @Transactional
-    public APIResponse deleteCustomer(HttpServletRequest request) {
-        String token = HeaderUtil.getAccessToken(request);
+    public APIResponse<String> deleteCustomer(HttpServletRequest request, Principal principal) {
+        customerRepository.deleteById(principal.getName());
 
-        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        log.info("ID: " + principal.getName() + "quit!");
 
-        Claims claims = authToken.getTokenClaims();
-        if (claims == null) {
-            return APIResponse.invalidAccessToken();
-        }
-        String userId = claims.getSubject();
-
-        //존재하는 회원인지 확인
-        if (customerRepository.existsCustomerById(userId)) {
-            return APIResponse.invalidAccessToken();
-        }
-
-        System.out.println("ID: " + userId);
-
-        return APIResponse.success("customerId", userId);
+        return APIResponse.success("customerId", principal.getName() + " user deleted !");
     }
 }

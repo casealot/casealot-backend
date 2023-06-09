@@ -3,6 +3,7 @@ package kr.casealot.shop.domain.customer.controller;
 import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
+import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 @RestController
 @Slf4j
@@ -21,24 +23,24 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/join")
-    public APIResponse join(@RequestBody CustomerDto customerDto) {
+    public APIResponse<String> join(@RequestBody CustomerDto customerDto) {
         return customerService.join(customerDto);
     }
 
     @PostMapping("/login")
-    public APIResponse login(@RequestBody CustomerLoginDto customerLoginDto
+    public APIResponse<CustomerTokenDto> login(@RequestBody CustomerLoginDto customerLoginDto
             , HttpServletRequest request
             , HttpServletResponse response) {
-        return customerService.login(customerLoginDto,request , response);
+        return customerService.login(customerLoginDto, request, response);
     }
 
     @DeleteMapping("/logout")
-    public APIResponse logout(HttpServletRequest request) {
+    public APIResponse<String> logout(HttpServletRequest request) {
         return customerService.logout(request);
     }
 
     @DeleteMapping("/quit")
-    public APIResponse quit(HttpServletRequest request) {
-        return customerService.deleteCustomer(request);
+    public APIResponse<String> quit(HttpServletRequest request, Principal principal) {
+        return customerService.deleteCustomer(request, principal);
     }
 }
