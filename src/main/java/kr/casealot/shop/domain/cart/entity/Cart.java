@@ -34,11 +34,8 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
-//    private int quantity; //장바구니에 담긴 총 상품 수
-
     public static Cart createCart(Customer customer) {
         Cart cart = new Cart();
-//        cart.setQuantity(0);
         cart.setCustomer(customer);
         return cart;
     }

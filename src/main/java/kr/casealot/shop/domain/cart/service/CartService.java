@@ -65,11 +65,56 @@ public class CartService {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         }
 
-//        cart.setQuantity(cart.getQuantity() + quantity);
 
         CartResDTO cartResDto = new CartResDTO().builder()
                 .cartId(cart.getSeq())
-//                .cartItemId(cartItem.getSeq())
+                .productName(product.getName())
+                .quantity(cartItem.getQuantity())
+                .build();
+
+        cartRepository.save(cart);
+
+        return APIResponse.success(API_NAME, cartResDto);
+    }
+
+    @Transactional
+    public APIResponse<CartResDTO> addManyItemToCart(Principal principal, Long productId, int quantity) {
+        Customer customer = customerRepository.findById(principal.getName());
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (customer == null || product == null) {
+            return APIResponse.nullCheckPlease();
+        }
+
+        Cart cart = cartRepository.findByCustomerId(principal.getName());
+        if (cart == null) {
+            cart = Cart.createCart(customer);
+        }
+
+        List<CartItem> cartItems = cart.getCartItems();
+        CartItem cartItem = null;
+        if (cartItems != null) {
+            for (CartItem item : cartItems) {
+                if (item.getProduct().equals(product)) {
+                    cartItem = item;
+                    break;
+                }
+            }
+        }
+
+        if (cartItem == null) {
+            cartItem = new CartItem();
+            cartItem.setProduct(product);
+            cartItem.setQuantity(quantity);
+            cartItem.setCart(cart);
+            cart.getCartItems().add(cartItem);
+        } else {
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+        }
+
+
+        CartResDTO cartResDto = new CartResDTO().builder()
+                .cartId(cart.getSeq())
                 .productName(product.getName())
                 .quantity(cartItem.getQuantity())
                 .build();
