@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface CartRepository extends JpaRepository<Cart, Long> {
     Cart findByCustomerId(String customerId);
 
-    //    void deleteAllByCustomerId(String customerId);
     @Modifying
     @Query("DELETE FROM CartItem ci WHERE ci.cart = :cart")
     void deleteCartItemsByCart(@Param("cart") Cart cart);
