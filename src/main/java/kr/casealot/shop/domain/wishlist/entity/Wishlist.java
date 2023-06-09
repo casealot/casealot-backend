@@ -28,6 +28,6 @@ public class Wishlist{
 
     @Builder.Default
     @JsonBackReference
-    @OneToMany(mappedBy = "wishlist", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "wishlist", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<WishlistItem> wishlistItemList = new ArrayList<>();
 }
