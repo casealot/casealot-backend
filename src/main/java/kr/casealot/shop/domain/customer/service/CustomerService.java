@@ -45,7 +45,7 @@ public class CustomerService {
 
         // 아이디 중복 확인
         if (customerRepository.existsCustomerById(customerDto.getId())) {
-            return APIResponse.incorrectID();
+            return APIResponse.duplicatedID();
         }
 
         // 이메일 중복 확인
@@ -91,7 +91,7 @@ public class CustomerService {
 
         // 토큰 생성 (jwt)
         // 토큰 유효 기간 설정 (30분 후)
-        long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry() + 10000000;
+        long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry() + (60 * 60 * 24 * 30); //1달로 설정
 
         AuthToken authToken = authTokenProvider.createAuthToken(
                 customer.getId(),
