@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.cart.service;
 
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
-import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
 import kr.casealot.shop.domain.cart.dto.CartGetDTO;
 import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
@@ -28,7 +27,6 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final CartItemRepository cartItemRepository;
 
     @Transactional
     public APIResponse<CartResDTO> addItemToCart(Principal principal, Long productId) {
