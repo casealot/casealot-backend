@@ -1,16 +1,11 @@
 package kr.casealot.shop.domain.wishlist.controller;
 
 import io.swagger.annotations.Api;
-import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
-import kr.casealot.shop.domain.product.entity.Product;
-import kr.casealot.shop.domain.wishlist.dto.WishlistReqDTO;
 import kr.casealot.shop.domain.wishlist.dto.WishlistResDTO;
 import kr.casealot.shop.domain.wishlist.service.WishlistService;
 import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemResDTO;
-import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,20 +20,28 @@ public class WishlistController {
 
     private final WishlistService wishlistService;
 
-    @PostMapping("/add")
-    public APIResponse<WishlistResDTO> addProductToWishlist(@RequestBody WishlistReqDTO wishlistReqDTO,
+    @PostMapping("/add/{productId}")
+    public APIResponse<WishlistResDTO> addProductToWishlist(@PathVariable Long productId,
                                    HttpServletRequest request,
                                    Principal principal){
 
-        return wishlistService.addProductToWishlist(wishlistReqDTO, request, principal);
+        return wishlistService.addProductToWishlist(productId, request, principal);
     }
 
-    @DeleteMapping("/delete")
-    public APIResponse<WishlistResDTO> deleteProductToWishlist(@RequestBody WishlistReqDTO wishlistReqDTO,
+    // 개별삭제
+    @DeleteMapping("/delete/{productId}")
+    public APIResponse<WishlistResDTO> deleteProductToWishlist(@PathVariable Long productId,
                                                    HttpServletRequest request,
                                                    Principal principal){
 
-        return wishlistService.deleteProductToWishlist(wishlistReqDTO, request, principal);
+        return wishlistService.deleteProductToWishlist(productId, request, principal);
+    }
+
+    // 전체삭제
+    @DeleteMapping("/delete")
+    public APIResponse deleteWishlist(Principal principal){
+
+        return wishlistService.deleteWishlist(principal);
     }
 
     @GetMapping
