@@ -10,14 +10,14 @@ import java.util.List;
 
 public class ProductDTO {
     /**
-     * 상품 등록 요청
+     * 상품 등록, 수정 요청
      */
     @Getter
     @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateRequest{
+    public static class Request{
         private String name;
         private String content;
         private int price;
@@ -27,23 +27,6 @@ public class ProductDTO {
         private String type;
     }
 
-    /**
-     * 상품 등록 요청
-     */
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateRequest{
-        private String name;
-        private String content;
-        private int price;
-        private int sale;
-        private String color;
-        private String season;
-        private String type;
-    }
 
     /**
      * 상품 조회 요청
@@ -65,7 +48,10 @@ public class ProductDTO {
         @ApiModelProperty(value = "정렬 옵션", example = "0")
         private List<SortDTO> sort;
     }
-
+    
+    /**
+     * 상품 조회 응답
+     */
     @Getter
     @Setter
     @Builder
@@ -78,6 +64,9 @@ public class ProductDTO {
         private Long totalCount;
     }
 
+    /**
+     * 상품 상세 조회 응답
+     */
     @Getter
     @Setter
     @Builder
