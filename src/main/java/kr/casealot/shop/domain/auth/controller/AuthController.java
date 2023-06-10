@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
+import kr.casealot.shop.global.exception.NotFoundException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -49,7 +50,8 @@ public class AuthController {
         // refresh token
         String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
-                .orElse((null));
+                .orElseThrow(() -> new NotFoundException("Not Found RefreshToken From Cookie"));
+
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
         // userId refresh token으로 DB 확인
