@@ -40,7 +40,7 @@ public class AuthController {
     private final CustomerRepository customerRepository;
 
     private final static long THREE_DAYS_MSEC = 259200000;
-    private final static String REFRESH_TOKEN = "refreshToken";
+    private final static String REFRESH_TOKEN = "refresh_token";
 
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
