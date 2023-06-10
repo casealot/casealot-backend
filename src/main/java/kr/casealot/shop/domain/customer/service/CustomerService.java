@@ -38,6 +38,7 @@ public class CustomerService {
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
+    private final AuthTokenProvider tokenProvider;
     private final static String REFRESH_TOKEN = "refreshToken";
 
     public APIResponse<String> join(CustomerDto customerDto) {
@@ -100,23 +101,34 @@ public class CustomerService {
 
         String accessToken = authToken.getToken();
 
-        // refreshToken 기간 7일
-        long refreshExpiry = appProperties.getAuth().getRefreshTokenExpiry();
-        AuthToken refreshToken = authTokenProvider.createAuthToken(
-                appProperties.getAuth().getTokenSecret(),
-                new Date(new Date().getTime() + refreshExpiry)
-        );
-
         // userId refresh token 으로 DB 확인
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(customer.getId());
+
+        long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
+
+        AuthToken refreshToken = null;
         if (customerRefreshToken != null) {
-            customerRefreshToken.setRefreshToken(refreshToken.getToken());
+            refreshToken = authTokenProvider.convertAuthToken(customerRefreshToken.getRefreshToken());
+            // refresh 토큰이 유효 됐을 경우 다시 재발급 한다.
+            if(refreshToken.validate()){
+                refreshToken = tokenProvider.createAuthToken(
+                        appProperties.getAuth().getTokenSecret(),
+                        new Date(now.getTime() + refreshTokenExpiry)
+                );
+                customerRefreshToken.setRefreshToken(refreshToken.getToken());
+                customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
+            }
         } else {
+            refreshToken = tokenProvider.createAuthToken(
+                    appProperties.getAuth().getTokenSecret(),
+                    new Date(now.getTime() + refreshTokenExpiry)
+            );
+            customerRefreshToken.setRefreshToken(refreshToken.getToken());
             customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
             customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
         }
 
-        int cookieMaxAge = (int) refreshExpiry / 60;
+        int cookieMaxAge = (int) refreshTokenExpiry / 60;
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
