@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
@@ -34,7 +36,7 @@ public class AuthController {
     private final AuthTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
-    private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
 
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refreshToken";
@@ -42,23 +44,8 @@ public class AuthController {
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
     public APIResponse refreshToken (HttpServletRequest request) throws Exception {
-        // access token 확인
-        String accessToken = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
-        if (!authToken.validate() && StringUtils.hasText(accessToken)) {
-            return APIResponse.invalidAccessToken();
-        }
-
-        // expired access token 인지 확인
-        Claims claims = authToken.getExpiredTokenClaims();
-        if (claims == null) {
-            return APIResponse.notExpiredTokenYet();
-        }
-
-        String userId = claims.getSubject();
-        RoleType roleType = RoleType.of(claims.get("role", String.class));
-
         // refresh token cookie에서 갖고옴
+
         // refresh token
         String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
@@ -70,8 +57,13 @@ public class AuthController {
         }
 
         // userId refresh token으로 DB 확인
-        CustomerRefreshToken userRefreshToken = customerRefreshTokenRepository.findByIdAndRefreshToken(userId, refreshToken);
-        if (userRefreshToken == null) {
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
+
+        String userId = customerRefreshToken.getId();
+        Customer customer = customerRepository.findById(userId);
+        RoleType roleType = customer.getRoleType();
+
+        if (customerRefreshToken == null) {
             return APIResponse.invalidRefreshToken();
         }
 
@@ -95,8 +87,8 @@ public class AuthController {
             );
 
             // DB에 refresh 토큰 업데이트
-            userRefreshToken.setRefreshToken(authRefreshToken.getToken());
-            customerRefreshTokenRepository.save(userRefreshToken);
+            customerRefreshToken.setRefreshToken(authRefreshToken.getToken());
+            customerRefreshTokenRepository.save(customerRefreshToken);
         }
 
         return APIResponse.success("token", newAccessToken.getToken());
