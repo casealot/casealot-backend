@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.entity.Notice;
+import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
@@ -17,6 +18,7 @@ import kr.casealot.shop.global.oauth.entity.RoleType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -105,6 +107,10 @@ public class Customer extends BaseTimeEntity {
     @JsonBackReference
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Wishlist wishList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Order> orders = new ArrayList<>();
 
     /**
      * Create Customer for OAuth
