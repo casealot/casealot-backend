@@ -129,7 +129,7 @@ public class ProductService {
             Product savedProduct = productRepository.saveAndFlush(saveProduct);
             return APIResponse.success(API_NAME, savedProduct);
         }else{
-            return APIResponse.productNameDuplicated();
+            throw new RuntimeException("같은 이름의 상품이 이미 존재합니다.");
         }
     }
 
