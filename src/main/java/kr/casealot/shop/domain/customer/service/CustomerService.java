@@ -38,7 +38,7 @@ public class CustomerService {
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
-    private final static String REFRESH_TOKEN = "refresh_token";
+    private final static String REFRESH_TOKEN = "refreshToken";
 
     public APIResponse<String> join(CustomerDto customerDto) {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
@@ -104,26 +104,23 @@ public class CustomerService {
         long refreshExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = authTokenProvider.createAuthToken(
                 appProperties.getAuth().getTokenSecret(),
-                new Date(refreshExpiry)
+                new Date(new Date().getTime() + refreshExpiry)
         );
 
         // userId refresh token 으로 DB 확인
-        CustomerRefreshToken userRefreshToken = customerRefreshTokenRepository.findById(customer.getId());
-        if (userRefreshToken == null) {
-            // 없는 경우 새로 등록
-            userRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(customer.getId());
+        if (customerRefreshToken != null) {
+            customerRefreshToken.setRefreshToken(refreshToken.getToken());
         } else {
-            // TODO DB에 refresh 토큰 업데이트
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
+            customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
+            customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
         }
 
-        customerRefreshTokenRepository.saveAndFlush(userRefreshToken);
-
-        int cookieMaxAge = (int) refreshExpiry;
+        int cookieMaxAge = (int) refreshExpiry / 60;
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-        CookieUtil.addCookie(response, REFRESH_TOKEN, userRefreshToken.getRefreshToken(), cookieMaxAge);
+        CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
-        return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, userRefreshToken.getRefreshToken(), customer.getRoleType()));
+        return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
 
     //로그아웃

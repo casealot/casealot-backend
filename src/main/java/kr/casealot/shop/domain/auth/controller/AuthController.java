@@ -13,12 +13,18 @@ import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+@Slf4j
 @RestController
 @RequestMapping("/cal/v1/auth")
 @RequiredArgsConstructor
@@ -31,7 +37,7 @@ public class AuthController {
     private final CustomerService customerService;
 
     private final static long THREE_DAYS_MSEC = 259200000;
-    private final static String REFRESH_TOKEN = "refresh_token";
+    private final static String REFRESH_TOKEN = "refreshToken";
 
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
@@ -39,8 +45,7 @@ public class AuthController {
         // access token 확인
         String accessToken = HeaderUtil.getAccessToken(request);
         AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
-
-        if (!authToken.validate()) {
+        if (!authToken.validate() && StringUtils.hasText(accessToken)) {
             return APIResponse.invalidAccessToken();
         }
 
@@ -54,8 +59,10 @@ public class AuthController {
         RoleType roleType = RoleType.of(claims.get("role", String.class));
 
         // refresh token cookie에서 갖고옴
-        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN).orElseThrow(() -> new Exception("cookie token invalidate")).getValue();
-
+        // refresh token
+        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
+                .map(Cookie::getValue)
+                .orElse((null));
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
         if (authRefreshToken.validate()) {
@@ -94,43 +101,5 @@ public class AuthController {
 
         return APIResponse.success("token", newAccessToken.getToken());
     }
-
-
-//    @PostMapping("/signup")
-//    public ResponseEntity<Customer> signup(@RequestBody Customer customer){
-//        Customer createdCustomer = customerService.signup(customer);
-//        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
-//    }
-//
-//    @PostMapping("/local")
-//    public ResponseEntity<String> login(@RequestBody Customer customer){
-//        Customer savedCustomer = customerService.login(customer);
-//        Date expireDate= new Date(new Date().getTime() + appProperties.getAuth().getTokenExpiry());
-//        // subj role exp
-//        AuthToken authToken = tokenProvider.createAuthToken(customer.getId(), RoleType.USER.getCode(), expireDate);
-//        return ResponseEntity.ok(authToken.getToken());
-//    }
-//
-//    @DeleteMapping("/quit")
-//    public ResponseEntity<String> quit(HttpServletRequest request){
-//        // Step 1 :: Header 에서 토큰 꺼내옴
-//        String accessToken = HeaderUtil.getAccessToken(request);
-//        // Step 2 :: 토큰 값으로 authToken 객체 변환
-//        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
-//        // expired access token 인지 확인
-//
-//        // Claims
-//        Claims claims = authToken.getTokenClaims();
-//        String userId = claims.getId();
-//
-//        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
-//                .map(Cookie::getValue)
-//                .orElse((null));
-//        AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
-//
-//
-//        return ResponseEntity.ok("success");
-//    }
-
 
 }
