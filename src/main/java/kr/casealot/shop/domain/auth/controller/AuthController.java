@@ -50,7 +50,7 @@ public class AuthController {
         // refresh token
         String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new NotFoundException("Not Found RefreshToken From Cookie"));
+                .orElseThrow(() -> new NotFoundException("쿠키에서 리프레시 토큰을 찾을 수 없습니다."));
 
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
