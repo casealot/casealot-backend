@@ -4,7 +4,6 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
-import kr.casealot.shop.domain.wishlist.dto.WishlistResDTO;
 import kr.casealot.shop.domain.wishlist.entity.Wishlist;
 import kr.casealot.shop.domain.wishlist.repository.WishlistRepository;
 import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemResDTO;
@@ -31,7 +30,7 @@ public class WishlistService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public APIResponse<WishlistResDTO> addProductToWishlist(Long productId, HttpServletRequest request, Principal principal) {
+    public APIResponse<WishlistItemResDTO> addProductToWishlist(Long productId, HttpServletRequest request, Principal principal) {
 
         String customerId = principal.getName();
 
@@ -48,7 +47,7 @@ public class WishlistService {
         boolean isExist = wishlist.getWishlistItemList().stream()
                 .anyMatch(item -> item.getProduct().getId().equals(product.getId()));
 
-        if(isExist){
+        if (isExist) {
             return APIResponse.alreadyExistRequest();
         }
 
@@ -59,43 +58,60 @@ public class WishlistService {
 
         wishlistItemRepository.save(wishlistItem);
 
-        WishlistResDTO wishlistResDTO = WishlistResDTO.builder()
-                                        .customerId(customerId)
-                                        .productId(product.getId())
-                                        .productName(product.getName())
-                                        .build();
+        WishlistItemResDTO wishlistItemResDTO = WishlistItemResDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .content(product.getContent())
+                .color(product.getColor())
+                .season(product.getSeason())
+                .type(product.getType())
+                .build();
 
-        wishlistRepository.save(wishlist);
+        if (product.getThumbnail() != null) {
+            wishlistItemResDTO.setThumbnail(product.getThumbnail().getUrl());
+        } else {
+            wishlistItemResDTO.setThumbnail(null);
+        }
 
-        return APIResponse.success(API_NAME, wishlistResDTO);
+        return APIResponse.success(API_NAME, wishlistItemResDTO);
     }
 
     @Transactional
-    public APIResponse<WishlistResDTO> deleteProductToWishlist(Long productId, HttpServletRequest request, Principal principal) {
+    public APIResponse<WishlistItemResDTO> deleteProductToWishlist(Long productId, HttpServletRequest request, Principal principal) {
 
         String customerId = principal.getName();
         Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
         Product product = productRepository.findById(productId).orElseThrow();
 
         List<WishlistItem> wishlistItems = wishlist.getWishlistItemList();
-        wishlistItems.removeIf(item -> item.getProduct().getId().equals(product.getId()));
+        boolean isItemDeleted = wishlistItems.removeIf(item -> item.getProduct().getId().equals(product.getId()));
 
-
-        WishlistItem wishlistItemToDelete = wishlistItemRepository.findByProductAndWishlist(product, wishlist);
-        if (wishlistItemToDelete != null) {
-            wishlistItemRepository.delete(wishlistItemToDelete);
-
-            WishlistResDTO wishlistResDTO = WishlistResDTO.builder()
-                    .customerId(customerId)
-                    .productId(product.getId())
-                    .productName(product.getName())
+        if (isItemDeleted) {
+            WishlistItemResDTO deletedItemResDTO = WishlistItemResDTO.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .content(product.getContent())
+                    .color(product.getColor())
+                    .season(product.getSeason())
+                    .type(product.getType())
                     .build();
 
-            return APIResponse.success(API_NAME, wishlistResDTO);
+            if (product.getThumbnail() != null) {
+                deletedItemResDTO.setThumbnail(product.getThumbnail().getUrl());
+            } else {
+                deletedItemResDTO.setThumbnail(null);
+            }
+
+            wishlistItemRepository.deleteByProductAndWishlist(product, wishlist);
+
+            return APIResponse.success(API_NAME, deletedItemResDTO);
         } else {
             return APIResponse.notExistRequest();
         }
     }
+
 
     public APIResponse<List<WishlistItemResDTO>> getWishlistItems(Principal principal) {
 
@@ -128,7 +144,7 @@ public class WishlistService {
             if (product.getThumbnail() != null) {
                 wishlistItemResDTO.setThumbnail(product.getThumbnail().getUrl());
             } else {
-                wishlistItemResDTO.setThumbnail("등록된 사진 없음");
+                wishlistItemResDTO.setThumbnail(null);
             }
 
             wishlistItemResDTOList.add(wishlistItemResDTO);
@@ -145,13 +161,39 @@ public class WishlistService {
     }
 
     @Transactional
-    public APIResponse deleteWishlist(Principal principal) {
+    public APIResponse<List<WishlistItemResDTO>> deleteWishlist(Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
         Wishlist wishlist = wishlistRepository.findByCustomerId(principal.getName());
+
+        List<WishlistItem> deletedItems = wishlist.getWishlistItemList();
 
         wishlistRepository.deleteCartItemsByCart(wishlist);
         wishlistRepository.delete(wishlist);
 
-        return APIResponse.success("위시리스트 삭제", customer.getId());
+        List<WishlistItemResDTO> deletedItemResDTOList = new ArrayList<>();
+
+        for (WishlistItem deletedItem : deletedItems) {
+            Product product = deletedItem.getProduct();
+            WishlistItemResDTO deletedItemResDTO = WishlistItemResDTO.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .content(product.getContent())
+                    .color(product.getColor())
+                    .season(product.getSeason())
+                    .type(product.getType())
+                    .build();
+
+            if (product.getThumbnail() != null) {
+                deletedItemResDTO.setThumbnail(product.getThumbnail().getUrl());
+            } else {
+                deletedItemResDTO.setThumbnail(null);
+            }
+
+            deletedItemResDTOList.add(deletedItemResDTO);
+        }
+
+        return APIResponse.success( API_NAME, deletedItemResDTOList);
     }
+
 }

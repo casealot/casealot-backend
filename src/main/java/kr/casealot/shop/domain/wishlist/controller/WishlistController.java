@@ -1,7 +1,6 @@
 package kr.casealot.shop.domain.wishlist.controller;
 
 import io.swagger.annotations.Api;
-import kr.casealot.shop.domain.wishlist.dto.WishlistResDTO;
 import kr.casealot.shop.domain.wishlist.service.WishlistService;
 import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemResDTO;
 import kr.casealot.shop.global.common.APIResponse;
@@ -21,25 +20,23 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @PostMapping("/add/{productId}")
-    public APIResponse<WishlistResDTO> addProductToWishlist(@PathVariable Long productId,
-                                   HttpServletRequest request,
-                                   Principal principal){
-
+    public APIResponse<WishlistItemResDTO> addProductToWishlist(@PathVariable Long productId,
+                                                                HttpServletRequest request,
+                                                                Principal principal) {
         return wishlistService.addProductToWishlist(productId, request, principal);
     }
 
-    // 개별삭제
     @DeleteMapping("/delete/{productId}")
-    public APIResponse<WishlistResDTO> deleteProductToWishlist(@PathVariable Long productId,
-                                                   HttpServletRequest request,
-                                                   Principal principal){
-
+    public APIResponse<WishlistItemResDTO> deleteProductToWishlist(@PathVariable Long productId,
+                                                                   HttpServletRequest request,
+                                                                   Principal principal) {
         return wishlistService.deleteProductToWishlist(productId, request, principal);
     }
 
+
     // 전체삭제
     @DeleteMapping("/delete")
-    public APIResponse deleteWishlist(Principal principal){
+    public APIResponse<List<WishlistItemResDTO>> deleteWishlist(Principal principal){
 
         return wishlistService.deleteWishlist(principal);
     }
