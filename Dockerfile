@@ -9,4 +9,4 @@ WORKDIR /app
 COPY ${JAR_FILE} casealot-backend.jar
 
 # 실행
-CMD ["java","-jar","-Duser.timezone=Asia/Seoul -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}","casealot-backend.jar"]
+CMD ["java","-jar","-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}","casealot-backend.jar"]
