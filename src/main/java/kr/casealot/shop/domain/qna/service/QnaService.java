@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.qna.dto.*;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.*;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
@@ -166,7 +167,7 @@ public class QnaService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!(customerId.equals(qna.getCustomer().getId()) || !isAdmin)) {
-            return APIResponse.permissionDenied();
+            throw new PermissionException("올바르지 않은 권한입니다.");
         }
 
         qnaRepository.delete(qna);
