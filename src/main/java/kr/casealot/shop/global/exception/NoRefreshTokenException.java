@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * https://www.baeldung.com/spring-response-status
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class NotFoundTokenException extends RuntimeException{
-    static final String NOT_FOUND_TOKEN = "리프레시 토큰값이 존재하지 않습니다.";
-    public NotFoundTokenException( ) {
+public class NoRefreshTokenException extends RuntimeException{
+    static final String NOT_FOUND_TOKEN = "리프레시 토큰값을 받지 못하였습니다.";
+    public NoRefreshTokenException( ) {
         super(NOT_FOUND_TOKEN);
     }
 }
