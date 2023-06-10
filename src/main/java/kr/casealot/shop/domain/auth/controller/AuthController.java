@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.auth.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
@@ -26,6 +27,7 @@ import java.util.Date;
 @Slf4j
 @RestController
 @RequestMapping("/cal/v1/auth")
+@Api(tags = {"AUTH API"}, description = "권한 관련 API")
 @RequiredArgsConstructor
 public class AuthController {
 
