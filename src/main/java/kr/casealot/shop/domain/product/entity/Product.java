@@ -29,7 +29,7 @@ public class Product extends BaseTimeEntity {
     @ManyToOne
     private Customer customer;
 
-    @Column(name = "PRODUCT_NAME", length = 1024, unique = true)
+    @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;
 
     @Lob
