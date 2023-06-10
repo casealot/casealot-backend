@@ -30,7 +30,7 @@ public class ProductAdminController {
     @PutMapping("/{id}")
     public APIResponse<Product> updateProduct(
             @PathVariable Long id,
-            @ApiParam(value = "상품 수정 요청 DTO") @RequestBody ProductDTO.UpdateRequest updateRequest){
+            @ApiParam(value = "상품 수정 요청 DTO") @RequestBody ProductDTO.UpdateRequest updateRequest) throws Exception {
         return productService.updateProduct(id, updateRequest);
     }
 

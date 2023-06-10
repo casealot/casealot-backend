@@ -7,6 +7,7 @@ import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
 import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.exception.NotExistProduct;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +73,7 @@ public class ProductService {
     @Transactional
     public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
-                () -> new Exception("존재하지 않는 상품입니다."));
+                () -> new NotExistProduct("존재하지 않는 상품입니다."));
 
         // 상품 조회시 상품 조회 수 증가.
         savedProduct.setViews(savedProduct.getViews() + 1);
@@ -129,20 +131,100 @@ public class ProductService {
         }else{
             return APIResponse.productNameDuplicated();
         }
-
-
     }
 
     @Transactional
-    public APIResponse<Product> saveProductWithImage(Long id, UploadFile thumbnail, List<UploadFile> images) throws Exception {
+    public APIResponse<Product> saveProductWithImage(
+            Long id, MultipartFile thumbnailFile, List<MultipartFile> imagesFiles) throws Exception {
 
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new Exception("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
 
-        savedProduct.setThumbnail(thumbnail);
-        savedProduct.setImages(images);
+        UploadFile thumbnail = null;
+        if(null != thumbnailFile){
+            String path = s3UploadService.uploadFile(thumbnailFile);
+            thumbnail = uploadFileService.create(UploadFile.builder()
+                    .name(thumbnailFile.getOriginalFilename())
+                    .url(path)
+                    .fileType(thumbnailFile.getContentType())
+                    .fileSize(thumbnailFile.getSize())
+                    .build());
+            savedProduct.setThumbnail(thumbnail);
+        }
+
+        List<UploadFile> images = null;
+        if(null != imagesFiles){
+            images = new ArrayList<>();
+            for(MultipartFile imageFile : imagesFiles){
+                String path = s3UploadService.uploadFile(imageFile);
+                images.add(uploadFileService.create(UploadFile.builder()
+                        .name(thumbnailFile.getOriginalFilename())
+                        .url(path)
+                        .fileType(thumbnailFile.getContentType())
+                        .fileSize(thumbnailFile.getSize())
+                        .build()));
+            }
+            savedProduct.setImages(images);
+        }else{
+
+        }
 
         savedProduct = productRepository.saveAndFlush(savedProduct);
+
+        return APIResponse.success(API_NAME, savedProduct);
+    }
+
+    @Transactional
+    public APIResponse modifyProductWithImage(Long id, MultipartFile thumbnailFile,
+                                              List<MultipartFile> imagesFiles) throws Exception {
+        Product savedProduct = productRepository.findById(id)
+                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
+
+        UploadFile thumbnail = null;
+        if(null != thumbnailFile){
+            //기존에 이미지가 있다면 삭제
+            UploadFile savedThumbnailFile = savedProduct.getThumbnail();
+            if(null != savedThumbnailFile){
+                s3UploadService.deleteFileFromS3Bucket(savedThumbnailFile.getUrl());
+                uploadFileService.delete(savedThumbnailFile);
+            }
+
+            String path = s3UploadService.uploadFile(thumbnailFile);
+            thumbnail = uploadFileService.create(UploadFile.builder()
+                    .name(thumbnailFile.getOriginalFilename())
+                    .url(path)
+                    .fileType(thumbnailFile.getContentType())
+                    .fileSize(thumbnailFile.getSize())
+                    .build());
+            savedProduct.setThumbnail(thumbnail);
+        }
+
+        List<UploadFile> images = null;
+        if(null != imagesFiles){
+            images = new ArrayList<>();
+            //기존에 이미지가 있다면 삭제
+            List<UploadFile> savedImagesFile = savedProduct.getImages();
+            if(null != savedImagesFile){
+                for(UploadFile savedImage : savedImagesFile){
+                    s3UploadService.deleteFileFromS3Bucket(savedImage.getUrl());
+                    uploadFileService.delete(savedImage);
+                }
+            }
+
+            for(MultipartFile imageFile : imagesFiles){
+                String path = s3UploadService.uploadFile(imageFile);
+                images.add(uploadFileService.create(UploadFile.builder()
+                        .name(thumbnailFile.getOriginalFilename())
+                        .url(path)
+                        .fileType(thumbnailFile.getContentType())
+                        .fileSize(thumbnailFile.getSize())
+                        .build()));
+            }
+            savedProduct.setImages(images);
+        }
+
+        savedProduct = productRepository.saveAndFlush(savedProduct);
+
         return APIResponse.success(API_NAME, savedProduct);
     }
 
@@ -150,7 +232,7 @@ public class ProductService {
     public APIResponse deleteProduct(Long productId) throws Exception {
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new Exception("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
 
         // step1 : S3 업로드된 이미지 삭제
         // step2 : DB에 저장된 이미지 메타정보 삭제
@@ -173,7 +255,11 @@ public class ProductService {
     }
 
     @Transactional
-    public APIResponse<Product> updateProduct(Long productId, ProductDTO.UpdateRequest updateRequest) {
+    public APIResponse<Product> updateProduct(Long productId, ProductDTO.UpdateRequest updateRequest) throws Exception {
+
+        Product savedProduct = productRepository.findById(productId).orElseThrow(
+                () -> new NotExistProduct("존재하지 않는 상품입니다.")
+        );
 
         Product updateProduct = Product.builder()
                 .id(productId)
@@ -184,6 +270,9 @@ public class ProductService {
                 .color(updateRequest.getColor())
                 .season(updateRequest.getSeason())
                 .type(updateRequest.getType())
+                // 저장 되어 있는 썸네일 이미지 사용
+                .thumbnail(savedProduct.getThumbnail())
+                .images(savedProduct.getImages())
                 .build();
 
         Product updatedProduct = productRepository.saveAndFlush(updateProduct);
