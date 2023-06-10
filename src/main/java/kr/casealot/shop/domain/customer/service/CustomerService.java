@@ -10,6 +10,9 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
+import kr.casealot.shop.global.exception.DuplicateException;
+import kr.casealot.shop.global.exception.IncorrectException;
+import kr.casealot.shop.global.exception.NotFoundException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -41,17 +44,17 @@ public class CustomerService {
     private final AuthTokenProvider tokenProvider;
     private final static String REFRESH_TOKEN = "refreshToken";
 
-    public APIResponse<String> join(CustomerDto customerDto) {
+    public APIResponse<String> join(CustomerDto customerDto) throws DuplicateException {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
         // 아이디 중복 확인
         if (customerRepository.existsCustomerById(customerDto.getId())) {
-            return APIResponse.duplicatedID();
+            throw new DuplicateException("중복되는 아이디가 이미 존재합니다.");
         }
 
         // 이메일 중복 확인
         if (customerRepository.existsByEmail(customerDto.getEmail())) {
-            return APIResponse.duplicatedEmail();
+            throw new DuplicateException("중복되는 이메일이 이미 존재합니다.");
         }
 
         Customer customer = Customer.builder()
@@ -78,12 +81,12 @@ public class CustomerService {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
-            return APIResponse.incorrectID();
+            throw new NotFoundException("존재하지 않는 회원입니다.");
         }
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(customerLoginDto.getPassword(), customer.getPassword())) {
-            return APIResponse.incorrectPassword();
+            throw new IncorrectException("비밀번호가 일치하지 않습니다.");
         }
 
         RoleType roleType = customer.getRoleType();
