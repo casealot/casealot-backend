@@ -10,6 +10,7 @@ import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -48,7 +49,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            return APIResponse.permissionDenied();
+            throw new PermissionException("올바르지 않은 권한입니다.");
         }
 
         QnaComment qnaComment = QnaComment.builder()
@@ -80,7 +81,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            return APIResponse.permissionDenied();
+            throw new PermissionException("올바르지 않은 권한입니다.");
         }
 
         qnaCommentRepository.delete(qnaComment);
@@ -106,7 +107,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            return APIResponse.permissionDenied();
+            throw new PermissionException("올바르지 않은 권한입니다.");
         }
 
         qnaComment.setTitle(qnaCommentReqDTO.getTitle());

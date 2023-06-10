@@ -10,6 +10,7 @@ import kr.casealot.shop.domain.notice.comment.repository.NoticeCommentRepository
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.notice.repository.NoticeRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -73,7 +74,7 @@ public class NoticeCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())){
-            return APIResponse.permissionDenied();
+            throw new PermissionException("올바르지 않은 권한입니다.");
         }
 
         noticeCommentRepository.delete(noticeComment);
