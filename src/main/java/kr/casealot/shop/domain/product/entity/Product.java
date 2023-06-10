@@ -83,4 +83,7 @@ public class Product extends BaseTimeEntity {
         this.season = season;
         this.type = type;
     }
+    
+    //조회수 증가
+    public void addView(int views) {this.views += views;}
 }
