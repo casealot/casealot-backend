@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
@@ -44,7 +45,7 @@ public class AuthController {
 
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
-    public APIResponse refreshToken (HttpServletRequest request) throws Exception {
+    public APIResponse<CustomerTokenDto> refreshToken (HttpServletRequest request) throws Exception {
         // refresh token cookie에서 갖고옴
 
         // refresh token
@@ -91,8 +92,13 @@ public class AuthController {
             customerRefreshToken.setRefreshToken(authRefreshToken.getToken());
             customerRefreshTokenRepository.save(customerRefreshToken);
         }
+        CustomerTokenDto customerTokenDto = CustomerTokenDto.builder()
+                .customerId(customerRefreshToken.getId())
+                .accessToken(newAccessToken.getToken())
+                .roleType(customer.getRoleType())
+                .refreshToken(customerRefreshToken.getRefreshToken()).build();
 
-        return APIResponse.success("token", newAccessToken.getToken());
+        return APIResponse.success(customerTokenDto);
     }
 
 }
