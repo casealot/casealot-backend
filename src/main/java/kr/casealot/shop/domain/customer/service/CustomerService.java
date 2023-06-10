@@ -42,7 +42,7 @@ public class CustomerService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthTokenProvider authTokenProvider;
     private final AuthTokenProvider tokenProvider;
-    private final static String REFRESH_TOKEN = "refreshToken";
+    private final static String REFRESH_TOKEN = "refresh_token";
 
     public APIResponse<String> join(CustomerDto customerDto) throws DuplicateException {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
