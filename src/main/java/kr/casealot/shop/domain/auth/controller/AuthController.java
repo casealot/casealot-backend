@@ -9,7 +9,9 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
-import kr.casealot.shop.global.exception.NotFoundTokenException;
+import kr.casealot.shop.global.exception.NoRefreshTokenException;
+import kr.casealot.shop.global.exception.NotFoundRefreshTokenException;
+import kr.casealot.shop.global.exception.NotFoundUserException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -48,7 +50,7 @@ public class AuthController {
         // refresh token
         String refreshToken = HeaderUtil.getRefreshToken(request);
         if(null == refreshToken){
-            throw new NotFoundTokenException();
+            throw new NoRefreshTokenException();
         }
 
         log.info("refreshToken ====> {}", refreshToken);
@@ -59,11 +61,14 @@ public class AuthController {
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
 
         String userId = customerRefreshToken.getId();
+        if(userId == null){
+            throw new NotFoundUserException();
+        }
         Customer customer = customerRepository.findById(userId);
         RoleType roleType = customer.getRoleType();
 
         if (customerRefreshToken == null) {
-            return APIResponse.invalidRefreshToken();
+            throw new NotFoundRefreshTokenException();
         }
 
         Date now = new Date();
