@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
 public class PermissionException extends RuntimeException{
-    public PermissionException(String message) {
-        super(message);
+    static final String PERMISSION_DENIED = "올바르지 않은 권한입니다.";
+    public PermissionException() {
+        super(PERMISSION_DENIED);
     }
 }

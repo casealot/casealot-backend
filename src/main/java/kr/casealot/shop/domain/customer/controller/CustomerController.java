@@ -6,7 +6,8 @@ import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.DuplicateException;
+import kr.casealot.shop.global.exception.DuplicateEmailException;
+import kr.casealot.shop.global.exception.DuplicateIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/join")
-    public APIResponse<String> join(@RequestBody CustomerDto customerDto) throws DuplicateException {
+    public APIResponse<String> join(@RequestBody CustomerDto customerDto) throws DuplicateEmailException, DuplicateIdException {
         return customerService.join(customerDto);
     }
 

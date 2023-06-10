@@ -10,9 +10,10 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
-import kr.casealot.shop.global.exception.DuplicateException;
-import kr.casealot.shop.global.exception.IncorrectException;
-import kr.casealot.shop.global.exception.NotFoundException;
+import kr.casealot.shop.global.exception.DuplicateEmailException;
+import kr.casealot.shop.global.exception.DuplicateIdException;
+import kr.casealot.shop.global.exception.IncorrectPasswordException;
+import kr.casealot.shop.global.exception.NotFoundUserException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -44,17 +45,17 @@ public class CustomerService {
     private final AuthTokenProvider tokenProvider;
     private final static String REFRESH_TOKEN = "refresh_token";
 
-    public APIResponse<String> join(CustomerDto customerDto) throws DuplicateException {
+    public APIResponse<String> join(CustomerDto customerDto) throws DuplicateEmailException, DuplicateIdException {
         String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
 
         // 아이디 중복 확인
         if (customerRepository.existsCustomerById(customerDto.getId())) {
-            throw new DuplicateException("중복되는 아이디가 이미 존재합니다.");
+            throw new DuplicateIdException();
         }
 
         // 이메일 중복 확인
         if (customerRepository.existsByEmail(customerDto.getEmail())) {
-            throw new DuplicateException("중복되는 이메일이 이미 존재합니다.");
+            throw new DuplicateEmailException();
         }
 
         Customer customer = Customer.builder()
@@ -81,12 +82,12 @@ public class CustomerService {
         Customer customer = customerRepository.findById(customerLoginDto.getId());
 
         if (customer == null) {
-            throw new NotFoundException("존재하지 않는 회원입니다.");
+            throw new NotFoundUserException();
         }
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(customerLoginDto.getPassword(), customer.getPassword())) {
-            throw new IncorrectException("비밀번호가 일치하지 않습니다.");
+            throw new IncorrectPasswordException();
         }
 
         RoleType roleType = customer.getRoleType();

@@ -49,7 +49,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         QnaComment qnaComment = QnaComment.builder()
@@ -81,7 +81,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         qnaCommentRepository.delete(qnaComment);
@@ -107,7 +107,7 @@ public class QnaCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         qnaComment.setTitle(qnaCommentReqDTO.getTitle());

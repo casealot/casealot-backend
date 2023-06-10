@@ -113,7 +113,7 @@ public class NoticeService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin){
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         Customer customer = customerRepository.findById(customerId);
@@ -147,7 +147,7 @@ public class NoticeService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin){
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         notice.setTitle(noticeReqDTO.getTitle());
@@ -176,7 +176,7 @@ public class NoticeService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin){
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         noticeRepository.delete(notice);

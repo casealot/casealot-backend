@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * https://www.baeldung.com/spring-response-status
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class NotFoundException extends RuntimeException{
-    public NotFoundException(String message) {
-        super(message);
+public class NotFoundProductException extends RuntimeException{
+    static final String NOT_FOUND_PRODUCT = "존재하지 않는 상품입니다.";
+    public NotFoundProductException( ) {
+        super(NOT_FOUND_PRODUCT);
     }
 }
