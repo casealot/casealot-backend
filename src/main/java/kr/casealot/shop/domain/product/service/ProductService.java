@@ -1,23 +1,20 @@
 package kr.casealot.shop.domain.product.service;
 
-import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
 import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
-import kr.casealot.shop.domain.product.exception.NotExistProduct;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
-import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
-import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
+import kr.casealot.shop.global.exception.DuplicateException;
+import kr.casealot.shop.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,7 +70,7 @@ public class ProductService {
     @Transactional
     public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
-                () -> new NotExistProduct("존재하지 않는 상품입니다."));
+                () -> new NotFoundException("존재하지 않는 상품입니다."));
 
         // 상품 조회시 상품 조회 수 증가.
         savedProduct.setViews(savedProduct.getViews() + 1);
@@ -113,9 +110,7 @@ public class ProductService {
 
     @Transactional
     public APIResponse<Product> createProduct(
-            ProductDTO.Request createRequest) {
-
-
+            ProductDTO.Request createRequest) throws DuplicateException {
         if (productRepository.findByName(createRequest.getName()) == null) {
             Product saveProduct = Product.builder()
                     .name(createRequest.getName())
@@ -129,10 +124,8 @@ public class ProductService {
             Product savedProduct = productRepository.saveAndFlush(saveProduct);
             return APIResponse.success(API_NAME, savedProduct);
         }else{
-            return APIResponse.productNameDuplicated();
+            throw new DuplicateException("상품명이 중복되었습니다.");
         }
-
-
     }
 
     @Transactional
@@ -140,7 +133,7 @@ public class ProductService {
             Long id, MultipartFile thumbnailFile, List<MultipartFile> imagesFiles) throws Exception {
 
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
 
         UploadFile thumbnail = null;
         if(null != thumbnailFile){
@@ -180,7 +173,7 @@ public class ProductService {
     public APIResponse modifyProductWithImage(Long id, MultipartFile thumbnailFile,
                                               List<MultipartFile> imagesFiles) throws Exception {
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
 
         UploadFile thumbnail = null;
         if(null != thumbnailFile){
@@ -234,7 +227,7 @@ public class ProductService {
     public APIResponse deleteProduct(Long productId) throws Exception {
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotExistProduct("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
 
         // step1 : S3 업로드된 이미지 삭제
         // step2 : DB에 저장된 이미지 메타정보 삭제
@@ -260,7 +253,7 @@ public class ProductService {
     public APIResponse<Product> updateProduct(Long productId, ProductDTO.Request updateRequest) throws Exception {
 
         Product savedProduct = productRepository.findById(productId).orElseThrow(
-                () -> new NotExistProduct("존재하지 않는 상품입니다.")
+                () -> new NotFoundException("존재하지 않는 상품입니다.")
         );
 
         Product updateProduct = Product.builder()
