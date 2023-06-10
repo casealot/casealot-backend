@@ -71,7 +71,6 @@ public class Product extends BaseTimeEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
-
     @Builder
     public Product(String name, String content, int price, int sale,
                    String color, String season, String type) {
