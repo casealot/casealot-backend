@@ -73,7 +73,7 @@ public class ProductService {
                 () -> new NotFoundException("존재하지 않는 상품입니다."));
 
         // 상품 조회시 상품 조회 수 증가.
-        savedProduct.setViews(savedProduct.getViews() + 1);
+        savedProduct.addView(savedProduct.getViews());
         productRepository.save(savedProduct);
 
         // 리뷰 추가
