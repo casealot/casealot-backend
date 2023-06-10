@@ -167,7 +167,7 @@ public class QnaService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!(customerId.equals(qna.getCustomer().getId()) || !isAdmin)) {
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         qnaRepository.delete(qna);

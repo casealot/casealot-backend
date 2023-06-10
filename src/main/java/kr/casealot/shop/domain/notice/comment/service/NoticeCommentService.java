@@ -74,7 +74,7 @@ public class NoticeCommentService {
         boolean isAdmin = checkAdminRole(customerId);
 
         if(!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())){
-            throw new PermissionException("올바르지 않은 권한입니다.");
+            throw new PermissionException();
         }
 
         noticeCommentRepository.delete(noticeComment);
