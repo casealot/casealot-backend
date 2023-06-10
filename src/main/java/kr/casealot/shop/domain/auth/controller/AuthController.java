@@ -52,10 +52,6 @@ public class AuthController {
                 .orElse((null));
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
-        if (authRefreshToken.validate()) {
-            return APIResponse.invalidRefreshToken();
-        }
-
         // userId refresh token으로 DB 확인
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
 
