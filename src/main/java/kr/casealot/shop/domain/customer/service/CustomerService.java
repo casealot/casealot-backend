@@ -119,11 +119,11 @@ public class CustomerService {
                 customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
             }
         } else {
+            // 없을 경우 새로 발급한다.
             refreshToken = tokenProvider.createAuthToken(
                     appProperties.getAuth().getTokenSecret(),
                     new Date(now.getTime() + refreshTokenExpiry)
             );
-            customerRefreshToken.setRefreshToken(refreshToken.getToken());
             customerRefreshToken = new CustomerRefreshToken(customer.getId(), refreshToken.getToken());
             customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
         }
