@@ -33,7 +33,7 @@ public class NoticeController {
 
     // 특정 공지 조회
     @GetMapping("/{notice_id}")
-    public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId) throws NotFoundException {
+    public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId){
 
         return noticeService.getNotice(noticeId);
     }
