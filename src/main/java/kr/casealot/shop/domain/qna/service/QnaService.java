@@ -1,20 +1,21 @@
 package kr.casealot.shop.domain.qna.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.qna.comment.dto.QnaCommentResDTO;
 import kr.casealot.shop.domain.qna.comment.entity.QnaComment;
-import kr.casealot.shop.domain.qna.dto.*;
+import kr.casealot.shop.domain.qna.dto.QnaDetailDTO;
+import kr.casealot.shop.domain.qna.dto.QnaReqDTO;
+import kr.casealot.shop.domain.qna.dto.QnaResDTO;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
-import kr.casealot.shop.global.oauth.token.*;
-import kr.casealot.shop.global.util.HeaderUtil;
+import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,6 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
 
 //     qna 등록
 //    @Transactional
@@ -50,7 +50,6 @@ public class QnaService {
 
     @Transactional
     public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
                                             Principal principal) {
 
         String customerId = principal.getName();
@@ -67,7 +66,7 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success(API_NAME,qnaResDTO);
+        return APIResponse.success(API_NAME, qnaResDTO);
     }
 
 
@@ -75,11 +74,10 @@ public class QnaService {
     @Transactional
     public APIResponse<QnaResDTO> updateQna(Long qnaId,
                                             QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 
@@ -103,10 +101,10 @@ public class QnaService {
 
     // qna 조회
     @Transactional
-    public APIResponse<QnaDetailDTO> getQna(Long qnaId){
+    public APIResponse<QnaDetailDTO> getQna(Long qnaId) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
         // 조회수 증가
@@ -147,11 +145,10 @@ public class QnaService {
     // qna 삭제
     @Transactional
     public APIResponse<QnaResDTO> deleteQna(Long qnaId,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 

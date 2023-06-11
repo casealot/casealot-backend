@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ public class WishlistService {
 
     @Transactional
     public APIResponse<WishlistResDTO> addProductToWishlist(Long productId,
-                                                            HttpServletRequest request,
                                                             Principal principal) throws DuplicateProductException {
         String customerId = principal.getName();
 
@@ -49,7 +47,7 @@ public class WishlistService {
 
         Product product = productRepository.findById(productId).orElse(null);
 
-        if(product == null){
+        if (product == null) {
             throw new NotFoundProductException();
         }
 
@@ -99,7 +97,7 @@ public class WishlistService {
     }
 
     @Transactional
-    public APIResponse<WishlistResDTO> deleteProductToWishlist(Long productId, HttpServletRequest request, Principal principal) {
+    public APIResponse<WishlistResDTO> deleteProductToWishlist(Long productId, Principal principal) {
         String customerId = principal.getName();
         Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
         Product product = productRepository.findById(productId).orElseThrow(NotFoundProductException::new);
@@ -133,7 +131,7 @@ public class WishlistService {
         return APIResponse.success(API_NAME, wishlistResDTO);
     }
 
-    public int getCustomerCountForProduct(Long productId, Principal principal) {
+    public int getCustomerCountForProduct(Long productId) {
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null) {
             throw new NotFoundProductException();
@@ -150,7 +148,7 @@ public class WishlistService {
     }
 
     @Transactional
-    public Wishlist createWishlist(Customer customer){
+    public Wishlist createWishlist(Customer customer) {
         Wishlist wishlist = new Wishlist();
         wishlist.setCustomer(customer);
         wishlist.setWishlistItemList(new ArrayList<>());
