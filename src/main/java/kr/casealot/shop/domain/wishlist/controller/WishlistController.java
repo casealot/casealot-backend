@@ -22,7 +22,7 @@ public class WishlistController {
     private final WishlistService wishlistService;
     private final WishlistItemRepository wishlistItemRepository;
 
-    @PostMapping("/add/{productId}")
+    @PostMapping("/{productId}")
     public APIResponse<WishlistResDTO> addProductToWishlist(@PathVariable Long productId,
                                                             HttpServletRequest request,
                                                             Principal principal) throws DuplicateProductException {
@@ -37,7 +37,7 @@ public class WishlistController {
         return wishlistService.getWishlistItems(principal);
     }
 
-    @DeleteMapping("/delete/{productId}")
+    @DeleteMapping("/{productId}")
     public APIResponse<WishlistResDTO> deleteProductToWishlist(@PathVariable Long productId,
                                                                HttpServletRequest request,
                                                                Principal principal) {
@@ -45,12 +45,11 @@ public class WishlistController {
     }
 
     // 전체삭제
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public APIResponse<WishlistResDTO> deleteWishlist(Principal principal){
 
         return wishlistService.deleteWishlist(principal);
     }
-
 
     @GetMapping("/{productId}")
     public ResponseEntity getCustomerCountByProductId(@PathVariable Long productId, Principal principal) {
