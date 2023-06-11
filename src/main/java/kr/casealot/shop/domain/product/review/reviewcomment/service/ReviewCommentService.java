@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.review.reviewcomment.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.review.entity.Review;
@@ -10,13 +9,11 @@ import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentRes
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
+import kr.casealot.shop.global.exception.NoReviewException;
+import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -25,16 +22,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReviewCommentService {
-    private final AuthTokenProvider authTokenProvider;
     private final ReviewCommentRepository reviewCommentRepository;
     private final CustomerRepository customerRepository;
     private final ReviewRepository reviewRepository;
 
-    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, HttpServletRequest request, Principal principal) {
+    public APIResponse<ReviewCommentResDTO> createReviewComment(ReviewCommentReqDTO reviewCommentReqDTO, Long reviewSeq, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
         Review review = reviewRepository.findBySeq(reviewSeq);
         if (review == null) {
-            return APIResponse.notExistRequest();
+            throw new NoReviewException();
         }
         ReviewComment reviewComment = reviewCommentRepository.save(ReviewComment.builder()
                 .customer(customer)
@@ -51,7 +47,7 @@ public class ReviewCommentService {
         return APIResponse.success("reviewComment", reviewCommentRes);
     }
 
-    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, Principal principal) {
+    public APIResponse<ReviewCommentResDTO> fixReviewComment(Long reviewCommentId, ReviewCommentReqDTO reviewCommentReqDTO, Principal principal) {
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
         if (optionalReviewComment.isPresent()) {
             ReviewComment review = optionalReviewComment.get();
@@ -68,14 +64,14 @@ public class ReviewCommentService {
                 reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
                 return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
-                return APIResponse.permissionDenied();
+                throw new PermissionException();
             }
         } else {
-            return APIResponse.notExistRequest();
+            throw new PermissionException();
         }
     }
 
-    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, HttpServletRequest request, Principal principal) {
+    public APIResponse<ReviewCommentResDTO> deleteReviewComment(Long reviewCommentId, Principal principal) {
         Optional<ReviewComment> optionalReviewComment = reviewCommentRepository.findById(reviewCommentId);
         if (optionalReviewComment.isPresent()) {
             ReviewComment reviewComment = optionalReviewComment.get();
@@ -91,10 +87,10 @@ public class ReviewCommentService {
                 reviewCommentRes.setModifiedDt(reviewComment.getModifiedDt());
                 return APIResponse.success("reviewComment", reviewCommentRes);
             } else {
-                return APIResponse.permissionDenied();
+                throw new PermissionException();
             }
         } else {
-            return APIResponse.notExistRequest();
+            throw new PermissionException();
         }
     }
 

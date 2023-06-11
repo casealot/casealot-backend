@@ -1,35 +1,35 @@
 package kr.casealot.shop.domain.auth.controller;
 
-import io.jsonwebtoken.Claims;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
-import kr.casealot.shop.global.exception.NotFoundException;
+import kr.casealot.shop.global.exception.NoRefreshTokenException;
+import kr.casealot.shop.global.exception.NotFoundRefreshTokenException;
+import kr.casealot.shop.global.exception.NotFoundUserException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Slf4j
 @RestController
 @RequestMapping("/cal/v1/auth")
+@Api(tags = {"AUTH API"}, description = "권한 관련 API")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -40,17 +40,18 @@ public class AuthController {
     private final CustomerRepository customerRepository;
 
     private final static long THREE_DAYS_MSEC = 259200000;
-    private final static String REFRESH_TOKEN = "refreshToken";
+    private final static String REFRESH_TOKEN = "refresh_token";
 
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
-    public APIResponse refreshToken (HttpServletRequest request) throws Exception {
-        // refresh token cookie에서 갖고옴
-
+    public APIResponse<CustomerTokenDto> refreshToken (HttpServletRequest request) throws Exception {
         // refresh token
-        String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new NotFoundException("Not Found RefreshToken From Cookie"));
+        String refreshToken = HeaderUtil.getRefreshToken(request);
+        if(null == refreshToken){
+            throw new NoRefreshTokenException();
+        }
+
+        log.info("refreshToken ====> {}", refreshToken);
 
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
 
@@ -58,11 +59,14 @@ public class AuthController {
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
 
         String userId = customerRefreshToken.getId();
+        if(userId == null){
+            throw new NotFoundUserException();
+        }
         Customer customer = customerRepository.findById(userId);
         RoleType roleType = customer.getRoleType();
 
         if (customerRefreshToken == null) {
-            return APIResponse.invalidRefreshToken();
+            throw new NotFoundRefreshTokenException();
         }
 
         Date now = new Date();
@@ -88,8 +92,13 @@ public class AuthController {
             customerRefreshToken.setRefreshToken(authRefreshToken.getToken());
             customerRefreshTokenRepository.save(customerRefreshToken);
         }
+        CustomerTokenDto customerTokenDto = CustomerTokenDto.builder()
+                .customerId(customerRefreshToken.getId())
+                .accessToken(newAccessToken.getToken())
+                .roleType(customer.getRoleType())
+                .refreshToken(customerRefreshToken.getRefreshToken()).build();
 
-        return APIResponse.success("token", newAccessToken.getToken());
+        return APIResponse.success(customerTokenDto);
     }
 
 }
