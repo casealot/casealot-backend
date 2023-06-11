@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.entity.Review;
@@ -25,6 +26,7 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_ID")
     private Long id;
 
+    @JsonIgnore
     @JsonBackReference
     @ManyToOne
     private Customer customer;
@@ -67,6 +69,7 @@ public class Product extends BaseTimeEntity {
     private String type;
 
     //상품 1개에 리뷰 n개 (1:n 설정)
+    @JsonIgnore
     @JsonBackReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
@@ -82,4 +85,7 @@ public class Product extends BaseTimeEntity {
         this.season = season;
         this.type = type;
     }
+
+    //조회수 증가
+    public void addView(int views) {this.views += views;}
 }
