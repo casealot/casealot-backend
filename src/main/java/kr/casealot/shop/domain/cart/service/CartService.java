@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.cart.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.dto.CartGetDTO;
 import kr.casealot.shop.domain.cart.dto.CartResDTO;
@@ -108,7 +109,7 @@ public class CartService {
         Product product = productRepository.findById(productId).orElse(null);
 
         if (customer == null || product == null) {
-            return APIResponse.nullCheckPlease();
+            throw new NotFoundException("고객 혹은 상품이 존재하지 않습니다.");
         }
 
         Cart cart = cartRepository.findByCustomerId(principal.getName());
@@ -179,7 +180,7 @@ public class CartService {
     public APIResponse<String> clearCart(Principal principal) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         if (customer == null) {
-            return APIResponse.nullCheckPlease();
+            throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
         }
 
         Cart cart = cartRepository.findByCustomerId(principal.getName());
@@ -200,13 +201,10 @@ public class CartService {
 
         Customer customer = customerRepository.findCustomerById(customerId);
         if (customer == null) {
-            return APIResponse.nullCheckPlease();
+            throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
         }
 
         Cart cart = customer.getCartList();
-        if (cart == null) {
-            return APIResponse.nullCheckPlease();
-        }
 
         CartGetDTO cartGetDto = new CartGetDTO();
         cartGetDto.setCustomerSeq(customer.getSeq());
