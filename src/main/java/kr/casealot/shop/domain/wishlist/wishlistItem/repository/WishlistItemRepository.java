@@ -20,4 +20,6 @@ public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long
 
     @Query("SELECT COUNT(DISTINCT w.wishlist.customer.id) FROM WishlistItem w WHERE w.product.id = :productId")
     Long countDistinctByProduct_Id(@Param("productId") Long productId);
+
+    int countByProduct_Id(Long id);
 }
