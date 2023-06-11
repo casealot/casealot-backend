@@ -29,7 +29,7 @@ public class ProductController {
     public APIResponse<ProductDTO.GetResponse> getProductList(
             @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO
     ) {
-        return productService.findAllSearch(productReqDTO);
+        return productService.search(productReqDTO);
     }
 
     /**
@@ -40,7 +40,7 @@ public class ProductController {
     @GetMapping("/product/{id}")
     public APIResponse<ProductDTO.DetailResponse> getProductDetail(
             @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) throws Exception {
-        return productService.findById(id);
+        return productService.searchProduct(id);
     }
 
 
