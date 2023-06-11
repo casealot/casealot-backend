@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -39,8 +41,8 @@ public class ProductController {
      */
     @GetMapping("/product/{id}")
     public APIResponse<ProductDTO.DetailResponse> getProductDetail(
-            @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) throws Exception {
-        return productService.searchProduct(id);
+            @ApiParam(value = "상품 요청 DTO")@PathVariable Long id, Principal principal) throws Exception {
+        return productService.getDetailProduct(id, principal);
     }
 
 
