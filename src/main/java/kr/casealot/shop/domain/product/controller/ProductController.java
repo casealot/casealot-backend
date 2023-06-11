@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
-import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;

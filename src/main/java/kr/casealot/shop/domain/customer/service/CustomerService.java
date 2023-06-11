@@ -3,6 +3,8 @@ package kr.casealot.shop.domain.customer.service;
 import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
@@ -41,6 +43,7 @@ public class CustomerService {
     private final AppProperties appProperties;
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository;
     private final AuthTokenProvider authTokenProvider;
     private final AuthTokenProvider tokenProvider;
     private final static String REFRESH_TOKEN = "refresh_token";
@@ -135,6 +138,13 @@ public class CustomerService {
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
+
+        //로그인시 카트 없으면 생성 후 db에 저장
+        Cart cart = cartRepository.findByCustomerId(customer.getId());
+        if (cart == null) {
+            cart = Cart.createCart(customer);
+            cartRepository.save(cart);
+        }
 
         return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(), customer.getRoleType()));
     }

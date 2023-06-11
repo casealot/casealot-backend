@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.review.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.entity.Product;
@@ -9,20 +8,16 @@ import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
-import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
+import kr.casealot.shop.global.exception.NoReviewException;
+import kr.casealot.shop.global.exception.NotFoundProductException;
+import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.Option;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -30,18 +25,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
-    private final AuthTokenProvider authTokenProvider;
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
 
-    private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewCommentService reviewCommentService;
 
-    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, HttpServletRequest request, Long id, Principal principal) {
+    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO,  Long productId, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
 
-        Optional<Product> productOptional = productRepository.findById(id);
+        Optional<Product> productOptional = productRepository.findById(productId);
 
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
@@ -64,11 +57,11 @@ public class ReviewService {
 
             return APIResponse.success("review", reviewResDTO);
         } else {
-            return APIResponse.fail();
+            throw new NotFoundProductException();
         }
     }
 
-    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, HttpServletRequest request, Principal principal) {
+    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, Principal principal) {
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
@@ -78,7 +71,7 @@ public class ReviewService {
                 review.setReviewText(reviewReqDTO.getReviewText());
                 reviewRepository.save(review);
             } else {
-                return APIResponse.permissionDenied();
+                throw new PermissionException();
             }
             ReviewResDTO reviewResDTO = new ReviewResDTO();
             reviewResDTO.setId(review.getSeq());
@@ -91,11 +84,11 @@ public class ReviewService {
 
             return APIResponse.success("review", reviewResDTO);
         } else {
-            return APIResponse.permissionDenied();
+            throw new PermissionException();
         }
     }
 
-    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, HttpServletRequest request, Principal principal) {
+    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, Principal principal) {
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
@@ -113,15 +106,15 @@ public class ReviewService {
 
                 return APIResponse.success("review", reviewResDTO);
             } else {
-                return APIResponse.permissionDenied();
+                throw new PermissionException();
             }
         } else {
-            return APIResponse.permissionDenied();
+            throw new PermissionException();
         }
     }
 
     @Transactional(readOnly = true)
-    public APIResponse<ReviewResDTO> getReview(Long reviewSeq, Principal principal){
+    public APIResponse<ReviewResDTO> getReview(Long reviewSeq){
         Optional<Review> reviewOptional = reviewRepository.findById(reviewSeq);
 
         if (reviewOptional.isPresent()) {
@@ -139,8 +132,8 @@ public class ReviewService {
             return APIResponse.success("review", reviewResDTO);
         } else {
             // Optional이 비어있을 경우에 대한 처리
-            log.warn("이건 오류다.");
-            return APIResponse.notExistRequest();
+            log.warn("리뷰Optional이 존재하지 않음.");
+            throw new NoReviewException();
         }
     }
 }
