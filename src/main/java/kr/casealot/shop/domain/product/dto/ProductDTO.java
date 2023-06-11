@@ -2,7 +2,6 @@ package kr.casealot.shop.domain.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
-import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 

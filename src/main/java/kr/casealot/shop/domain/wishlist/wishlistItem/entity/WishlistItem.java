@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.wishlist.wishlistItem.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.wishlist.entity.Wishlist;
-import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
