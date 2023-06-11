@@ -1,9 +1,11 @@
 package kr.casealot.shop.domain.product.service;
 
+import com.google.gson.Gson;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
+import kr.casealot.shop.domain.product.dto.ProductMapper;
 import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
@@ -37,9 +39,10 @@ public class ProductService {
     private final S3UploadService s3UploadService;
     private final UploadFileService uploadFileService;
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Transactional
-    public APIResponse<ProductDTO.GetResponse> findAllSearch(ProductDTO.GetRequest productReqDTO) {
+    public APIResponse<ProductDTO.GetResponse> search(ProductDTO.GetRequest productReqDTO) {
 
         // criteria query
         Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery(), productReqDTO.getFilter());
@@ -69,7 +72,7 @@ public class ProductService {
     }
 
     @Transactional
-    public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
+    public APIResponse<ProductDTO.DetailResponse> searchProduct(Long id) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
                 NotFoundProductException::new);
 
@@ -112,21 +115,24 @@ public class ProductService {
     @Transactional
     public APIResponse<Product> createProduct(
             ProductDTO.Request createRequest) throws DuplicateEmailException, DuplicateProductException {
+
         if (productRepository.findByName(createRequest.getName()) == null) {
-            Product saveProduct = Product.builder()
-                    .name(createRequest.getName())
-                    .content(createRequest.getContent())
-                    .price(createRequest.getPrice())
-                    .sale(createRequest.getSale())
-                    .color(createRequest.getColor())
-                    .season(createRequest.getSeason())
-                    .type(createRequest.getType())
-                    .build();
-            Product savedProduct = productRepository.saveAndFlush(saveProduct);
+
+            Product savedProduct = productRepository.saveAndFlush(
+                    productMapper.createRequestDTOToEntity(createRequest));
+
             return APIResponse.success(API_NAME, savedProduct);
         }else{
             throw new DuplicateProductException();
         }
+    }
+
+    @Transactional
+    public APIResponse<Product> updateProduct(Long productId, ProductDTO.Request updateRequest) throws Exception {
+        Product updatedProduct = productRepository.saveAndFlush(
+                productMapper.updateRequestDTOToEntity(productId, updateRequest));
+
+        return APIResponse.success(API_NAME, updatedProduct);
     }
 
     @Transactional
@@ -248,30 +254,6 @@ public class ProductService {
 
         productRepository.delete(product);
         return APIResponse.delete();
-    }
-
-    @Transactional
-    public APIResponse<Product> updateProduct(Long productId, ProductDTO.Request updateRequest) throws Exception {
-
-        Product savedProduct = productRepository.findById(productId)
-                .orElseThrow(NotFoundProductException::new);
-
-        Product updateProduct = Product.builder()
-                .id(productId)
-                .name(updateRequest.getName())
-                .content(updateRequest.getContent())
-                .price(updateRequest.getPrice())
-                .sale(updateRequest.getSale())
-                .color(updateRequest.getColor())
-                .season(updateRequest.getSeason())
-                .type(updateRequest.getType())
-                // 저장 되어 있는 썸네일 이미지 사용
-                .thumbnail(savedProduct.getThumbnail())
-                .images(savedProduct.getImages())
-                .build();
-
-        Product updatedProduct = productRepository.saveAndFlush(updateProduct);
-        return APIResponse.success(API_NAME, updatedProduct);
     }
 
 }
