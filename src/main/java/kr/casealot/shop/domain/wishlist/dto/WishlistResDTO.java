@@ -1,6 +1,6 @@
 package kr.casealot.shop.domain.wishlist.dto;
 
-import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemDTO;
 import lombok.*;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class WishlistResDTO {
     private String customerId;
-    private Long productId;
-    private String productName;
+    private Long wishlistId;
+    private List<WishlistItemDTO> productList;
 }
 
