@@ -9,31 +9,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"REVIEWCOMMENT API"}, description = "리뷰 댓글 관련 API")
-@RequestMapping("/cal/v1/review/{reviewSeq}/comment")
+@RequestMapping("/cal/v1/review/comment")
 public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
-    @PostMapping("/create")
-    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, @PathVariable long reviewSeq, Principal principal) {
-        return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, request, principal);
+    @PostMapping("/{reviewSeq}")
+    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, @PathVariable long reviewSeq, Principal principal) {
+        return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, principal);
     }
 
     //수정
-    @PutMapping("/fix/{reviewCommentId}")
-    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, HttpServletRequest request, Principal principal) {
-        return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, request, principal);
+    @PutMapping("/{reviewCommentId}")
+    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, Principal principal) {
+        return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, principal);
     }
 
     //삭제
-    @DeleteMapping("/delete/{reviewCommentId}")
-    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, HttpServletRequest request, Principal principal) {
-        return reviewCommentService.deleteReviewComment(reviewCommentId, request, principal);
+    @DeleteMapping("/{reviewCommentId}")
+    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, Principal principal) {
+        return reviewCommentService.deleteReviewComment(reviewCommentId, principal);
     }
 }
