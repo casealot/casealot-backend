@@ -45,8 +45,6 @@ public class AuthController {
     @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
     public APIResponse<CustomerTokenDto> refreshToken (HttpServletRequest request) throws Exception {
-        // refresh token cookie에서 갖고옴
-
         // refresh token
         String refreshToken = HeaderUtil.getRefreshToken(request);
         if(null == refreshToken){
