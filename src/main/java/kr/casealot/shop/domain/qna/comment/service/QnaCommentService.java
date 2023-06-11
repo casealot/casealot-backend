@@ -10,6 +10,8 @@ import kr.casealot.shop.domain.qna.comment.repository.QnaCommentRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundCommentException;
+import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -41,7 +43,7 @@ public class QnaCommentService {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
         if(qna == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
         String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
@@ -73,7 +75,7 @@ public class QnaCommentService {
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
         if(qnaComment == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundCommentException();
         }
 
         String customerId = principal.getName();
@@ -99,7 +101,7 @@ public class QnaCommentService {
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
         if(qnaComment == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundCommentException();
         }
 
         String customerId = principal.getName();

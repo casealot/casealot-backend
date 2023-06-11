@@ -1,15 +1,17 @@
 package kr.casealot.shop.domain.wishlist.controller;
 
 import io.swagger.annotations.Api;
+import kr.casealot.shop.domain.wishlist.dto.WishlistResDTO;
 import kr.casealot.shop.domain.wishlist.service.WishlistService;
-import kr.casealot.shop.domain.wishlist.wishlistItem.dto.WishlistItemResDTO;
+import kr.casealot.shop.domain.wishlist.wishlistItem.repository.WishlistItemRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.DuplicateProductException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,32 +20,41 @@ import java.util.List;
 public class WishlistController {
 
     private final WishlistService wishlistService;
+    private final WishlistItemRepository wishlistItemRepository;
 
     @PostMapping("/add/{productId}")
-    public APIResponse<WishlistItemResDTO> addProductToWishlist(@PathVariable Long productId,
-                                                                HttpServletRequest request,
-                                                                Principal principal) {
+    public APIResponse<WishlistResDTO> addProductToWishlist(@PathVariable Long productId,
+                                                            HttpServletRequest request,
+                                                            Principal principal) throws DuplicateProductException {
+
         return wishlistService.addProductToWishlist(productId, request, principal);
     }
 
+
+    @GetMapping
+    public APIResponse<WishlistResDTO> getWishlist(Principal principal){
+
+        return wishlistService.getWishlistItems(principal);
+    }
+
     @DeleteMapping("/delete/{productId}")
-    public APIResponse<WishlistItemResDTO> deleteProductToWishlist(@PathVariable Long productId,
-                                                                   HttpServletRequest request,
-                                                                   Principal principal) {
+    public APIResponse<WishlistResDTO> deleteProductToWishlist(@PathVariable Long productId,
+                                                               HttpServletRequest request,
+                                                               Principal principal) {
         return wishlistService.deleteProductToWishlist(productId, request, principal);
     }
 
-
     // 전체삭제
     @DeleteMapping("/delete")
-    public APIResponse<List<WishlistItemResDTO>> deleteWishlist(Principal principal){
+    public APIResponse<WishlistResDTO> deleteWishlist(Principal principal){
 
         return wishlistService.deleteWishlist(principal);
     }
 
-    @GetMapping
-    public APIResponse<List<WishlistItemResDTO>> getWishlist(Principal principal){
 
-        return wishlistService.getWishlistItems(principal);
+    @GetMapping("/{productId}")
+    public ResponseEntity getCustomerCountByProductId(@PathVariable Long productId, Principal principal) {
+        int customerCount = wishlistService.getCustomerCountForProduct(productId, principal);
+        return ResponseEntity.ok(customerCount);
     }
 }

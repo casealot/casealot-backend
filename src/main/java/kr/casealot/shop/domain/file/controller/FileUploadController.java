@@ -26,10 +26,7 @@ import java.util.Optional;
 @Api(tags = {"S3 파일 업로드 API"})
 @RequiredArgsConstructor
 public class FileUploadController {
-    private final ProductRepository productRepository;
     private final ProductService productService ;
-    private final S3UploadService s3UploadService;
-    private final UploadFileService uploadFileService;
 
     @PostMapping("/{product_id}/image")
     @ApiOperation(value = "상품 이미지 업로드", notes = "상품의 이미지와 썸네일 이미지를 업로드한다.")
