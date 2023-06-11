@@ -13,8 +13,9 @@ import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentRes
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.DuplicateException;
-import kr.casealot.shop.global.exception.NotFoundException;
+import kr.casealot.shop.global.exception.DuplicateEmailException;
+import kr.casealot.shop.global.exception.DuplicateProductException;
+import kr.casealot.shop.global.exception.NotFoundProductException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,7 +71,7 @@ public class ProductService {
     @Transactional
     public APIResponse<ProductDTO.DetailResponse> findById(Long id) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("존재하지 않는 상품입니다."));
+                NotFoundProductException::new);
 
         // 상품 조회시 상품 조회 수 증가.
         savedProduct.addView(savedProduct.getViews());
@@ -110,7 +111,7 @@ public class ProductService {
 
     @Transactional
     public APIResponse<Product> createProduct(
-            ProductDTO.Request createRequest) throws DuplicateException {
+            ProductDTO.Request createRequest) throws DuplicateEmailException, DuplicateProductException {
         if (productRepository.findByName(createRequest.getName()) == null) {
             Product saveProduct = Product.builder()
                     .name(createRequest.getName())
@@ -124,7 +125,7 @@ public class ProductService {
             Product savedProduct = productRepository.saveAndFlush(saveProduct);
             return APIResponse.success(API_NAME, savedProduct);
         }else{
-            throw new DuplicateException("상품명이 중복되었습니다.");
+            throw new DuplicateProductException();
         }
     }
 
@@ -133,7 +134,7 @@ public class ProductService {
             Long id, MultipartFile thumbnailFile, List<MultipartFile> imagesFiles) throws Exception {
 
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new NotFoundProductException());
 
         UploadFile thumbnail = null;
         if(null != thumbnailFile){
@@ -173,7 +174,7 @@ public class ProductService {
     public APIResponse modifyProductWithImage(Long id, MultipartFile thumbnailFile,
                                               List<MultipartFile> imagesFiles) throws Exception {
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
+                .orElseThrow(NotFoundProductException::new);
 
         UploadFile thumbnail = null;
         if(null != thumbnailFile){
@@ -227,7 +228,7 @@ public class ProductService {
     public APIResponse deleteProduct(Long productId) throws Exception {
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
+                .orElseThrow(NotFoundProductException::new);
 
         // step1 : S3 업로드된 이미지 삭제
         // step2 : DB에 저장된 이미지 메타정보 삭제
@@ -252,9 +253,8 @@ public class ProductService {
     @Transactional
     public APIResponse<Product> updateProduct(Long productId, ProductDTO.Request updateRequest) throws Exception {
 
-        Product savedProduct = productRepository.findById(productId).orElseThrow(
-                () -> new NotFoundException("존재하지 않는 상품입니다.")
-        );
+        Product savedProduct = productRepository.findById(productId)
+                .orElseThrow(NotFoundProductException::new);
 
         Product updateProduct = Product.builder()
                 .id(productId)

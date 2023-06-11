@@ -163,7 +163,7 @@ spring:
           clientSecret: mDjShWDkXnOwNoSIj4kjvpcL6nACSKkz
           clientAuthenticationMethod: post
           authorizationGrantType: authorization_code
-          redirectUri: http://localhost:8000/login/oauth2/code/kakao
+          redirectUri: http://43.201.107.8:8000/login/oauth2/code/kakao
           scope:
             - profile_nickname
             - profile_image
@@ -196,8 +196,8 @@ app:
     refreshTokenExpiry: 604800000
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth/redirect
-    defaultRedirectUri: http://localhost:3000/oauth/redirect
+      - http://localhost:5174/oauth/redirect
+    defaultRedirectUri: http://localhost:5174/oauth/redirect
 
 upload:
   path: images
