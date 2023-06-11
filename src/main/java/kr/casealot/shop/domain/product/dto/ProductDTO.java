@@ -94,6 +94,7 @@ public class ProductDTO {
         private String season;
         private String type;
         private int wishCount;
+        private String wishYn;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime createdDt;
