@@ -10,6 +10,8 @@ import kr.casealot.shop.domain.notice.comment.repository.NoticeCommentRepository
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.notice.repository.NoticeRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundCommentException;
+import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -39,7 +41,7 @@ public class NoticeCommentService {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
         if(notice == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         String customerId = principal.getName();
@@ -66,7 +68,7 @@ public class NoticeCommentService {
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
 
         if(noticeComment == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundCommentException();
         }
 
         String customerId = principal.getName();
@@ -92,13 +94,13 @@ public class NoticeCommentService {
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
 
         if(noticeComment == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundCommentException();
         }
 
         String customerId = principal.getName();
 
         if(!customerId.equals(noticeComment.getCustomer().getId())){
-            return APIResponse.permissionDenied();
+            throw new PermissionException();
         }
 
         noticeComment.setTitle(noticeCommentReqDTO.getTitle());
