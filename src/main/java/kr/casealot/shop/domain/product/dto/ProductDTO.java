@@ -1,10 +1,12 @@
 package kr.casealot.shop.domain.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class ProductDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GetResponse {
-        private List<Product> items = new ArrayList<>();
+        private List<ProductInfo> items = new ArrayList<>();
         private Long count;
         private Long totalPages;
         private Long totalCount;
@@ -73,9 +75,33 @@ public class ProductDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DetailResponse {
-        private Product product;
+        private ProductInfo product;
 
         private List<ReviewResDTO> reviewList;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProductInfo{
+        private Long id;
+        private String name;
+        private String content;
+        private int price;
+        private int sale;
+        private String color;
+        private String season;
+        private String type;
+        private int wishCount;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private LocalDateTime createdDt;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private LocalDateTime modifiedDt;
+
     }
 
 }
