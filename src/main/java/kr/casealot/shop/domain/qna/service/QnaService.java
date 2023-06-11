@@ -9,6 +9,7 @@ import kr.casealot.shop.domain.qna.dto.*;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.*;
 import kr.casealot.shop.global.util.HeaderUtil;
@@ -54,10 +55,6 @@ public class QnaService {
 
         String customerId = principal.getName();
 
-        if(customerId == null){
-            return APIResponse.invalidAccessToken();
-        }
-
         Customer customer = customerRepository.findById(customerId);
 
         Qna qna = Qna.builder()
@@ -83,19 +80,15 @@ public class QnaService {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
         if(qna == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         String customerId = principal.getName();
 
         Customer customer = customerRepository.findById(customerId);
 
-        if(customerId == null){
-            return APIResponse.invalidAccessToken();
-        }
-
         if (!customerId.equals(customer.getId())) {
-            return APIResponse.permissionDenied();
+            throw new PermissionException();
         }
 
         qna.setTitle(qnaReqDTO.getTitle());
@@ -114,7 +107,7 @@ public class QnaService {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
         if(qna == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
         // 조회수 증가
         qna.setViews(qna.getViews() + 1);
@@ -159,7 +152,7 @@ public class QnaService {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
         if(qna == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         String customerId = principal.getName();
