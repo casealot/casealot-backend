@@ -14,7 +14,6 @@ import java.util.List;
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     Wishlist findByCustomerId(String id);
 
-
     @Modifying
     @Query("DELETE FROM WishlistItem wi WHERE wi.wishlist = :wishlist")
     void deleteCartItemsByCart(@Param("wishlist") Wishlist wishlist);
