@@ -11,6 +11,7 @@ import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.notice.repository.NoticeRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
@@ -65,7 +66,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
         if(notice == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         notice.setViews(notice.getViews() + 1);
@@ -139,7 +140,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
         if(notice == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         String customerId = principal.getName();
@@ -168,7 +169,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
         if(notice == null){
-            return APIResponse.notExistRequest();
+            throw new NotFoundWriteException();
         }
 
         String customerId = principal.getName();
