@@ -62,8 +62,10 @@ public class ProductService {
 
         Page<Product> products = productRepository.findAll(specification, pageable);
 
+        List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(products.getContent());
+
         ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
-                .items(products.getContent())
+                .items(productInfos)
                 .count((long) products.getContent().size())
                 .totalCount(products.getTotalElements())
                 .totalPages((long) products.getTotalPages()).build();
@@ -106,8 +108,10 @@ public class ProductService {
             reviewList.add(reviewDTO);
         }
 
+        ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct);
+
         return APIResponse.success(ProductDTO.DetailResponse.builder()
-                .product(savedProduct)
+                .product(productInfo)
                 .reviewList(reviewList)
                 .build());
     }
