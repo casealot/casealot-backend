@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.entity.Review;
-import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.global.entity.BaseTimeEntity;
 import lombok.*;
 

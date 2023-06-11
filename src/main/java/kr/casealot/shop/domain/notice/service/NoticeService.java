@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.notice.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
@@ -13,9 +12,6 @@ import kr.casealot.shop.domain.notice.repository.NoticeRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
-import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
