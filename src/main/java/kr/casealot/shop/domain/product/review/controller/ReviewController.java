@@ -30,18 +30,18 @@ public class ReviewController {
     }
 
     //수정
-    @PutMapping("/fix/{reviewId}")
+    @PutMapping("/{reviewId}")
     private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, Principal principal) {
         return reviewService.fixReview(reviewId, reviewReqDTO, principal);
     }
 
     //삭제
-    @DeleteMapping("/delete/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, Principal principal) {
         return reviewService.deleteReview(reviewId, principal);
     }
 
-    @GetMapping("/view/{reviewId}")
+    @GetMapping("/{reviewId}")
     private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId) {
         return reviewService.getReview(reviewId);
     }
