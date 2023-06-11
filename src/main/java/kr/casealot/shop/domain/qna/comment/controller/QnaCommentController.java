@@ -21,7 +21,7 @@ public class QnaCommentController {
 
     private final QnaCommentService qnaCommentService;
 
-    @PostMapping("/{qna_id}/comments")
+    @PostMapping("/{qna_id}")
     public APIResponse<QnaCommentResDTO> createQnaComment(@PathVariable Long qna_id,
                                                           @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
                                                           HttpServletRequest request,
@@ -31,7 +31,7 @@ public class QnaCommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/comments/{comment_id}")
+    @DeleteMapping("/{comment_id}")
     public APIResponse<QnaCommentResDTO> deleteComment(@PathVariable("comment_id") Long commentId,
                                                        HttpServletRequest request,
                                                        Principal principal){
@@ -39,7 +39,7 @@ public class QnaCommentController {
         return qnaCommentService.deleteComment(commentId, request, principal);
     }
     // 댓글 수정
-    @PutMapping("/comments/{comment_id}")
+    @PutMapping("/{comment_id}")
     public APIResponse<QnaCommentResDTO> updateComment( @PathVariable("comment_id") Long commentId,
                                                         @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
                                                         HttpServletRequest request,
