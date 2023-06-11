@@ -94,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/cal/v1/customer/login"
                 ).permitAll()
                 .antMatchers(
-                        "/cal/v1/product/review/**",
+                        "/cal/v1/review/**",
                         "/cal/v1/wishlist/**",
                         "/cal/v1/notice/**",
                         "/cal/v1/qna/**",

@@ -19,30 +19,30 @@ import java.security.Principal;
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"REVIEW API"}, description = "리뷰 관련 API")
-@RequestMapping("/cal/v1/product/review/{id}")
+@RequestMapping("/cal/v1/review")
 public class ReviewController {
     private final ReviewService reviewService;
 
     //생성
-    @PostMapping("/create")
-    private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, @PathVariable Long id, Principal principal) {
-        return reviewService.createReview(reviewReqDTO, request, id, principal);
+    @PostMapping("/{productId}/create")
+    private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, @PathVariable Long productId, Principal principal) {
+        return reviewService.createReview(reviewReqDTO, productId, principal);
     }
 
     //수정
     @PutMapping("/fix/{reviewId}")
-    private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, HttpServletRequest request, Principal principal) {
-        return reviewService.fixReview(reviewId, reviewReqDTO, request, principal);
+    private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, Principal principal) {
+        return reviewService.fixReview(reviewId, reviewReqDTO, principal);
     }
 
     //삭제
     @DeleteMapping("/delete/{reviewId}")
-    private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, HttpServletRequest request, Principal principal) {
-        return reviewService.deleteReview(reviewId, request, principal);
+    private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, Principal principal) {
+        return reviewService.deleteReview(reviewId, principal);
     }
 
     @GetMapping("/view/{reviewId}")
-    private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId, Principal principal) throws ChangeSetPersister.NotFoundException {
-        return reviewService.getReview(reviewId, principal);
+    private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId) {
+        return reviewService.getReview(reviewId);
     }
 }
