@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -74,7 +75,7 @@ public class ProductService {
     }
 
     @Transactional
-    public APIResponse<ProductDTO.DetailResponse> searchProduct(Long id) throws Exception {
+    public APIResponse<ProductDTO.DetailResponse> getDetailProduct(Long id, Principal principal) throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(
                 NotFoundProductException::new);
 
@@ -108,7 +109,7 @@ public class ProductService {
             reviewList.add(reviewDTO);
         }
 
-        ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct);
+        ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct, principal);
 
         return APIResponse.success(ProductDTO.DetailResponse.builder()
                 .product(productInfo)
