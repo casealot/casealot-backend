@@ -18,7 +18,7 @@ import java.security.Principal;
 public class NoticeCommentController {
     private final NoticeCommentService noticeCommentService;
 
-    @PostMapping("/{notice_id}/comments")
+    @PostMapping("/{notice_id}")
     public APIResponse<NoticeCommentResDTO> createComment(
             @PathVariable("notice_id") Long noticeId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
@@ -29,7 +29,7 @@ public class NoticeCommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/comments/{comment_id}")
+    @DeleteMapping("/{comment_id}")
     public APIResponse<NoticeCommentResDTO> deleteComment(
             @PathVariable("comment_id") Long commentId,
             HttpServletRequest request,
@@ -38,7 +38,7 @@ public class NoticeCommentController {
         return noticeCommentService.deleteComment(commentId, request, principal);
     }
     // 댓글 수정
-    @PutMapping("/comments/{comment_id}")
+    @PutMapping("/{comment_id}")
     public APIResponse<NoticeCommentResDTO> updateComment(
             @PathVariable("comment_id") Long commentId,
             @RequestBody NoticeCommentReqDTO noticeCommentReqDTO,
