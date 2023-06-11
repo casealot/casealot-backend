@@ -14,19 +14,26 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "wishlist_item")
+@Table(name = "WISHLIST_ITEM")
 public class WishlistItem{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "wishlist_id")
+    @JoinColumn(name = "WISHLIST_ID")
     private Wishlist wishlist;
 
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "PRODUCT_ID")
     private Product product;
+
+    public String getCustomerId() {
+        if (wishlist != null) {
+            return wishlist.getCustomer().getId();
+        }
+        return null;
+    }
 }

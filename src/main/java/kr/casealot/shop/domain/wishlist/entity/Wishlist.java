@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "wishlist")
+@Table(name = "WISHLIST")
 public class Wishlist{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
