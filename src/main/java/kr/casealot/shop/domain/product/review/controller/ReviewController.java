@@ -24,7 +24,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     //생성
-    @PostMapping("/{productId}/create")
+    @PostMapping("/{productId}")
     private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, @PathVariable Long productId, Principal principal) {
         return reviewService.createReview(reviewReqDTO, productId, principal);
     }
