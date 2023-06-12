@@ -42,9 +42,12 @@ public class QnaCommentService {
 
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
+
         if(qna == null){
             throw new NotFoundWriteException();
         }
+
+        qna.setHasReply(true);
         String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
@@ -62,6 +65,8 @@ public class QnaCommentService {
                 .build();
 
         qnaCommentRepository.save(qnaComment);
+
+        qnaRepository.save(qna);
 
         QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
 
