@@ -177,9 +177,21 @@ public class CustomerService {
 
     @Transactional
     public APIResponse<String> deleteCustomer(HttpServletRequest request, Principal principal) {
-        customerRepository.deleteById(principal.getName());
+        String token = HeaderUtil.getAccessToken(request);
 
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(principal.getName());
+
+        Claims claims = authToken.getTokenClaims();
+        String userId = claims.getSubject();
+        customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
+        customerRepository.deleteById(principal.getName());
         log.info("ID: " + principal.getName() + "quit!");
+
+        BlacklistToken blacklistToken = new BlacklistToken();
+        blacklistToken.setId(userId);
+        blacklistToken.setBlacklistToken(token);
+        blacklistTokenRepository.save(blacklistToken);
 
         return APIResponse.success("customerId", principal.getName() + " user deleted !");
     }
