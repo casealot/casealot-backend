@@ -7,13 +7,9 @@ import kr.casealot.shop.domain.product.review.service.ReviewService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-// /cal/v1/product/{id}
 
 @RestController
 @Slf4j
