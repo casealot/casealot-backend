@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @AllArgsConstructor
 public enum OrderStatus {
-    ORDER("주문"),
-    CANCEL("주문취소");
+    ORDER("접수"),
+    IN_PROGRESS("처리중"),
+    CANCEL("취소"),
+    COMPLETE("완료");
     private final String displayName;
 }

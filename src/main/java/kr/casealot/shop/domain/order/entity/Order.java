@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +19,25 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order{
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
+    private String orderNumber;
 
+    @Column(name = "order_dt")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime orderDt;
+    @Column(name = "order_status")
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+    @Column(name = "total_amount")
+    private int totalAmount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    private Customer customer; //주문 회원
+    private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderItems = new ArrayList<>();
@@ -35,12 +46,6 @@ public class Order{
 //    @JoinColumn(name = "delivery_id")
 //    private Delivery delivery; //배송정보
 
-    @Column(name = "order_dt")
-    private LocalDateTime orderDt; //주문시간
-
-    @Column(name = "order_status")
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status; //주문상태 [ORDER, CANCEL]
     //==생성 메서드==//
 //    public static Order createOrder(Customer customer, Delivery delivery, OrderItem... orderItems) {
 //        Order order = new Order();
