@@ -1,8 +1,12 @@
 package kr.casealot.shop.domain.customer.service;
 
 import io.jsonwebtoken.Claims;
+import kr.casealot.shop.domain.auth.entity.BlacklistToken;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
+import kr.casealot.shop.domain.auth.repository.BlacklistTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
+import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
@@ -41,8 +45,10 @@ public class CustomerService {
     private final AppProperties appProperties;
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository;
     private final AuthTokenProvider authTokenProvider;
     private final AuthTokenProvider tokenProvider;
+    private final BlacklistTokenRepository blacklistTokenRepository;
     private final static String REFRESH_TOKEN = "refresh_token";
 
     public APIResponse<String> join(CustomerDto customerDto) throws DuplicateEmailException, DuplicateIdException {
@@ -136,10 +142,16 @@ public class CustomerService {
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
+        //로그인시 카트 없으면 생성 후 db에 저장
+        Cart cart = cartRepository.findByCustomerId(customer.getId());
+        if (cart == null) {
+            cart = Cart.createCart(customer);
+            cartRepository.save(cart);
+        }
+
         return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
 
-    //로그아웃
     @Transactional
     public APIResponse<String> logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
@@ -151,12 +163,18 @@ public class CustomerService {
 
         System.out.println("ID: " + userId);
 
-        //회원탈퇴시에 refreshToken 삭제
-        //TODO: accessToken 사용불가하게 만들어야함.
-        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userId);
-        if (customerRefreshToken != null) {
-            customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
+        // 이미 블랙리스트에 등록된 토큰인 경우 삭제하도록 처리
+        BlacklistToken existingToken = blacklistTokenRepository.findByBlacklistToken(token);
+        if (existingToken != null) {
+            blacklistTokenRepository.delete(existingToken);
         }
+
+        // AccessToken을 블랙리스트에 추가
+        BlacklistToken blacklistToken = new BlacklistToken();
+        blacklistToken.setId(userId);
+        blacklistToken.setBlacklistToken(token);
+        blacklistTokenRepository.save(blacklistToken);
+
 
         return APIResponse.success("customerId", userId + " user logout!");
     }
@@ -164,9 +182,21 @@ public class CustomerService {
 
     @Transactional
     public APIResponse<String> deleteCustomer(HttpServletRequest request, Principal principal) {
-        customerRepository.deleteById(principal.getName());
+        String token = HeaderUtil.getAccessToken(request);
 
+        AuthToken authToken = authTokenProvider.convertAuthToken(token);
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(principal.getName());
+
+        Claims claims = authToken.getTokenClaims();
+        String userId = claims.getSubject();
+        customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
+        customerRepository.deleteById(principal.getName());
         log.info("ID: " + principal.getName() + "quit!");
+
+        BlacklistToken blacklistToken = new BlacklistToken();
+        blacklistToken.setId(userId);
+        blacklistToken.setBlacklistToken(token);
+        blacklistTokenRepository.save(blacklistToken);
 
         return APIResponse.success("customerId", principal.getName() + " user deleted !");
     }

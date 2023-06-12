@@ -1,12 +1,16 @@
 package kr.casealot.shop.domain.product.dto;
 
+import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
+import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.domain.wishlist.wishlistItem.repository.WishlistItemRepository;
 import kr.casealot.shop.global.exception.NotFoundProductException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +19,7 @@ import java.util.List;
 public class ProductMapper {
     private final ProductRepository productRepository;
     private final WishlistItemRepository wishlistItemRepository;
+    private final CustomerRepository customerRepository;
 
     public Product createRequestDTOToEntity(ProductDTO.Request request) {
         Product saveProduct = Product.builder()
@@ -61,6 +66,7 @@ public class ProductMapper {
                     .color(product.getColor())
                     .type(product.getType())
                     .wishCount(wishCount)
+                    .wishYn("N")
                     .createdDt(product.getCreatedDt())
                     .modifiedDt(product.getModifiedDt())
                     .build());
@@ -69,6 +75,18 @@ public class ProductMapper {
     }
 
     public ProductDTO.ProductInfo convertEntityToDTO(Product product) {
+        return convertEntityToDTO(product, null);
+    }
+
+    public ProductDTO.ProductInfo convertEntityToDTO(Product product, Principal principal) {
+        String wishYn = "N";
+        if(principal != null){
+            Customer customer = customerRepository.findById(principal.getName());
+            int wishCount = wishlistItemRepository.countByProductIdAndWishlistId(product.getId(), customer.getSeq());
+            if(wishCount > 0){
+                wishYn = "Y";
+            }
+        }
         int wishCount = wishlistItemRepository.countByProduct_Id(product.getId());
         return ProductDTO.ProductInfo.builder()
                 .id(product.getId())
@@ -79,6 +97,7 @@ public class ProductMapper {
                 .color(product.getColor())
                 .type(product.getType())
                 .wishCount(wishCount)
+                .wishYn(wishYn)
                 .createdDt(product.getCreatedDt())
                 .modifiedDt(product.getModifiedDt())
                 .build();
