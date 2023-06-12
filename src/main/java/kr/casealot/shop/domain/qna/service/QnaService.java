@@ -53,7 +53,6 @@ public class QnaService {
 
     @Transactional
     public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
                                             Principal principal) {
 
         String customerId = principal.getName();
@@ -71,7 +70,7 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success(API_NAME,qnaResDTO);
+        return APIResponse.success(API_NAME, qnaResDTO);
     }
 
 
@@ -79,11 +78,10 @@ public class QnaService {
     @Transactional
     public APIResponse<QnaResDTO> updateQna(Long qnaId,
                                             QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 
@@ -167,11 +165,10 @@ public class QnaService {
     // qna 삭제
     @Transactional
     public APIResponse<QnaResDTO> deleteQna(Long qnaId,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 

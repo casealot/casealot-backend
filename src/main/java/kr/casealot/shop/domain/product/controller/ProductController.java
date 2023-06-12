@@ -4,12 +4,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.product.dto.ProductDTO;
-import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @Slf4j
@@ -39,8 +40,8 @@ public class ProductController {
      */
     @GetMapping("/product/{id}")
     public APIResponse<ProductDTO.DetailResponse> getProductDetail(
-            @ApiParam(value = "상품 요청 DTO")@PathVariable Long id) throws Exception {
-        return productService.searchProduct(id);
+            @ApiParam(value = "상품 요청 DTO")@PathVariable Long id, Principal principal) throws Exception {
+        return productService.getDetailProduct(id, principal);
     }
 
 
