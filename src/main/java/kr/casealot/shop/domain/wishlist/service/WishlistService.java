@@ -159,6 +159,7 @@ public class WishlistService {
         WishlistItemDTO wishlistItemDTO = new WishlistItemDTO();
         wishlistItemDTO.setId(product.getId());
         wishlistItemDTO.setName(product.getName());
+        wishlistItemDTO.setPrice(product.getPrice());
         if (product.getThumbnail() != null) {
             wishlistItemDTO.setThumbnail(product.getThumbnail().getUrl());
         } else {
