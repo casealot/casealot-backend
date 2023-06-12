@@ -1,5 +1,6 @@
 package kr.casealot.shop.global.config.security;
 
+import kr.casealot.shop.domain.auth.repository.BlacklistTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.config.properties.AppProperties;
@@ -55,6 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
     private final CustomerRepository customerRepository;
     private final CustomUserDetailsService customUserDetailsService;
+    private final BlacklistTokenRepository blacklistTokenRepository;
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -162,7 +165,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * */
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
-        return new TokenAuthenticationFilter(tokenProvider, customUserDetailsService);
+        return new TokenAuthenticationFilter(tokenProvider, customUserDetailsService, blacklistTokenRepository);
     }
 
     /*
