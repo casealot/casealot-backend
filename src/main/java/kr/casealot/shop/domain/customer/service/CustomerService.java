@@ -152,7 +152,6 @@ public class CustomerService {
         return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
 
-    //로그아웃
     @Transactional
     public APIResponse<String> logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
@@ -164,12 +163,18 @@ public class CustomerService {
 
         System.out.println("ID: " + userId);
 
-        //TODO: accessToken 사용불가하게 만들어야함.
+        // 이미 블랙리스트에 등록된 토큰인 경우 삭제하도록 처리
+        BlacklistToken existingToken = blacklistTokenRepository.findByBlacklistToken(token);
+        if (existingToken != null) {
+            blacklistTokenRepository.delete(existingToken);
+        }
+
         // AccessToken을 블랙리스트에 추가
         BlacklistToken blacklistToken = new BlacklistToken();
         blacklistToken.setId(userId);
         blacklistToken.setBlacklistToken(token);
         blacklistTokenRepository.save(blacklistToken);
+
 
         return APIResponse.success("customerId", userId + " user logout!");
     }
