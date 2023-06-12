@@ -1,7 +1,9 @@
 package kr.casealot.shop.domain.customer.service;
 
 import io.jsonwebtoken.Claims;
+import kr.casealot.shop.domain.auth.entity.BlacklistToken;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
+import kr.casealot.shop.domain.auth.repository.BlacklistTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
@@ -46,6 +48,7 @@ public class CustomerService {
     private final CartRepository cartRepository;
     private final AuthTokenProvider authTokenProvider;
     private final AuthTokenProvider tokenProvider;
+    private final BlacklistTokenRepository blacklistTokenRepository;
     private final static String REFRESH_TOKEN = "refresh_token";
 
     public APIResponse<String> join(CustomerDto customerDto) throws DuplicateEmailException, DuplicateIdException {
@@ -161,12 +164,12 @@ public class CustomerService {
 
         System.out.println("ID: " + userId);
 
-        //회원탈퇴시에 refreshToken 삭제
         //TODO: accessToken 사용불가하게 만들어야함.
-        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userId);
-        if (customerRefreshToken != null) {
-            customerRefreshTokenRepository.deleteById(customerRefreshToken.getRefreshTokenSeq());
-        }
+        // AccessToken을 블랙리스트에 추가
+        BlacklistToken blacklistToken = new BlacklistToken();
+        blacklistToken.setId(userId);
+        blacklistToken.setBlacklistToken(token);
+        blacklistTokenRepository.save(blacklistToken);
 
         return APIResponse.success("customerId", userId + " user logout!");
     }
