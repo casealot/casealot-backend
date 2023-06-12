@@ -40,7 +40,7 @@ public class Order{
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderProduct> orderItems = new ArrayList<>();
+    private List<OrderProduct> orderProducts = new ArrayList<>();
 
 //    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JoinColumn(name = "delivery_id")
