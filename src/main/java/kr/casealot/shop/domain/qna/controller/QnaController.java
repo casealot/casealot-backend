@@ -31,24 +31,20 @@ public class QnaController {
 //    }
 
 
-
     @PostMapping
     public APIResponse<QnaResDTO> createQna(@RequestBody QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
                                             Principal principal) {
 
-        return qnaService.createQna(qnaReqDTO, request, principal);
+        return qnaService.createQna(qnaReqDTO, principal);
     }
 
     @PutMapping("/{qna_id}")
     public APIResponse<QnaResDTO> updateQna(@PathVariable("qna_id") Long qnaId,
-                                       @RequestBody QnaReqDTO qnaReqDTO,
-                                       HttpServletRequest request,
-                                       Principal principal){
+                                            @RequestBody QnaReqDTO qnaReqDTO,
+                                            Principal principal) {
 
 
-
-        return qnaService.updateQna(qnaId, qnaReqDTO, request, principal);
+        return qnaService.updateQna(qnaId, qnaReqDTO, principal);
     }
 
     @GetMapping("/list/{qna_id}")
@@ -60,10 +56,9 @@ public class QnaController {
 
     @DeleteMapping("/{qna_id}")
     public APIResponse<QnaResDTO> deleteQna(@PathVariable("qna_id") Long qnaId,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
 
-        return qnaService.deleteQna(qnaId, request, principal);
+        return qnaService.deleteQna(qnaId, principal);
     }
 
     @GetMapping("/list")
