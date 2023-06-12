@@ -31,4 +31,6 @@ public class Qna extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
+
+    private boolean hasReply;
 }
