@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.notice.service;
 
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.notice.comment.dto.CommentDetailDTO;
 import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
 
@@ -58,7 +60,7 @@ public class NoticeService {
     }
 
     @Transactional
-    public APIResponse<NoticeDetailDTO> getNotice(Long noticeId){
+    public APIResponse<NoticeDetailDTO> getNotice(Long noticeId, Principal principal){
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
         if(notice == null){
@@ -77,21 +79,29 @@ public class NoticeService {
                 .modifiedDt(notice.getModifiedDt())
                 .build();
 
-
         List<NoticeComment> noticeCommentList = notice.getNoticeCommentList();
-        List<NoticeCommentResDTO> commentDTOList = new ArrayList<>();
+        List<CommentDetailDTO> commentDTOList = new ArrayList<>();
+
 
         for (NoticeComment noticeComment : noticeCommentList) {
-            NoticeCommentResDTO noticeCommentResDTO = NoticeCommentResDTO.builder()
+            String available = "N";
+            if (principal != null) {
+                Customer customer = customerRepository.findById(principal.getName());
+                if (Objects.equals(customer.getSeq(), noticeComment.getCustomer().getSeq())) {
+                    available = "Y"; // 로그인한 사용자가 작성한 글인 경우 수정, 삭제 가능으로 설정
+                }
+            }
+            CommentDetailDTO commentDetailDTO = CommentDetailDTO.builder()
                     .id(noticeComment.getId())
                     .customerId(noticeComment.getCustomer().getId())
                     .title(noticeComment.getTitle())
                     .content(noticeComment.getContent())
+                    .available(available)
                     .createdDt(noticeComment.getCreatedDt())
                     .modifiedDt(noticeComment.getModifiedDt())
                     .build();
 
-            commentDTOList.add(noticeCommentResDTO);
+            commentDTOList.add(commentDetailDTO);
         }
 
         noticeDetailDTO.setNoticeCommentList(commentDTOList);
