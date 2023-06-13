@@ -93,6 +93,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/health",
                         "/cal/v1/auth/refresh",
                         "/cal/v1/product/**",
+                        "/cal/v1/qna/list/**",
+                        "/cal/v1/notice/list/**",
                         "/cal/v1/customer/join",
                         "/cal/v1/customer/login"
                 ).permitAll()

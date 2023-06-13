@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import kr.casealot.shop.domain.product.review.dto.ReviewProductResDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 
@@ -76,7 +77,7 @@ public class ProductDTO {
     public static class DetailResponse {
         private ProductInfo product;
 
-        private List<ReviewResDTO> reviewList;
+        private List<ReviewProductResDTO> reviewList;
     }
 
     @Getter
