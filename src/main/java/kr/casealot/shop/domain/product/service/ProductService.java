@@ -76,8 +76,8 @@ public class ProductService {
 
     @Transactional
     public APIResponse<ProductDTO.DetailResponse> getDetailProduct(Long id, Principal principal) throws Exception {
-        Product savedProduct = productRepository.findById(id)
-                .orElseThrow(NotFoundProductException::new);
+        Product savedProduct = productRepository.findById(id).orElseThrow(
+                NotFoundProductException::new);
 
         // 상품 조회시 상품 조회 수 증가.
         savedProduct.addView(savedProduct.getViews());
@@ -88,36 +88,53 @@ public class ProductService {
         for (Review review : savedProduct.getReviews()) {
             List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
             for (ReviewComment reviewComment : review.getReviewCommentList()) {
-                boolean isCommentByPrincipal = principal != null && principal.getName().equals(reviewComment.getCustomer().getId());
-                String available = isCommentByPrincipal ? "Y" : "N";
-
-                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
-                        .id(reviewComment.getSeq())
-                        .customerName(reviewComment.getCustomer().getName())
-                        .reviewCommentText(reviewComment.getReviewCommentText())
-                        .available(available)
-                        .createdDt(reviewComment.getCreatedDt())
-                        .modifiedDt(reviewComment.getModifiedDt())
-                        .build();
-
-                reviewCommentList.add(reviewCommentDTO);
+                if (principal != null && principal.getName().equals(reviewComment.getCustomer().getId())) {
+                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                            .id(reviewComment.getSeq())
+                            .customerName(reviewComment.getCustomer().getName())
+                            .reviewCommentText(reviewComment.getReviewCommentText())
+                            .available("Y")
+                            .createdDt(reviewComment.getCreatedDt())
+                            .modifiedDt(reviewComment.getModifiedDt())
+                            .build();
+                    reviewCommentList.add(reviewCommentDTO);
+                } else {
+                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                            .id(reviewComment.getSeq())
+                            .customerName(reviewComment.getCustomer().getName())
+                            .reviewCommentText(reviewComment.getReviewCommentText())
+                            .available("N")
+                            .createdDt(reviewComment.getCreatedDt())
+                            .modifiedDt(reviewComment.getModifiedDt())
+                            .build();
+                    reviewCommentList.add(reviewCommentDTO);
+                }
             }
-
-            boolean isReviewByPrincipal = principal != null && principal.getName().equals(review.getCustomer().getId());
-            String available = isReviewByPrincipal ? "Y" : "N";
-
-            ReviewResDTO reviewDTO = ReviewResDTO.builder()
-                    .id(review.getSeq())
-                    .customerName(review.getCustomer().getName())
-                    .rating(review.getRating())
-                    .reviewText(review.getReviewText())
-                    .available(available)
-                    .reviewCommentList(reviewCommentList)
-                    .createdDt(review.getCreatedDt())
-                    .modifiedDt(review.getModifiedDt())
-                    .build();
-
-            reviewList.add(reviewDTO);
+            if (principal != null && principal.getName().equals(review.getCustomer().getId())) {
+                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                        .id(review.getSeq())
+                        .customerName(review.getCustomer().getName())
+                        .rating(review.getRating())
+                        .reviewText(review.getReviewText())
+                        .available("Y")
+                        .reviewCommentList(reviewCommentList)
+                        .createdDt(review.getCreatedDt())
+                        .modifiedDt(review.getModifiedDt())
+                        .build();
+                reviewList.add(reviewDTO);
+            } else {
+                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                        .id(review.getSeq())
+                        .customerName(review.getCustomer().getName())
+                        .rating(review.getRating())
+                        .reviewText(review.getReviewText())
+                        .available("N")
+                        .reviewCommentList(reviewCommentList)
+                        .createdDt(review.getCreatedDt())
+                        .modifiedDt(review.getModifiedDt())
+                        .build();
+                reviewList.add(reviewDTO);
+            }
         }
 
         ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct, principal);
