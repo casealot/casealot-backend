@@ -122,10 +122,12 @@ public class QnaService {
         // 조회수 증가
         qna.setViews(qna.getViews() + 1);
 
+
         String available = "N"; // 기본적으로 로그인하지 않은 사용자는 수정, 삭제 불가능
 
         if (principal != null) {
-            if (principal.getName().equals(qna.getCustomer().getName())) {
+            Customer customer = customerRepository.findById(principal.getName());
+            if (customer.getId().equals(qna.getCustomer().getId())) {
                 available = "Y"; // 로그인한 사용자가 작성한 글인 경우 수정, 삭제 가능으로 설정
             }
         }
