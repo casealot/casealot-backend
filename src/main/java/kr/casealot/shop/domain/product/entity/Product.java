@@ -32,9 +32,9 @@ public class Product extends BaseTimeEntity {
 
     @Column(name = "PRODUCT_NAME", length = 1024)
     private String name;
-
+    @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "PRODUCT_CONTENT", columnDefinition = "TEXT")
+    @Column(name = "PRODUCT_CONTENT")
     private String content;
 
     // 상품 이미지 프리뷰
