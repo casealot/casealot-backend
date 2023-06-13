@@ -88,25 +88,53 @@ public class ProductService {
         for (Review review : savedProduct.getReviews()) {
             List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
             for (ReviewComment reviewComment : review.getReviewCommentList()) {
-                ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
-                        .id(reviewComment.getSeq())
-                        .customerName(reviewComment.getCustomer().getName())
-                        .reviewCommentText(reviewComment.getReviewCommentText())
-                        .createdDt(reviewComment.getCreatedDt())
-                        .modifiedDt(reviewComment.getModifiedDt())
-                        .build();
-                reviewCommentList.add(reviewCommentDTO);
+                if (principal != null && principal.getName().equals(reviewComment.getCustomer().getId())) {
+                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                            .id(reviewComment.getSeq())
+                            .customerName(reviewComment.getCustomer().getName())
+                            .reviewCommentText(reviewComment.getReviewCommentText())
+                            .available("Y")
+                            .createdDt(reviewComment.getCreatedDt())
+                            .modifiedDt(reviewComment.getModifiedDt())
+                            .build();
+                    reviewCommentList.add(reviewCommentDTO);
+                } else {
+                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                            .id(reviewComment.getSeq())
+                            .customerName(reviewComment.getCustomer().getName())
+                            .reviewCommentText(reviewComment.getReviewCommentText())
+                            .available("N")
+                            .createdDt(reviewComment.getCreatedDt())
+                            .modifiedDt(reviewComment.getModifiedDt())
+                            .build();
+                    reviewCommentList.add(reviewCommentDTO);
+                }
             }
-            ReviewResDTO reviewDTO = ReviewResDTO.builder()
-                    .id(review.getSeq())
-                    .customerName(review.getCustomer().getName())
-                    .rating(review.getRating())
-                    .reviewText(review.getReviewText())
-                    .reviewCommentList(reviewCommentList)
-                    .createdDt(review.getCreatedDt())
-                    .modifiedDt(review.getModifiedDt())
-                    .build();
-            reviewList.add(reviewDTO);
+            if (principal != null && principal.getName().equals(review.getCustomer().getId())) {
+                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                        .id(review.getSeq())
+                        .customerName(review.getCustomer().getName())
+                        .rating(review.getRating())
+                        .reviewText(review.getReviewText())
+                        .available("Y")
+                        .reviewCommentList(reviewCommentList)
+                        .createdDt(review.getCreatedDt())
+                        .modifiedDt(review.getModifiedDt())
+                        .build();
+                reviewList.add(reviewDTO);
+            } else {
+                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                        .id(review.getSeq())
+                        .customerName(review.getCustomer().getName())
+                        .rating(review.getRating())
+                        .reviewText(review.getReviewText())
+                        .available("N")
+                        .reviewCommentList(reviewCommentList)
+                        .createdDt(review.getCreatedDt())
+                        .modifiedDt(review.getModifiedDt())
+                        .build();
+                reviewList.add(reviewDTO);
+            }
         }
 
         ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct, principal);
@@ -127,7 +155,7 @@ public class ProductService {
                     productMapper.createRequestDTOToEntity(createRequest));
 
             return APIResponse.success(API_NAME, savedProduct);
-        }else{
+        } else {
             throw new DuplicateProductException();
         }
     }
@@ -148,7 +176,7 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundProductException());
 
         UploadFile thumbnail = null;
-        if(null != thumbnailFile){
+        if (null != thumbnailFile) {
             String path = s3UploadService.uploadFile(thumbnailFile);
             thumbnail = uploadFileService.create(UploadFile.builder()
                     .name(thumbnailFile.getOriginalFilename())
@@ -160,9 +188,9 @@ public class ProductService {
         }
 
         List<UploadFile> images = null;
-        if(null != imagesFiles){
+        if (null != imagesFiles) {
             images = new ArrayList<>();
-            for(MultipartFile imageFile : imagesFiles){
+            for (MultipartFile imageFile : imagesFiles) {
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
                         .name(thumbnailFile.getOriginalFilename())
@@ -172,7 +200,7 @@ public class ProductService {
                         .build()));
             }
             savedProduct.setImages(images);
-        }else{
+        } else {
 
         }
 
@@ -188,10 +216,10 @@ public class ProductService {
                 .orElseThrow(NotFoundProductException::new);
 
         UploadFile thumbnail = null;
-        if(null != thumbnailFile){
+        if (null != thumbnailFile) {
             //기존에 이미지가 있다면 삭제
             UploadFile savedThumbnailFile = savedProduct.getThumbnail();
-            if(null != savedThumbnailFile){
+            if (null != savedThumbnailFile) {
                 s3UploadService.deleteFileFromS3Bucket(savedThumbnailFile.getUrl());
                 uploadFileService.delete(savedThumbnailFile);
             }
@@ -207,18 +235,18 @@ public class ProductService {
         }
 
         List<UploadFile> images = null;
-        if(null != imagesFiles){
+        if (null != imagesFiles) {
             images = new ArrayList<>();
             //기존에 이미지가 있다면 삭제
             List<UploadFile> savedImagesFile = savedProduct.getImages();
-            if(null != savedImagesFile){
-                for(UploadFile savedImage : savedImagesFile){
+            if (null != savedImagesFile) {
+                for (UploadFile savedImage : savedImagesFile) {
                     s3UploadService.deleteFileFromS3Bucket(savedImage.getUrl());
                     uploadFileService.delete(savedImage);
                 }
             }
 
-            for(MultipartFile imageFile : imagesFiles){
+            for (MultipartFile imageFile : imagesFiles) {
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
                         .name(thumbnailFile.getOriginalFilename())
