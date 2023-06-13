@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -19,7 +20,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundExc
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"NOTICE API"}, description = "NOTICE 관련 API")
-@RequestMapping("/cal/v1/notice")
+@RequestMapping("/cal/v1/notice/list")
 public class NoticeController {
 
     private final NoticeService noticeService;
@@ -33,8 +34,9 @@ public class NoticeController {
 
     // 특정 공지 조회
     @GetMapping("/{notice_id}")
-    public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId){
+    public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId,
+                                                  Principal principal){
 
-        return noticeService.getNotice(noticeId);
+        return noticeService.getNotice(noticeId, principal);
     }
 }
