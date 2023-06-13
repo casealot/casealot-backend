@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.service;
 
-import com.google.gson.Gson;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
@@ -9,9 +8,10 @@ import kr.casealot.shop.domain.product.dto.ProductMapper;
 import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
+import kr.casealot.shop.domain.product.review.dto.ReviewProductResDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
-import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
+import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentProductResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
@@ -84,12 +84,12 @@ public class ProductService {
         productRepository.save(savedProduct);
 
         // 리뷰 추가
-        List<ReviewResDTO> reviewList = new ArrayList<>();
+        List<ReviewProductResDTO> reviewList = new ArrayList<>();
         for (Review review : savedProduct.getReviews()) {
-            List<ReviewCommentResDTO> reviewCommentList = new ArrayList<>();
+            List<ReviewCommentProductResDTO> reviewCommentList = new ArrayList<>();
             for (ReviewComment reviewComment : review.getReviewCommentList()) {
                 if (principal != null && principal.getName().equals(reviewComment.getCustomer().getId())) {
-                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                    ReviewCommentProductResDTO reviewCommentDTO = ReviewCommentProductResDTO.builder()
                             .id(reviewComment.getSeq())
                             .customerName(reviewComment.getCustomer().getName())
                             .reviewCommentText(reviewComment.getReviewCommentText())
@@ -99,7 +99,7 @@ public class ProductService {
                             .build();
                     reviewCommentList.add(reviewCommentDTO);
                 } else {
-                    ReviewCommentResDTO reviewCommentDTO = ReviewCommentResDTO.builder()
+                    ReviewCommentProductResDTO reviewCommentDTO = ReviewCommentProductResDTO.builder()
                             .id(reviewComment.getSeq())
                             .customerName(reviewComment.getCustomer().getName())
                             .reviewCommentText(reviewComment.getReviewCommentText())
@@ -111,7 +111,7 @@ public class ProductService {
                 }
             }
             if (principal != null && principal.getName().equals(review.getCustomer().getId())) {
-                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                ReviewProductResDTO reviewDTO = ReviewProductResDTO.builder()
                         .id(review.getSeq())
                         .customerName(review.getCustomer().getName())
                         .rating(review.getRating())
@@ -123,7 +123,7 @@ public class ProductService {
                         .build();
                 reviewList.add(reviewDTO);
             } else {
-                ReviewResDTO reviewDTO = ReviewResDTO.builder()
+                ReviewProductResDTO reviewDTO = ReviewProductResDTO.builder()
                         .id(review.getSeq())
                         .customerName(review.getCustomer().getName())
                         .rating(review.getRating())
