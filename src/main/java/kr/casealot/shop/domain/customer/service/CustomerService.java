@@ -102,7 +102,7 @@ public class CustomerService {
         // 토큰 생성 (jwt)
         // 토큰 유효 기간 설정 (30분 후)
         //long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry() + (60 * 60 * 24 * 30); //1달로 설정
-        long jwtExpiry = now.getTime() + 1000 * 60 * 2; // 테스트 2분
+        long jwtExpiry = now.getTime() + 1000 * 60 * 60; // 1시간
 
         AuthToken authToken = authTokenProvider.createAuthToken(
                 customer.getId(),
@@ -152,7 +152,6 @@ public class CustomerService {
         return APIResponse.success("customerToken", new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(), customer.getRoleType()));
     }
 
-    //로그아웃
     @Transactional
     public APIResponse<String> logout(HttpServletRequest request) {
         String token = HeaderUtil.getAccessToken(request);
@@ -164,12 +163,18 @@ public class CustomerService {
 
         System.out.println("ID: " + userId);
 
-        //TODO: accessToken 사용불가하게 만들어야함.
+        // 이미 블랙리스트에 등록된 토큰인 경우 삭제하도록 처리
+        BlacklistToken existingToken = blacklistTokenRepository.findByBlacklistToken(token);
+        if (existingToken != null) {
+            blacklistTokenRepository.delete(existingToken);
+        }
+
         // AccessToken을 블랙리스트에 추가
         BlacklistToken blacklistToken = new BlacklistToken();
         blacklistToken.setId(userId);
         blacklistToken.setBlacklistToken(token);
         blacklistTokenRepository.save(blacklistToken);
+
 
         return APIResponse.success("customerId", userId + " user logout!");
     }

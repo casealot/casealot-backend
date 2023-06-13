@@ -21,7 +21,7 @@ public class BlacklistToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long blacklistTokenSeq;
 
-    @Column(name = "CUSTOMER_ID", length = 64, unique = true)
+    @Column(name = "CUSTOMER_ID", length = 64)
     @NotNull
     @Size(max = 64)
     private String id;

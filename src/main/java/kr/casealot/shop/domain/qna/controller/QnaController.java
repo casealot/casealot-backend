@@ -31,34 +31,39 @@ public class QnaController {
 //    }
 
 
+
     @PostMapping
     public APIResponse<QnaResDTO> createQna(@RequestBody QnaReqDTO qnaReqDTO,
+                                            HttpServletRequest request,
                                             Principal principal) {
 
-        return qnaService.createQna(qnaReqDTO, principal);
+        return qnaService.createQna(qnaReqDTO, request, principal);
     }
 
     @PutMapping("/{qna_id}")
     public APIResponse<QnaResDTO> updateQna(@PathVariable("qna_id") Long qnaId,
-                                            @RequestBody QnaReqDTO qnaReqDTO,
-                                            Principal principal) {
+                                       @RequestBody QnaReqDTO qnaReqDTO,
+                                       HttpServletRequest request,
+                                       Principal principal){
 
 
-        return qnaService.updateQna(qnaId, qnaReqDTO, principal);
+
+        return qnaService.updateQna(qnaId, qnaReqDTO, request, principal);
     }
 
-    @GetMapping("/{qna_id}")
-    public APIResponse<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId) {
+    @GetMapping("/list/{qna_id}")
+    public APIResponse<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId, Principal principal){
 
 
-        return qnaService.getQna(qnaId);
+        return qnaService.getQna(qnaId, principal);
     }
 
     @DeleteMapping("/{qna_id}")
     public APIResponse<QnaResDTO> deleteQna(@PathVariable("qna_id") Long qnaId,
-                                            Principal principal) {
+                                            HttpServletRequest request,
+                                            Principal principal){
 
-        return qnaService.deleteQna(qnaId, principal);
+        return qnaService.deleteQna(qnaId, request, principal);
     }
 
     @GetMapping("/list")
