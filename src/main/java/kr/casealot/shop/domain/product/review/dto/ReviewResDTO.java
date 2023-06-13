@@ -18,6 +18,7 @@ public class ReviewResDTO {
     private String customerName; //고객 이름
     private Double rating; //별점
     private String reviewText; //리뷰 내용
+    private String available; //수정, 삭제가능여부
     @JsonProperty
     private List<ReviewCommentResDTO> reviewCommentList;
 
