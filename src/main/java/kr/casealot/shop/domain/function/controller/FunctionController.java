@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.function.controller;
 
 import io.swagger.annotations.Api;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
@@ -22,9 +23,11 @@ public class FunctionController {
 
   private final FunctionService functionService;
 
+  //오늘 기준 시간 00시 00분 00초
+  LocalDateTime today = LocalDateTime.now().with(LocalTime.MIN);
+
   @GetMapping("/daily")
-  public APIResponse<FunctionDTO> getDailyOrderData(
-      @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime date) {
-    return functionService.getFunction(date);
+  public APIResponse<FunctionDTO> getDailyOrderData() {
+    return functionService.getFunction(today);
   }
 }
