@@ -95,7 +95,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/qna/list/**",
             "/cal/v1/notice/list/**",
             "/cal/v1/customer/join",
-            "/cal/v1/customer/login"
+            "/cal/v1/customer/login",
+                "/cal/v1/autocomplete"
         ).permitAll()
         .antMatchers(
             "/cal/v1/review/**",
