@@ -13,9 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FunctionDTO {
 
-  private int todayOrder;
-  private int todayCancel;
-  private int todayReturn;
-  private int todayChange;
-  private int todayQna;
+  private long todayOrder;
+  private long todayCancel;
+  private long todayReturn;
+  private long todayChange;
+  private long todayQna;
 }

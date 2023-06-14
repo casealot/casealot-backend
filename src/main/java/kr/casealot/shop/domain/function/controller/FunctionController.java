@@ -3,7 +3,9 @@ package kr.casealot.shop.domain.function.controller;
 import io.swagger.annotations.Api;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
+import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,11 @@ public class FunctionController {
 
   @GetMapping("/daily")
   public APIResponse<FunctionDTO> getDailyOrderData() {
-    return functionService.getFunction(today);
+    return functionService.getTodayFunction(today);
+  }
+
+  @GetMapping("/weekly")
+  public APIResponse<List<FunctionWeekDTO>> getWeeklyOrderData() {
+    return functionService.getWeekFunction(today);
   }
 }
