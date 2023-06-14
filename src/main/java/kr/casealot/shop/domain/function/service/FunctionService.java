@@ -19,18 +19,17 @@ public class FunctionService {
   public APIResponse<FunctionDTO> getFunction(LocalDateTime date) {
     LocalDateTime startDate = date.toLocalDate().atStartOfDay();
     LocalDateTime endDate = date.toLocalDate().atTime(LocalTime.MAX);
-    int readyAnswer = qnaRepository.countByModifiedDtBetween(startDate, endDate);
+    int todaysEmptyComments = qnaRepository.countByModifiedDtBetweenAndQnaCommentListIsNull(startDate, endDate);
+
 
     FunctionDTO functionDTO = new FunctionDTO().builder()
         .todayOrder(0)
         .todayCancel(0)
         .todayReturn(0)
         .todayChange(0)
-        .todayQna(readyAnswer)
+        .todayQna(todaysEmptyComments)
         .build();
 
     return APIResponse.success("function",functionDTO);
   }
-
-
 }
