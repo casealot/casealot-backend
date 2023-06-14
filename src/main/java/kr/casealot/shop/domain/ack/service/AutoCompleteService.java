@@ -7,6 +7,7 @@ import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -21,10 +22,11 @@ public class AutoCompleteService {
     private final ProductRepository productRepository;
 
     @PostConstruct
+    @Scheduled(cron = "0 */5 * * * *")
     void loadKeyword(){
         trieNode = new TrieNode();
-        Set<Product> productSet = new HashSet<>(productRepository.findAll());
-        productSet.stream().map(Product::getName).forEach(trieNode::insert);
+        List<String> productSet = productRepository.findProductNames();
+        productSet.stream().forEach(trieNode::insert);
     }
 
     public APIResponse<ACKResponse> getACK(String query) {
