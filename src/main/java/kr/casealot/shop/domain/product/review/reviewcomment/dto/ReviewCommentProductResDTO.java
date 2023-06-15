@@ -1,25 +1,20 @@
-package kr.casealot.shop.domain.notice.dto;
+package kr.casealot.shop.domain.product.review.reviewcomment.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import kr.casealot.shop.domain.notice.comment.dto.CommentDetailDTO;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class NoticeDetailDTO {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReviewCommentProductResDTO {
     private Long id;
-    private String customerId;
-    private String title;
-    private String content;
-    private int views;
-    private List<CommentDetailDTO> noticeCommentList;
+    private String customerName; //작성자 이름
+    private String reviewCommentText; //리뷰 댓글 내용
+    private String available; //리뷰 댓글 수정 여부
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDt;

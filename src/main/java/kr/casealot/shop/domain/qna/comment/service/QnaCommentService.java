@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.qna.comment.service;
 
-import io.jsonwebtoken.Claims;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.qna.comment.dto.QnaCommentReqDTO;
@@ -13,14 +12,10 @@ import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.NotFoundCommentException;
 import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
-import kr.casealot.shop.global.oauth.token.AuthToken;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.security.Principal;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
@@ -42,9 +37,12 @@ public class QnaCommentService {
 
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
+
         if(qna == null){
             throw new NotFoundWriteException();
         }
+
+        qna.setHasReply(true);
         String customerId = principal.getName();
         Customer customer = customerRepository.findById(customerId);
 
@@ -62,6 +60,8 @@ public class QnaCommentService {
                 .build();
 
         qnaCommentRepository.save(qnaComment);
+
+        qnaRepository.save(qna);
 
         QnaCommentResDTO qnaCommentResDTO = getQnaCommentResDTO(customerId, qnaComment);
 

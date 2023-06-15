@@ -18,6 +18,8 @@ public class QnaDetailDTO {
     private String title;
     private String content;
     private int views;
+    private String available; // 수정 삭제 가능 여부
+
     private List<QnaCommentResDTO> qnaCommentList;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDt;

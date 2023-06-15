@@ -12,14 +12,10 @@ import java.util.List;
 
 @Repository
 public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long> {
-    WishlistItem findByProductAndWishlist(Product product, Wishlist wishlist);
-
     void deleteByProductAndWishlist(Product product, Wishlist wishlist);
-
     List<WishlistItem> findByProduct(Product product);
-
-    @Query("SELECT COUNT(DISTINCT w.wishlist.customer.id) FROM WishlistItem w WHERE w.product.id = :productId")
-    Long countDistinctByProduct_Id(@Param("productId") Long productId);
-
     int countByProduct_Id(Long id);
+
+    @Query("SELECT COUNT(*) FROM WishlistItem w INNER JOIN Wishlist wl ON wl.id = w.wishlist.id WHERE w.product.id = :productId AND wl.customer.seq = :customerSeq")
+    int countByProductIdAndWishlistId(@Param("productId") Long productId, @Param("customerSeq") Long customerSeq);
 }
