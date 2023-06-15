@@ -1,5 +1,6 @@
 package kr.casealot.shop.global.config.security;
 
+import kr.casealot.shop.domain.auth.repository.BlacklistTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.global.config.properties.AppProperties;
@@ -46,192 +47,200 @@ import java.util.Map;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //    private final CorsProperties corsProperties;
-    private final AppProperties appProperties;
-    private final AuthTokenProvider tokenProvider;
-    private final CustomUserDetailsService customerDetailsService;
-    private final CustomOAuth2UserService oAuth2UserService;
-    private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
-    private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
-    private final CustomerRepository customerRepository;
-    private final CustomUserDetailsService customUserDetailsService;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customerDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/explorer/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/v2/api-docs/**").permitAll()
-                .antMatchers("/h2-console/**").permitAll();
+  //    private final CorsProperties corsProperties;
+  private final AppProperties appProperties;
+  private final AuthTokenProvider tokenProvider;
+  private final CustomUserDetailsService customerDetailsService;
+  private final CustomOAuth2UserService oAuth2UserService;
+  private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
+  private final CustomerRefreshTokenRepository customerRefreshTokenRepository;
+  private final CustomerRepository customerRepository;
+  private final CustomUserDetailsService customUserDetailsService;
+  private final BlacklistTokenRepository blacklistTokenRepository;
 
 
-        http.cors().configurationSource(corsConfigurationSource())
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SpringSecurity에서 세션 관리 X
-                .and()
-                .csrf().disable()
-                .formLogin().disable()
-                .httpBasic().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .accessDeniedHandler(tokenAccessDeniedHandler)
-                .and()
-                .authorizeRequests().expressionHandler(expressionHandler())
-                .antMatchers(
-                        "/health",
-                        "/cal/v1/auth/refresh",
-                        "/cal/v1/product/**",
-                        "/cal/v1/customer/join",
-                        "/cal/v1/customer/login"
-                ).permitAll()
-                .antMatchers(
-                        "/cal/v1/review/**",
-                        "/cal/v1/wishlist/**",
-                        "/cal/v1/notice/**",
-                        "/cal/v1/qna/**",
-                        "/cal/v1/cart/**"
-                ).hasRole("USER")
-                .antMatchers(
-                        "/cal/v1/admin/**",
-                        "/cal/v1/admin/notice/**",
-                        "/cal/v1/admin/qna/**",
-                        "/cal/v1/file/**"
-                ).hasRole("ADMIN")
-                .antMatchers("/",
-                        "/error",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
-                .permitAll()
-                .antMatchers("/oauth2/**")
-                .permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .logout()
-                .logoutSuccessUrl("/")
-                .and()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorization")
-                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/*/oauth2/code/*")
-                .and()
-                .userInfoEndpoint()
-                .userService(oAuth2UserService)
-                .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler())
-                .failureHandler(oAuth2AuthenticationFailureHandler());
-        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(customerDetailsService)
+        .passwordEncoder(passwordEncoder());
+  }
 
-    /*
-     * auth 매니저 설정
-     * */
-    @Override
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests()
+        .antMatchers("/actuator/**").permitAll()
+        .antMatchers("/explorer/**").permitAll()
+        .antMatchers("/swagger-ui/**").permitAll()
+        .antMatchers("/swagger-resources/**").permitAll()
+        .antMatchers("/v2/api-docs/**").permitAll()
+        .antMatchers("/h2-console/**").permitAll();
 
-    /*
-     * security 설정 시, 사용할 인코더 설정
-     * */
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    http.cors().configurationSource(corsConfigurationSource())
+        .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SpringSecurity에서 세션 관리 X
+        .and()
+        .csrf().disable()
+        .formLogin().disable()
+        .httpBasic().disable()
+        .exceptionHandling()
+        .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+        .accessDeniedHandler(tokenAccessDeniedHandler)
+        .and()
+        .authorizeRequests().expressionHandler(expressionHandler())
+        .antMatchers(
+            "/health",
+            "/cal/v1/auth/refresh",
+            "/cal/v1/product/**",
+            "/cal/v1/qna/list/**",
+            "/cal/v1/notice/list/**",
+            "/cal/v1/customer/join",
+            "/cal/v1/customer/login",
+                "/cal/v1/autocomplete"
+        ).permitAll()
+        .antMatchers(
+            "/cal/v1/review/**",
+            "/cal/v1/wishlist/**",
+            "/cal/v1/notice/**",
+            "/cal/v1/qna/**",
+            "/cal/v1/cart/**"
+        ).hasRole("USER")
+        .antMatchers(
+            "/cal/v1/admin/**",
+            "/cal/v1/admin/notice/**",
+            "/cal/v1/admin/qna/**",
+            "/cal/v1/file/**",
+            "/cal/v1/function/**"
+        ).hasRole("ADMIN")
+        .antMatchers("/",
+            "/error",
+            "/favicon.ico",
+            "/**/*.png",
+            "/**/*.gif",
+            "/**/*.svg",
+            "/**/*.jpg",
+            "/**/*.html",
+            "/**/*.css",
+            "/**/*.js")
+        .permitAll()
+        .antMatchers("/oauth2/**")
+        .permitAll()
+        .anyRequest().authenticated()
+        .and()
+        .logout()
+        .logoutSuccessUrl("/")
+        .and()
+        .oauth2Login()
+        .authorizationEndpoint()
+        .baseUri("/oauth2/authorization")
+        .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
+        .and()
+        .redirectionEndpoint()
+        .baseUri("/*/oauth2/code/*")
+        .and()
+        .userInfoEndpoint()
+        .userService(oAuth2UserService)
+        .and()
+        .successHandler(oAuth2AuthenticationSuccessHandler())
+        .failureHandler(oAuth2AuthenticationFailureHandler());
+    http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+  }
 
-    /*
-     * 토큰 필터 설정
-     * */
-    @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-        return new TokenAuthenticationFilter(tokenProvider, customUserDetailsService);
-    }
+  /*
+   * auth 매니저 설정
+   * */
+  @Override
+  @Bean(BeanIds.AUTHENTICATION_MANAGER)
+  protected AuthenticationManager authenticationManager() throws Exception {
+    return super.authenticationManager();
+  }
 
-    /*
-     * 쿠키 기반 인가 Repository
-     * 인가 응답을 연계 하고 검증할 때 사용.
-     * */
-    @Bean
-    public OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository() {
-        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
-    }
+  /*
+   * security 설정 시, 사용할 인코더 설정
+   * */
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    /*
-     * Oauth 인증 성공 핸들러
-     * */
-    @Bean
-    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(
-                tokenProvider,
-                appProperties,
-                customerRefreshTokenRepository,
-                oAuth2AuthorizationRequestBasedOnCookieRepository(),
-                customerRepository
-        );
-    }
+  /*
+   * 토큰 필터 설정
+   * */
+  @Bean
+  public TokenAuthenticationFilter tokenAuthenticationFilter() {
+    return new TokenAuthenticationFilter(tokenProvider, customUserDetailsService,
+        blacklistTokenRepository);
+  }
 
-    /*
-     * Oauth 인증 실패 핸들러
-     * */
-    @Bean
-    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-        return new OAuth2AuthenticationFailureHandler(oAuth2AuthorizationRequestBasedOnCookieRepository());
-    }
+  /*
+   * 쿠키 기반 인가 Repository
+   * 인가 응답을 연계 하고 검증할 때 사용.
+   * */
+  @Bean
+  public OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository() {
+    return new OAuth2AuthorizationRequestBasedOnCookieRepository();
+  }
 
-    /*
-     * Cors 설정
-     *
-     */
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("*"); // addAllowedOrigin("*")은 allowCredentials(true)랑 같이 사용 불가능
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
+  /*
+   * Oauth 인증 성공 핸들러
+   * */
+  @Bean
+  public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+    return new OAuth2AuthenticationSuccessHandler(
+        tokenProvider,
+        appProperties,
+        customerRefreshTokenRepository,
+        oAuth2AuthorizationRequestBasedOnCookieRepository(),
+        customerRepository
+    );
+  }
 
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+  /*
+   * Oauth 인증 실패 핸들러
+   * */
+  @Bean
+  public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+    return new OAuth2AuthenticationFailureHandler(
+        oAuth2AuthorizationRequestBasedOnCookieRepository());
+  }
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
+  /*
+   * Cors 설정
+   *
+   */
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOriginPattern(
+        "*"); // addAllowedOrigin("*")은 allowCredentials(true)랑 같이 사용 불가능
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
 
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        Map<String, List<String>> roleHierarchyMap = new HashMap<>();
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
-        roleHierarchyMap.put("ROLE_ADMIN", Arrays.asList("ROLE_USER"));
+  @Bean
+  public RoleHierarchy roleHierarchy() {
 
-        String roles = RoleHierarchyUtils.roleHierarchyFromMap(roleHierarchyMap);
-        roleHierarchy.setHierarchy(roles);
-        return roleHierarchy;
-    }
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    Map<String, List<String>> roleHierarchyMap = new HashMap<>();
 
-    @Bean
-    public SecurityExpressionHandler<FilterInvocation> expressionHandler() {
-        DefaultWebSecurityExpressionHandler webSecurityExpressionHandler =
-                new DefaultWebSecurityExpressionHandler();
-        webSecurityExpressionHandler.setRoleHierarchy(roleHierarchy());
-        return webSecurityExpressionHandler;
-    }
+    roleHierarchyMap.put("ROLE_ADMIN", Arrays.asList("ROLE_USER"));
+
+    String roles = RoleHierarchyUtils.roleHierarchyFromMap(roleHierarchyMap);
+    roleHierarchy.setHierarchy(roles);
+    return roleHierarchy;
+  }
+
+  @Bean
+  public SecurityExpressionHandler<FilterInvocation> expressionHandler() {
+    DefaultWebSecurityExpressionHandler webSecurityExpressionHandler =
+        new DefaultWebSecurityExpressionHandler();
+    webSecurityExpressionHandler.setRoleHierarchy(roleHierarchy());
+    return webSecurityExpressionHandler;
+  }
 
 }

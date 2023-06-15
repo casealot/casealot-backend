@@ -1,6 +1,5 @@
 package kr.casealot.shop.domain.product.dto;
 
-import kr.casealot.shop.domain.file.entity.UploadFile;
 import lombok.*;
 
 @Getter
