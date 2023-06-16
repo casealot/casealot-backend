@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,8 @@ public class FunctionReviewDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  private String productThumbnail;
 
   private String reviewText;
 
