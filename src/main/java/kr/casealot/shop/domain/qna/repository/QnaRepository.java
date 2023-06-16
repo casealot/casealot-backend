@@ -14,4 +14,5 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
   int countByModifiedDt(LocalDateTime date); // 날짜별 요청의 총 수를 조회하는 메서드
   int countByModifiedDtBetween(LocalDateTime startDate, LocalDateTime endDate); // 날짜별 요청의 총 수를 조회하는 메서드
   int countByModifiedDtBetweenAndQnaCommentListIsNull(LocalDateTime startDate, LocalDateTime endDate); // 날짜별 요청의 총 수를 조회하는 메서드
+  List<Qna> findAllByOrderByModifiedDtDesc(); // 날짜별 요청의 총 수를 조회하는 메서드
 }

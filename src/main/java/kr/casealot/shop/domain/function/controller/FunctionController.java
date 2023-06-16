@@ -5,15 +5,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
+import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,5 +35,10 @@ public class FunctionController {
   @GetMapping("/weekly")
   public APIResponse<List<FunctionWeekDTO>> getWeeklyOrderData() {
     return functionService.getWeekFunction(today);
+  }
+
+  @GetMapping("/qna")
+  public APIResponse<List<FunctionQnaDTO>> getQnaData() {
+    return functionService.getQnaFunction();
   }
 }
