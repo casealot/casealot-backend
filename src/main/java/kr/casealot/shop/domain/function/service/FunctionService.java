@@ -5,10 +5,13 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
+import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
@@ -22,6 +25,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class FunctionService {
+
+  private final ProductRepository productRepository;
 
   private final ReviewRepository reviewRepository;
 
@@ -96,13 +101,31 @@ public class FunctionService {
     List<Review> reviewList = reviewRepository.findAllByOrderByModifiedDtDesc();
 
     for (Review review : reviewList) {
-      FunctionReviewDTO functionQnaDTO = FunctionReviewDTO.builder()
-          .id(review.getSeq())
-          .reviewText(review.getReviewText())
-          .customerId(review.getCustomer().getId())
-          .modifiedDt(review.getModifiedDt())
-          .build();
-      functionReviewDTOList.add(functionQnaDTO);
+      Product product = review.getProduct();
+      if (product != null) {
+        UploadFile thumbnail = product.getThumbnail();
+        FunctionReviewDTO functionReviewDTO;
+        if (thumbnail != null) {
+          functionReviewDTO = FunctionReviewDTO.builder()
+              .id(review.getSeq())
+              .productThumbnail(thumbnail.getUrl())
+              .reviewText(review.getReviewText())
+              .customerId(review.getCustomer().getId())
+              .modifiedDt(review.getModifiedDt())
+              .build();
+
+        } else {
+          functionReviewDTO = FunctionReviewDTO.builder()
+              .id(review.getSeq())
+              .productThumbnail(null)
+              .reviewText(review.getReviewText())
+              .customerId(review.getCustomer().getId())
+              .modifiedDt(review.getModifiedDt())
+              .build();
+
+        }
+        functionReviewDTOList.add(functionReviewDTO);
+      }
     }
     return APIResponse.success("function", functionReviewDTOList);
   }
