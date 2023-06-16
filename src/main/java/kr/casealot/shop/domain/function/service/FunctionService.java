@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
+import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
+import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,8 @@ public class FunctionService {
   public APIResponse<FunctionDTO> getTodayFunction(LocalDateTime date) {
     LocalDateTime startDate = date.toLocalDate().atStartOfDay();
     LocalDateTime endDate = date.toLocalDate().atTime(LocalTime.MAX);
-    int todaysEmptyComments = qnaRepository.countByModifiedDtBetweenAndQnaCommentListIsNull(startDate, endDate);
+    int todaysEmptyComments = qnaRepository.countByModifiedDtBetweenAndQnaCommentListIsNull(
+        startDate, endDate);
 
     FunctionDTO functionDTO = new FunctionDTO().builder()
         .todayOrder(0L)
@@ -38,7 +41,7 @@ public class FunctionService {
         .todayQna(todaysEmptyComments)
         .build();
 
-    return APIResponse.success("function",functionDTO);
+    return APIResponse.success("function", functionDTO);
   }
 
   public APIResponse<List<FunctionWeekDTO>> getWeekFunction(LocalDateTime date) {
@@ -65,7 +68,24 @@ public class FunctionService {
           .build();
       functionDayList.add(functionWeekDTO);
     }
-    return APIResponse.success("function",functionDayList);
+    return APIResponse.success("function", functionDayList);
+  }
+
+  public APIResponse<List<FunctionQnaDTO>> getQnaFunction() {
+
+    List<FunctionQnaDTO> functionQnaDTOList = new ArrayList<>();
+    List<Qna> qnaList = qnaRepository.findAllByOrderByModifiedDtDesc();
+
+    for (Qna qna : qnaList) {
+      FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
+          .id(qna.getId())
+          .title(qna.getTitle())
+          .customerId(qna.getCustomer().getId())
+          .modifiedDt(qna.getModifiedDt())
+          .build();
+      functionQnaDTOList.add(functionQnaDTO);
+    }
+    return APIResponse.success("function", functionQnaDTOList);
   }
 
 
