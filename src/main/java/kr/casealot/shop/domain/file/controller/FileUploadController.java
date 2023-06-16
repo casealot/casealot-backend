@@ -3,6 +3,8 @@ package kr.casealot.shop.domain.file.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.security.Principal;
+import kr.casealot.shop.domain.customer.service.CustomerService;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
@@ -27,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileUploadController {
     private final ProductService productService ;
+    private final CustomerService customerService ;
 
     @PostMapping("/{product_id}/image")
     @ApiOperation(value = "상품 이미지 업로드", notes = "상품의 이미지와 썸네일 이미지를 업로드한다.")
@@ -48,5 +51,12 @@ public class FileUploadController {
         return productService.modifyProductWithImage(id, thumbnailFile, imagesFiles);
     }
 
+    @PutMapping("/customer/image")
+    @ApiOperation(value = "회원 프로필 이미지 업로드 수정", notes = "기존에 등록되어있는 이미지는 삭제하고 새로 이미지를 업로드한다.")
+    public APIResponse modifyUploadedCustomerImage(
+        Principal principal, MultipartFile profileFile
+    ) throws Exception {
+        return customerService.modifyProfileWithImage(principal, profileFile);
+    }
 
 }
