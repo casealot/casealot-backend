@@ -15,7 +15,6 @@ import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
-import kr.casealot.shop.domain.customer.dto.CustomerMapper;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -59,7 +58,7 @@ public class CustomerService {
   private final BlacklistTokenRepository blacklistTokenRepository;
   private final S3UploadService s3UploadService;
   private final UploadFileService uploadFileService;
-  private final CustomerMapper customerMapper;
+//  private final CustomerMapper customerMapper;
   private final static String REFRESH_TOKEN = "refresh_token";
 
   public APIResponse<String> join(CustomerDto customerDto)
