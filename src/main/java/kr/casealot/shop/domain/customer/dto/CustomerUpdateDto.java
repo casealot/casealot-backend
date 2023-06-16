@@ -17,5 +17,4 @@ public class CustomerUpdateDto {
   private String phoneNumber;
   private String address;
   private String addressDetail;
-  private String profileImageUrl;
 }
