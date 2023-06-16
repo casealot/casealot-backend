@@ -51,12 +51,13 @@ public class FileUploadController {
         return productService.modifyProductWithImage(id, thumbnailFile, imagesFiles);
     }
 
-    @PutMapping("/customer/image")
+    @PutMapping("/{customer_id}/image")
     @ApiOperation(value = "회원 프로필 이미지 업로드 수정", notes = "기존에 등록되어있는 이미지는 삭제하고 새로 이미지를 업로드한다.")
     public APIResponse modifyUploadedCustomerImage(
-        Principal principal, MultipartFile profileFile
+        @PathVariable("customer_id") String id,
+        MultipartFile profileFile
     ) throws Exception {
-        return customerService.modifyProfileWithImage(principal, profileFile);
+        return customerService.modifyProfileWithImage(id, profileFile);
     }
 
 }

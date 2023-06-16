@@ -217,10 +217,10 @@ public class CustomerService {
 
 
   @Transactional
-  public APIResponse modifyProfileWithImage(Principal principal, MultipartFile profileImgFile)
+  public APIResponse modifyProfileWithImage(String id, MultipartFile profileImgFile)
       throws Exception {
     //회원 불러옴
-    Customer savedCustomer = customerRepository.findById(principal.getName());
+    Customer savedCustomer = customerRepository.findById(id);
 
     UploadFile profileImg = null;
     if (null != profileImgFile) {
