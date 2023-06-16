@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
+import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
@@ -40,5 +41,10 @@ public class FunctionController {
   @GetMapping("/qna")
   public APIResponse<List<FunctionQnaDTO>> getQnaData() {
     return functionService.getQnaFunction();
+  }
+
+  @GetMapping("/review")
+  public APIResponse<List<FunctionReviewDTO>> getReviewData() {
+    return functionService.getReviewFunction();
   }
 }

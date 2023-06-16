@@ -7,7 +7,9 @@ import java.util.List;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
+import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
+import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.qna.entity.Qna;
 import kr.casealot.shop.domain.qna.repository.QnaRepository;
@@ -86,6 +88,23 @@ public class FunctionService {
       functionQnaDTOList.add(functionQnaDTO);
     }
     return APIResponse.success("function", functionQnaDTOList);
+  }
+
+  public APIResponse<List<FunctionReviewDTO>> getReviewFunction() {
+
+    List<FunctionReviewDTO> functionReviewDTOList = new ArrayList<>();
+    List<Review> reviewList = reviewRepository.findAllByOrderByModifiedDtDesc();
+
+    for (Review review : reviewList) {
+      FunctionReviewDTO functionQnaDTO = FunctionReviewDTO.builder()
+          .id(review.getSeq())
+          .reviewText(review.getReviewText())
+          .customerId(review.getCustomer().getId())
+          .modifiedDt(review.getModifiedDt())
+          .build();
+      functionReviewDTOList.add(functionQnaDTO);
+    }
+    return APIResponse.success("function", functionReviewDTOList);
   }
 
 
