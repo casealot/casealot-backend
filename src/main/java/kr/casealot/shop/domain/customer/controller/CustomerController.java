@@ -1,10 +1,16 @@
 package kr.casealot.shop.domain.customer.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
+import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
+import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.service.CustomerService;
+import kr.casealot.shop.domain.product.dto.ProductDTO;
+import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.DuplicateEmailException;
 import kr.casealot.shop.global.exception.DuplicateIdException;
@@ -44,5 +50,11 @@ public class CustomerController {
     @DeleteMapping("/quit")
     public APIResponse<String> quit(HttpServletRequest request, Principal principal) {
         return customerService.deleteCustomer(request, principal);
+    }
+
+    @PutMapping("/update")
+    public APIResponse<Customer> update(
+        Principal principal,@RequestBody CustomerUpdateDto updateRequest) throws Exception {
+        return customerService.updateCustomer(principal, updateRequest);
     }
 }
