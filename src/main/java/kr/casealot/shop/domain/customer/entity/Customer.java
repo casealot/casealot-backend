@@ -3,6 +3,7 @@ package kr.casealot.shop.domain.customer.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.entity.Notice;
 import kr.casealot.shop.domain.order.entity.Order;
@@ -63,13 +64,16 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "ROLE_TYPE", length = 20)
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
-    @Column(name = "POST_NO", length = 20)
-    private String postNo;
+
     @Column(name = "ADDRESS", length = 512)
     private String address;
 
     @Column(name = "ADDRESS_DETAIL", length = 128)
     private String addressDetail;
+
+    // 프로필 사진
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UploadFile profileImg;
 
     @JsonBackReference
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
@@ -152,7 +156,6 @@ public class Customer extends BaseTimeEntity {
             String profileImageUrl,
             ProviderType providerType,
             RoleType roleType,
-            String postNo,
             String address,
             String addressDetail,
             List<Review> reviewList
@@ -166,7 +169,6 @@ public class Customer extends BaseTimeEntity {
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
         this.providerType = providerType;
         this.roleType = roleType;
-        this.postNo = postNo;
         this.address = address;
         this.addressDetail = addressDetail;
         // ? 이렇게 하는게 맞나
