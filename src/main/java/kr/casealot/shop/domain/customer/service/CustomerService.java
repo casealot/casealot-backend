@@ -262,7 +262,7 @@ public class CustomerService {
     Customer customer = customerRepository.findCustomerById(principal.getName());
 
     CustomerDto customerDto = CustomerDto.builder()
-        .profileImageUrl(customer.getProfileImageUrl())
+        .profileImageUrl(customer.getProfileImg().getUrl())
         .id(customer.getId())
         .name(customer.getName())
         .password(customer.getPassword())
