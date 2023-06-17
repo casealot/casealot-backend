@@ -217,7 +217,7 @@ public class CustomerService {
 
 
   @Transactional
-  public APIResponse modifyProfileWithImage(String id, MultipartFile profileImgFile)
+  public APIResponse<Customer> modifyProfileWithImage(String id, MultipartFile profileImgFile)
       throws Exception {
     //회원 불러옴
     Customer savedCustomer = customerRepository.findById(id);
@@ -240,6 +240,9 @@ public class CustomerService {
           .build());
       savedCustomer.setProfileImg(profileImg);
     }
+
+    customerRepository.saveAndFlush(savedCustomer);
+
     return APIResponse.success(API_NAME, savedCustomer);
   }
 
@@ -250,30 +253,7 @@ public class CustomerService {
 
     Customer updatedCustomer = customerRepository.saveAndFlush(
         customerMapper.updateRequestDTOToEntity(principal.getName(), customerUpdateDto));
-//    String customerId = principal.getName();
-//    Optional<Customer> optionalCustomer = Optional.ofNullable(
-//        customerRepository.findById(customerId));
-//
-//    if (optionalCustomer.isEmpty()) {
-//      throw new NotFoundException("해당 아이디로 저장된 사용자가 없습니다.");
-//    }
-//
-//    Customer savedCustomer = optionalCustomer.get();
-//
-//    // 변경된 이메일이 이미 존재하는지 확인
-//    if (!savedCustomer.getEmail().equals(customerUpdateDto.getEmail()) &&
-//        customerRepository.existsByEmail(customerUpdateDto.getEmail())) {
-//      throw new DuplicateEmailException();
-//    }
-//
-//    savedCustomer.setEmail(customerUpdateDto.getEmail());
-//    savedCustomer.setName(customerUpdateDto.getName());
-//    savedCustomer.setPhoneNumber(customerUpdateDto.getPhoneNumber());
-//    savedCustomer.setAddress(customerUpdateDto.getAddress());
-//    savedCustomer.setAddressDetail(customerUpdateDto.getAddressDetail());
-//    savedCustomer.setProfileImageUrl(optionalCustomer.get().getProfileImageUrl());
 
-//    Customer updatedCustomer = customerRepository.save(savedCustomer);
     return APIResponse.success(API_NAME, updatedCustomer);
   }
 }
