@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public enum OrderStatus {
     ORDER("접수"),
-    IN_PROGRESS("처리중"),
     CANCEL("취소"),
     COMPLETE("완료");
     private final String displayName;

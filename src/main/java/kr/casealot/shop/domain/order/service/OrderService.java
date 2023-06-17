@@ -12,6 +12,9 @@ import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.NotFoundProductException;
+import kr.casealot.shop.global.exception.OrderCancelException;
+import kr.casealot.shop.global.exception.PermissionException;
+import kr.casealot.shop.global.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static kr.casealot.shop.domain.order.dto.OrderStatus.CANCEL;
+import static kr.casealot.shop.domain.order.dto.OrderStatus.ORDER;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +42,10 @@ public class OrderService {
     public APIResponse<OrderDTO.Response> createOrder(OrderDTO.Request request, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
         Order order =  new Order();
-        order.setOrderNumber(request.getOrderNumber());
         order.setCustomer(customer);
-        // 배송정보
+        // 배송, 결제 정보
 
+        order.setOrderNumber(StringUtil.generateOrderNumber());
         order.setOrderDt(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.ORDER);
 
@@ -73,10 +77,15 @@ public class OrderService {
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow();
 
-        // 이미 취소된 주문, 배송중인 주문, 배송완료된 주문 취소불가
+        // 이미 취소된 주문, 배송중인 주문 취소불가
+        // TODO 배송완료된 주문 취소불가 적용해야됨
+        if(!order.getOrderStatus().equals(ORDER)){
+            throw new OrderCancelException();
+        }
 
         if(!order.getCustomer().getId().equals(customer.getName())){
             // 본인 주문건 아닐경우
+            throw new PermissionException();
         }
 
         order.setOrderStatus(CANCEL);
@@ -90,7 +99,8 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow();
 
         if (!order.getCustomer().getId().equals(customer.getId())) {
-            // 본인 주문건이 아닌 경우 에러 처리
+            // 본인 주문건이 아닌 경우
+            throw new PermissionException();
         }
 
         OrderDTO.Response orderResponse = orderResponse(order);
