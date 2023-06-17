@@ -15,7 +15,6 @@ public class OrderDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request{
-        private String orderNumber;
         private List<OrderProductDTO> orderProducts;
     }
 
