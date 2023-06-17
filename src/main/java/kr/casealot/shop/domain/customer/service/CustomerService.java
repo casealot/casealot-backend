@@ -15,6 +15,7 @@ import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
+import kr.casealot.shop.domain.customer.dto.CustomerMapper;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -58,7 +59,7 @@ public class CustomerService {
   private final BlacklistTokenRepository blacklistTokenRepository;
   private final S3UploadService s3UploadService;
   private final UploadFileService uploadFileService;
-//  private final CustomerMapper customerMapper;
+  private final CustomerMapper customerMapper;
   private final static String REFRESH_TOKEN = "refresh_token";
 
   public APIResponse<String> join(CustomerDto customerDto)
@@ -247,32 +248,32 @@ public class CustomerService {
       CustomerUpdateDto customerUpdateDto)
       throws Exception {
 
-//    Customer updatedCustomer = customerRepository.saveAndFlush(
-//        customerMapper.updateRequestDTOToEntity(principal.getName(), customerUpdateDto));
-    String customerId = principal.getName();
-    Optional<Customer> optionalCustomer = Optional.ofNullable(
-        customerRepository.findById(customerId));
+    Customer updatedCustomer = customerRepository.saveAndFlush(
+        customerMapper.updateRequestDTOToEntity(principal.getName(), customerUpdateDto));
+//    String customerId = principal.getName();
+//    Optional<Customer> optionalCustomer = Optional.ofNullable(
+//        customerRepository.findById(customerId));
+//
+//    if (optionalCustomer.isEmpty()) {
+//      throw new NotFoundException("해당 아이디로 저장된 사용자가 없습니다.");
+//    }
+//
+//    Customer savedCustomer = optionalCustomer.get();
+//
+//    // 변경된 이메일이 이미 존재하는지 확인
+//    if (!savedCustomer.getEmail().equals(customerUpdateDto.getEmail()) &&
+//        customerRepository.existsByEmail(customerUpdateDto.getEmail())) {
+//      throw new DuplicateEmailException();
+//    }
+//
+//    savedCustomer.setEmail(customerUpdateDto.getEmail());
+//    savedCustomer.setName(customerUpdateDto.getName());
+//    savedCustomer.setPhoneNumber(customerUpdateDto.getPhoneNumber());
+//    savedCustomer.setAddress(customerUpdateDto.getAddress());
+//    savedCustomer.setAddressDetail(customerUpdateDto.getAddressDetail());
+//    savedCustomer.setProfileImageUrl(optionalCustomer.get().getProfileImageUrl());
 
-    if (optionalCustomer.isEmpty()) {
-      throw new NotFoundException("해당 아이디로 저장된 사용자가 없습니다.");
-    }
-
-    Customer savedCustomer = optionalCustomer.get();
-
-    // 변경된 이메일이 이미 존재하는지 확인
-    if (!savedCustomer.getEmail().equals(customerUpdateDto.getEmail()) &&
-        customerRepository.existsByEmail(customerUpdateDto.getEmail())) {
-      throw new DuplicateEmailException();
-    }
-
-    savedCustomer.setEmail(customerUpdateDto.getEmail());
-    savedCustomer.setName(customerUpdateDto.getName());
-    savedCustomer.setPhoneNumber(customerUpdateDto.getPhoneNumber());
-    savedCustomer.setAddress(customerUpdateDto.getAddress());
-    savedCustomer.setAddressDetail(customerUpdateDto.getAddressDetail());
-    savedCustomer.setProfileImageUrl(optionalCustomer.get().getProfileImageUrl());
-
-    Customer updatedCustomer = customerRepository.save(savedCustomer);
+//    Customer updatedCustomer = customerRepository.save(savedCustomer);
     return APIResponse.success(API_NAME, updatedCustomer);
   }
 }
