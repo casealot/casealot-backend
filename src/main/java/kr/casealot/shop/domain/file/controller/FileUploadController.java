@@ -56,8 +56,9 @@ public class FileUploadController {
     @ApiOperation(value = "회원 프로필 이미지 업로드 수정", notes = "기존에 등록되어있는 이미지는 삭제하고 새로 이미지를 업로드한다.")
     public APIResponse<Customer> modifyUploadedCustomerImage(
         @PathVariable("customer_id") String id,
-        MultipartFile profileFile
+        @RequestParam(value = "profile", required = false) MultipartFile profileFile
     ) throws Exception {
+        log.info("사진올라가는거 호출");
         return customerService.modifyProfileWithImage(id, profileFile);
     }
 
