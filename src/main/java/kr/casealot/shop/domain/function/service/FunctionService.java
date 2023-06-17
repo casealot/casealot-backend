@@ -84,13 +84,25 @@ public class FunctionService {
     List<Qna> qnaList = qnaRepository.findAllByOrderByModifiedDtDesc();
 
     for (Qna qna : qnaList) {
-      FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
-          .id(qna.getId())
-          .title(qna.getTitle())
-          .customerId(qna.getCustomer().getId())
-          .modifiedDt(qna.getModifiedDt())
-          .build();
-      functionQnaDTOList.add(functionQnaDTO);
+      if(qna.getCustomer().getProfileImg()!= null) {
+        FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
+            .id(qna.getId())
+            .profileImg(qna.getCustomer().getProfileImg().getUrl())
+            .title(qna.getTitle())
+            .customerId(qna.getCustomer().getId())
+            .modifiedDt(qna.getModifiedDt())
+            .build();
+        functionQnaDTOList.add(functionQnaDTO);
+      }else{
+        FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
+            .id(qna.getId())
+            .profileImg(null)
+            .title(qna.getTitle())
+            .customerId(qna.getCustomer().getId())
+            .modifiedDt(qna.getModifiedDt())
+            .build();
+        functionQnaDTOList.add(functionQnaDTO);
+      }
     }
     return APIResponse.success("function", functionQnaDTOList);
   }
