@@ -35,12 +35,27 @@ public class Order{
     private OrderStatus orderStatus;
     @Column(name = "total_amount")
     private int totalAmount;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProduct> orderProducts = new ArrayList<>();
+
+    public void addOrderProduct(OrderProduct orderProduct) {
+        orderProducts.add(orderProduct);
+        orderProduct.setOrder(this);
+    }
+
+    public void calculateTotalAmount() {
+        int totalAmount = 0;
+
+        for (OrderProduct orderProduct : orderProducts) {
+            totalAmount += orderProduct.getPrice() * orderProduct.getQuantity();
+        }
+
+        setTotalAmount(totalAmount);
+    }
 
 //    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JoinColumn(name = "delivery_id")
