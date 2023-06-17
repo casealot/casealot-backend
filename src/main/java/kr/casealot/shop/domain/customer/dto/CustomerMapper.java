@@ -25,7 +25,7 @@ public class CustomerMapper {
     savedCustomer.setPhoneNumber(request.getPhoneNumber());
     savedCustomer.setAddress(request.getAddress());
     savedCustomer.setAddressDetail(request.getAddressDetail());
-    savedCustomer.setProfileImageUrl(savedCustomer.getProfileImageUrl());
+    savedCustomer.setProfileImg(savedCustomer.getProfileImg());
     return savedCustomer;
   }
 
