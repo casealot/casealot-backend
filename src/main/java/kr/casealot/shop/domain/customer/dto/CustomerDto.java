@@ -8,12 +8,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerDto {
+    private String profileImageUrl;
     private String id;
     private String name;
     private String password;
     private String phoneNumber;
     private String email;
-    private String profileImageUrl;
     private String address;
     private String addressDetail;
 }

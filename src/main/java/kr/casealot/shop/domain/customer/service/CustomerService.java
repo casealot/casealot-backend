@@ -256,4 +256,22 @@ public class CustomerService {
 
     return APIResponse.success(API_NAME, updatedCustomer);
   }
+
+  @Transactional
+  public APIResponse<CustomerDto> customerInfo(Principal principal) {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+
+    CustomerDto customerDto = CustomerDto.builder()
+        .profileImageUrl(customer.getProfileImageUrl())
+        .id(customer.getId())
+        .name(customer.getName())
+        .password(customer.getPassword())
+        .phoneNumber(customer.getPhoneNumber())
+        .email(customer.getEmail())
+        .address(customer.getAddress())
+        .addressDetail(customer.getAddressDetail())
+        .build();
+
+    return APIResponse.success(API_NAME, customerDto);
+  }
 }
