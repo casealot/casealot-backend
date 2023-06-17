@@ -58,6 +58,7 @@ public class FileUploadController {
         @PathVariable("customer_id") String id,
         @RequestParam(value = "profile", required = false) MultipartFile profileFile
     ) throws Exception {
+        log.info("사진올라가는거 호출");
         return customerService.modifyProfileWithImage(id, profileFile);
     }
 
