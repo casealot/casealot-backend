@@ -18,6 +18,10 @@ repositories {
 	mavenCentral()
 }
 
+repositories {
+	maven { url 'https://jitpack.io' }
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
@@ -47,6 +51,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.2'
+
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	compileOnly 'org.projectlombok:lombok'

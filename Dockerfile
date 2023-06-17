@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:17-jdk-slim
 ARG JAR_FILE=build/libs/*.jar
 ENV SPRING_PROFILES_ACTIVE=develop
 
