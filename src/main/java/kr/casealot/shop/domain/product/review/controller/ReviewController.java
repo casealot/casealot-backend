@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.product.review.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.service.ReviewService;
@@ -21,23 +22,27 @@ public class ReviewController {
 
     //생성
     @PostMapping("/{productId}")
+    @ApiOperation(value = "리뷰 작성", notes = "상품을 구매한 사용자가 리뷰를 작성한다.")
     private APIResponse<ReviewResDTO> createReview(@RequestBody ReviewReqDTO reviewReqDTO, @PathVariable Long productId, Principal principal) {
         return reviewService.createReview(reviewReqDTO, productId, principal);
     }
 
     //수정
     @PutMapping("/{reviewId}")
+    @ApiOperation(value = "리뷰 수정", notes = "리뷰를 작성한 사용자가 리뷰를 수정한다.")
     private APIResponse<ReviewResDTO> createReview(@PathVariable Long reviewId, @RequestBody ReviewReqDTO reviewReqDTO, Principal principal) {
         return reviewService.fixReview(reviewId, reviewReqDTO, principal);
     }
 
     //삭제
     @DeleteMapping("/{reviewId}")
+    @ApiOperation(value = "리뷰 삭제", notes = "리뷰를 작성한 사용자가 리뷰를 삭제한다.")
     private APIResponse<ReviewResDTO> deleteReview(@PathVariable Long reviewId, Principal principal) {
         return reviewService.deleteReview(reviewId, principal);
     }
 
     @GetMapping("/{reviewId}")
+    @ApiOperation(value = "특정 리뷰 조회", notes = "전체 사용자가 리뷰를 조회한다. (사용 X 테스트용)")
     private APIResponse<ReviewResDTO> viewReview(@PathVariable Long reviewId) {
         return reviewService.getReview(reviewId);
     }
