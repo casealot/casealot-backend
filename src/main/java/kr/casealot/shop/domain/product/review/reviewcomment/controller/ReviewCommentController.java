@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.review.reviewcomment.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentReqDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
@@ -18,25 +19,34 @@ import java.security.Principal;
 @Api(tags = {"REVIEWCOMMENT API"}, description = "리뷰 댓글 관련 API")
 @RequestMapping("/cal/v1/review/comment")
 public class ReviewCommentController {
-    private final ReviewCommentService reviewCommentService;
 
-    @PostMapping("/{reviewSeq}")
-    @ApiOperation(value = "리뷰 댓글 작성", notes = "리뷰에 대한 댓글을 작성한다.")
-    private APIResponse<ReviewCommentResDTO> createReview(@RequestBody ReviewCommentReqDTO reviewCommentReqDTO, @PathVariable long reviewSeq, Principal principal) {
-        return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, principal);
-    }
+  private final ReviewCommentService reviewCommentService;
 
-    //수정
-    @PutMapping("/{reviewCommentId}")
-    @ApiOperation(value = "리뷰 댓글 수정", notes = "리뷰에 대한 댓글을 작성한 사용자가 자신의 대댓글을 수정한다.")
-    private APIResponse<ReviewCommentResDTO> createReview(@PathVariable Long reviewCommentId, @RequestBody ReviewCommentReqDTO reviewCommentReqDTO, Principal principal) {
-        return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, principal);
-    }
+  @PostMapping("/{reviewSeq}")
+  @ApiOperation(value = "리뷰 댓글 작성", notes = "리뷰에 대한 댓글을 작성한다.")
+  private APIResponse<ReviewCommentResDTO> createReview(
+      @ApiParam(value = "리뷰 댓글 등록/수정 DTO") @RequestBody ReviewCommentReqDTO reviewCommentReqDTO,
+      @ApiParam(value = "리뷰 ID") @PathVariable long reviewSeq,
+      Principal principal) {
+    return reviewCommentService.createReviewComment(reviewCommentReqDTO, reviewSeq, principal);
+  }
 
-    //삭제
-    @DeleteMapping("/{reviewCommentId}")
-    @ApiOperation(value = "리뷰 댓글 작성", notes = "리뷰에 대한 댓글을 작성한 사용자가 자신의 대댓글을 삭제한다.")
-    private APIResponse<ReviewCommentResDTO> deleteReview(@PathVariable Long reviewCommentId, Principal principal) {
-        return reviewCommentService.deleteReviewComment(reviewCommentId, principal);
-    }
+  //수정
+  @PutMapping("/{reviewCommentId}")
+  @ApiOperation(value = "리뷰 댓글 수정", notes = "리뷰에 대한 댓글을 작성한 사용자가 자신의 대댓글을 수정한다.")
+  private APIResponse<ReviewCommentResDTO> createReview(
+      @ApiParam(value = "리뷰 댓글 ID") @PathVariable Long reviewCommentId,
+      @ApiParam(value = "리뷰 댓글 등록/수정 DTO") @RequestBody ReviewCommentReqDTO reviewCommentReqDTO,
+      Principal principal) {
+    return reviewCommentService.fixReviewComment(reviewCommentId, reviewCommentReqDTO, principal);
+  }
+
+  //삭제
+  @DeleteMapping("/{reviewCommentId}")
+  @ApiOperation(value = "리뷰 댓글 작성", notes = "리뷰에 대한 댓글을 작성한 사용자가 자신의 대댓글을 삭제한다.")
+  private APIResponse<ReviewCommentResDTO> deleteReview(
+      @ApiParam(value = "리뷰 댓글 ID") @PathVariable Long reviewCommentId,
+      Principal principal) {
+    return reviewCommentService.deleteReviewComment(reviewCommentId, principal);
+  }
 }
