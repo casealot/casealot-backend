@@ -42,8 +42,8 @@ public class AuthController {
     private final static long THREE_DAYS_MSEC = 259200000;
     private final static String REFRESH_TOKEN = "refresh_token";
 
-    @ApiOperation(value = "토큰 재발급")
     @GetMapping("/refresh")
+    @ApiOperation(value = "토큰 재발급", notes = "리프레시 토큰을 통해 JWT 토큰을 재발급한다.")
     public APIResponse<CustomerTokenDto> refreshToken (HttpServletRequest request) throws Exception {
         // refresh token
         String refreshToken = HeaderUtil.getRefreshToken(request);
@@ -71,9 +71,9 @@ public class AuthController {
 
         Date now = new Date();
         AuthToken newAccessToken = tokenProvider.createAuthToken(
-                userId,
-                roleType.getCode(),
-                new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
+            userId,
+            roleType.getCode(),
+            new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
         );
 
         long validTime = authRefreshToken.getTokenClaims().getExpiration().getTime() - now.getTime();
@@ -84,8 +84,8 @@ public class AuthController {
             long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
 
             authRefreshToken = tokenProvider.createAuthToken(
-                    appProperties.getAuth().getTokenSecret(),
-                    new Date(now.getTime() + refreshTokenExpiry)
+                appProperties.getAuth().getTokenSecret(),
+                new Date(now.getTime() + refreshTokenExpiry)
             );
 
             // DB에 refresh 토큰 업데이트
@@ -93,10 +93,10 @@ public class AuthController {
             customerRefreshTokenRepository.save(customerRefreshToken);
         }
         CustomerTokenDto customerTokenDto = CustomerTokenDto.builder()
-                .customerId(customerRefreshToken.getId())
-                .accessToken(newAccessToken.getToken())
-                .roleType(customer.getRoleType())
-                .refreshToken(customerRefreshToken.getRefreshToken()).build();
+            .customerId(customerRefreshToken.getId())
+            .accessToken(newAccessToken.getToken())
+            .roleType(customer.getRoleType())
+            .refreshToken(customerRefreshToken.getRefreshToken()).build();
 
         return APIResponse.success(customerTokenDto);
     }

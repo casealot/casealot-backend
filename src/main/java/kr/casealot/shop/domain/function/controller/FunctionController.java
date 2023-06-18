@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.function.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,21 +30,25 @@ public class FunctionController {
   LocalDateTime today = LocalDateTime.now().with(LocalTime.MIN);
 
   @GetMapping("/daily")
+  @ApiOperation(value = "오늘의 할일", notes = "오늘의 할일에 들어갈 데이터를 제공한다.")
   public APIResponse<FunctionDTO> getDailyOrderData() {
     return functionService.getTodayFunction(today);
   }
 
   @GetMapping("/weekly")
+  @ApiOperation(value = "일자별 요약", notes = "일자별 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionWeekDTO>> getWeeklyOrderData() {
     return functionService.getWeekFunction(today);
   }
 
   @GetMapping("/qna")
+  @ApiOperation(value = "QNA 요약", notes = "QNA 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionQnaDTO>> getQnaData() {
     return functionService.getQnaFunction();
   }
 
   @GetMapping("/review")
+  @ApiOperation(value = "리뷰 요약", notes = "리뷰 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionReviewDTO>> getReviewData() {
     return functionService.getReviewFunction();
   }
