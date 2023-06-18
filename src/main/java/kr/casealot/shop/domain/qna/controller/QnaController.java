@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.qna.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import kr.casealot.shop.domain.qna.dto.QnaDetailDTO;
 import kr.casealot.shop.domain.qna.dto.QnaReqDTO;
 import kr.casealot.shop.domain.qna.dto.QnaResDTO;
@@ -33,6 +34,7 @@ public class QnaController {
 
 
     @PostMapping
+    @ApiOperation(value = "QNA 작성", notes = "사용자가 QNA를 작성한다.")
     public APIResponse<QnaResDTO> createQna(@RequestBody QnaReqDTO qnaReqDTO,
                                             HttpServletRequest request,
                                             Principal principal) {
@@ -41,6 +43,7 @@ public class QnaController {
     }
 
     @PutMapping("/{qna_id}")
+    @ApiOperation(value = "QNA 수정", notes = "사용자가 작성한 QNA를 수정한다.")
     public APIResponse<QnaResDTO> updateQna(@PathVariable("qna_id") Long qnaId,
                                        @RequestBody QnaReqDTO qnaReqDTO,
                                        HttpServletRequest request,
@@ -52,6 +55,7 @@ public class QnaController {
     }
 
     @GetMapping("/list/{qna_id}")
+    @ApiOperation(value = "QNA 조회", notes = "QNA를 조회한다.")
     public APIResponse<QnaDetailDTO> getQna(@PathVariable("qna_id") Long qnaId, Principal principal){
 
 
@@ -59,6 +63,7 @@ public class QnaController {
     }
 
     @DeleteMapping("/{qna_id}")
+    @ApiOperation(value = "QNA 삭제", notes = "사용자가 작성한 QNA를 삭제한다.")
     public APIResponse<QnaResDTO> deleteQna(@PathVariable("qna_id") Long qnaId,
                                             HttpServletRequest request,
                                             Principal principal){
@@ -67,10 +72,9 @@ public class QnaController {
     }
 
     @GetMapping("/list")
+    @ApiOperation(value = "QNA 조회", notes = "QNA 목록을 조회한다.")
     public APIResponse<List<QnaResDTO>> getQnaList(Pageable pageable) {
 
         return qnaService.getQnaList(pageable);
     }
 }
-
-//<List<QnaDTO>>
