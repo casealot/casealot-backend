@@ -1,6 +1,5 @@
-FROM openjdk:17
+FROM openjdk:17-jdk-slim
 ARG JAR_FILE=build/libs/*.jar
-ENV SPRING_PROFILES_ACTIVE=develop
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -9,5 +8,5 @@ WORKDIR /app
 COPY ${JAR_FILE} casealot-backend.jar
 
 # 실행
-CMD ["java","-jar","-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}","casealot-backend.jar"]
+CMD ["java","-jar","casealot-backend.jar"]
 
