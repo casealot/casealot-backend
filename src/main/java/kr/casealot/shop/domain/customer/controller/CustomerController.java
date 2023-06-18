@@ -1,6 +1,7 @@
 package kr.casealot.shop.domain.customer.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,12 +34,14 @@ public class CustomerController {
   private final CustomerService customerService;
 
   @PostMapping("/join")
+  @ApiOperation(value = "회원 가입", notes = "회원 가입을 한다.")
   public APIResponse<String> join(@RequestBody CustomerDto customerDto)
       throws DuplicateEmailException, DuplicateIdException {
     return customerService.join(customerDto);
   }
 
   @PostMapping("/login")
+  @ApiOperation(value = "로그인", notes = "로그인을 한다.")
   public APIResponse<CustomerTokenDto> login(@RequestBody CustomerLoginDto customerLoginDto
       , HttpServletRequest request
       , HttpServletResponse response) {
@@ -46,22 +49,26 @@ public class CustomerController {
   }
 
   @DeleteMapping("/logout")
+  @ApiOperation(value = "로그아웃", notes = "로그아웃을 한다.")
   public APIResponse<String> logout(HttpServletRequest request) {
     return customerService.logout(request);
   }
 
   @DeleteMapping("/quit")
+  @ApiOperation(value = "회원 탈퇴", notes = "회원 탈퇴를 한다.")
   public APIResponse<String> quit(HttpServletRequest request, Principal principal) {
     return customerService.deleteCustomer(request, principal);
   }
 
   @PutMapping("/update")
+  @ApiOperation(value = "회원 수정", notes = "회원 수정을 한다.")
   public APIResponse<Customer> update(
       Principal principal, @RequestBody CustomerUpdateDto updateRequest) throws Exception {
     return customerService.updateCustomer(principal, updateRequest);
   }
 
   @GetMapping
+  @ApiOperation(value = "회원 정보", notes = "회원 정보를 보여준다.")
   public APIResponse<CustomerDto> info(Principal principal) {
     return customerService.customerInfo(principal);
   }
