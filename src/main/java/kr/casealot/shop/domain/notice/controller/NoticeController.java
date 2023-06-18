@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.notice.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeResDTO;
 import kr.casealot.shop.domain.notice.service.NoticeService;
@@ -24,22 +25,21 @@ import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundExc
 @RequestMapping("/cal/v1/notice/list")
 public class NoticeController {
 
-    private final NoticeService noticeService;
+  private final NoticeService noticeService;
 
-    // 공지 전체 조회
-    @GetMapping
-    @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 전체 공지를 조회한다.")
-    public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable){
+  // 공지 전체 조회
+  @GetMapping
+  @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 전체 공지를 조회한다.")
+  public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
+    return noticeService.getNoticeList(pageable);
+  }
 
-        return noticeService.getNoticeList(pageable);
-    }
-
-    // 특정 공지 조회
-    @GetMapping("/{notice_id}")
-    @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
-    public APIResponse<NoticeDetailDTO> getNotice(@PathVariable("notice_id") Long noticeId,
-                                                  Principal principal){
-
-        return noticeService.getNotice(noticeId, principal);
-    }
+  // 특정 공지 조회
+  @GetMapping("/{notice_id}")
+  @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
+  public APIResponse<NoticeDetailDTO> getNotice(
+      @ApiParam(value = "공지 ID") @PathVariable("notice_id") Long noticeId,
+      Principal principal) {
+    return noticeService.getNotice(noticeId, principal);
+  }
 }
