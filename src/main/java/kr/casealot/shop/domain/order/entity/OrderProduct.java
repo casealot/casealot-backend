@@ -31,4 +31,5 @@ public class OrderProduct {
     private int price; //주문 가격
     private int quantity; //주문 수량
 
+//    private int count;  필요?
 }

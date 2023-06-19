@@ -14,7 +14,7 @@ public class OrderDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Request{
+    public static class createOrder{
         private List<OrderProductDTO> orderProducts;
     }
 
@@ -41,7 +41,6 @@ public class OrderDTO {
     @AllArgsConstructor
     public static class OrderProductDTO {
         private Long productId;
-        private int price;
         private int quantity;
     }
 }
