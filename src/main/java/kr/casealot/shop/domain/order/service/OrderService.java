@@ -16,7 +16,6 @@ import kr.casealot.shop.global.exception.OrderCancelException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.util.StringUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public APIResponse<OrderDTO.Response> createOrder(OrderDTO.Request request, Principal principal) {
+    public APIResponse<OrderDTO.Response> createOrder(OrderDTO.createOrder createOrder, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
         Order order =  new Order();
         order.setCustomer(customer);
@@ -49,7 +48,7 @@ public class OrderService {
         order.setOrderDt(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.ORDER);
 
-        for (OrderDTO.OrderProductDTO productDTO : request.getOrderProducts()) {
+        for (OrderDTO.OrderProductDTO productDTO : createOrder.getOrderProducts()) {
             Product product = productRepository.findById(productDTO.getProductId())
                     .orElseThrow(NotFoundProductException::new);
 
@@ -124,7 +123,6 @@ public class OrderService {
                 .stream()
                 .map(orderProduct -> OrderDTO.OrderProductDTO.builder()
                         .productId(orderProduct.getProduct().getId())
-                        .price(orderProduct.getPrice())
                         .quantity(orderProduct.getQuantity())
                         .build())
                 .collect(Collectors.toList());
