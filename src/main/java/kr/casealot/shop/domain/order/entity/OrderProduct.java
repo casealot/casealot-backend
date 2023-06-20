@@ -28,6 +28,8 @@ public class OrderProduct {
     @JoinColumn(name = "product_id")
     private Product product; //주문 상품
 
+    private String name;
+
     private int price; //주문 가격
     private int quantity; //주문 수량
 
