@@ -1,22 +1,29 @@
 package kr.casealot.shop.domain.payment.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Prepare;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentMethod;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
 import kr.casealot.shop.domain.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import retrofit2.HttpException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.ConnectException;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
@@ -25,23 +32,27 @@ import java.util.Optional;
 
 import static lombok.Lombok.checkNotNull;
 
-@ConfigurationProperties(prefix = "pgmodule")
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-
-    @Value("{pgmodule.app-id}")
-    private String apiKey;
-    @Value("{pgmodule.secret-key}")
-    private String apiSecret;
+    private final IamportClient iamportClient;
 
     @Transactional
-    public Payment requestPayment(Customer customer, String orderNumber, BigDecimal amount) {
+    public Payment requestPayment(Customer customer, String orderNumber, BigDecimal amount) throws IamportResponseException, IOException {
         Payment payment = new Payment();
         payment.setCustomer(customer);
         payment.setOrderId(orderNumber);
         payment.setAmount(amount);
+        try {
+            PrepareData prepareReqData = new PrepareData(orderNumber, amount);
+            //사전 검증 데이터 생성 요청
+            IamportResponse<Prepare> response = iamportClient.postPrepare(prepareReqData);
+        }catch(IamportResponseException e){
+            // TODO 예외처리 메시지 정의 필요
+            throw new ConnectException(e.getMessage());
+        }
         return paymentRepository.save(payment);
     }
 
@@ -50,11 +61,10 @@ public class PaymentService {
         checkNotNull(payment, "payment must be provided.");
         checkNotNull(customer, "customer must be provided.");
 
-        if (!payment.getCustomer().equals(customer)) {
+        if (!payment.getCustomer().getId().equals(customer.getId())) {
             throw new NotFoundException("Could not found payment for " + customer.getName() + ".");
         }
 
-        IamportClient iamportClient = new IamportClient(apiKey, apiSecret);
         try {
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(payment.getReceiptId());
             if (Objects.nonNull(paymentResponse.getResponse())) {

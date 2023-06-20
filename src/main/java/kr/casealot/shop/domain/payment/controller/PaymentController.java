@@ -13,11 +13,13 @@ import kr.casealot.shop.domain.payment.entity.PaymentRequest;
 import kr.casealot.shop.domain.payment.service.PaymentService;
 import kr.casealot.shop.global.exception.NotFoundUserException;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,7 +38,7 @@ public class PaymentController {
     public ResponseEntity<?> requestPayment(
             Principal principal,
             @Valid @RequestBody PaymentRequest request
-    ) {
+    ) throws IamportResponseException, IOException {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         BigDecimal amount = new BigDecimal(request.getAmount());
         Payment payment = paymentService.requestPayment(customer, request.getOrderNumber(), amount);
