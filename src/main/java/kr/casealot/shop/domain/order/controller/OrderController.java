@@ -38,6 +38,13 @@ public class OrderController {
         return orderService.cancelOrder(orderId, principal);
     }
 
+    @PostMapping("/{orderId}/complete")
+    @ApiOperation(value = "주문 완료", notes = "주문 완료 - 주문 상태를 완료로 변경")
+    public APIResponse<Void> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+
+        return orderService.completeOrder(orderId, principal);
+    }
+
     @GetMapping("/{orderId}")
     @ApiOperation(value = "주문 상세 조회", notes = "본인의 주문 내역 상세조회")
     public APIResponse<OrderDTO.Response> getOrderDetail(@ApiParam(value = "주문 상세 조회 DTO - 주문 ID") @PathVariable Long orderId,
@@ -52,5 +59,6 @@ public class OrderController {
 
         return orderService.getOrderList(principal);
     }
+
 }
 

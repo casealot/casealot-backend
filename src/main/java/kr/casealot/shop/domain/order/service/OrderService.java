@@ -11,6 +11,7 @@ import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundOrderException;
 import kr.casealot.shop.global.exception.NotFoundProductException;
 import kr.casealot.shop.global.exception.OrderCancelException;
 import kr.casealot.shop.global.exception.PermissionException;
@@ -22,10 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static kr.casealot.shop.domain.order.dto.OrderStatus.CANCEL;
-import static kr.casealot.shop.domain.order.dto.OrderStatus.ORDER;
+import static kr.casealot.shop.domain.order.dto.OrderStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +76,7 @@ public class OrderService {
         Customer customer = customerRepository.findById(principal.getName());
 
         // 주문내역이 존재하지않을 경우
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
 
         // 이미 취소된 주문, 배송중인 주문 취소불가
         // TODO 배송완료된 주문 취소불가 적용해야됨
@@ -89,6 +90,31 @@ public class OrderService {
         }
 
         order.setOrderStatus(CANCEL);
+        orderRepository.save(order);
+
+        return APIResponse.success(API_NAME, null);
+    }
+
+    public APIResponse<Void> completeOrder(Long orderId, Principal principal) {
+        Customer customer = customerRepository.findById(principal.getName());
+
+        // 주문내역이 존재하지않을 경우
+        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+
+        // 이미 취소된 주문, 배송중인 주문 취소불가
+        // TODO 배송완료된 주문 취소불가 적용해야됨
+        if(!order.getOrderStatus().equals(ORDER)){
+            throw new OrderCancelException();
+        }
+        Optional.of(!order.getOrderStatus().equals(ORDER)).orElseThrow();
+
+        if(!order.getCustomer().getId().equals(customer.getName())){
+            // 본인 주문건 아닐경우
+            throw new PermissionException();
+        }
+
+        //주문 완료
+        order.setOrderStatus(COMPLETE);
         orderRepository.save(order);
 
         return APIResponse.success(API_NAME, null);
