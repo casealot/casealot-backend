@@ -2,7 +2,6 @@ package kr.casealot.shop.domain.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.casealot.shop.domain.customer.entity.Customer;
-import kr.casealot.shop.domain.delivery.entity.Delivery;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import lombok.AllArgsConstructor;
@@ -48,9 +47,6 @@ public class Order{
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "delivery_id")
-    private Delivery delivery;
 
     public void addOrderProduct(OrderProduct orderProduct) {
         orderProducts.add(orderProduct);
