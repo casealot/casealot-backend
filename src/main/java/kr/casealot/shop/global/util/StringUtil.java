@@ -2,6 +2,7 @@ package kr.casealot.shop.global.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -15,6 +16,14 @@ public class StringUtil {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String orderNumber = currentDate + uuid.substring(0, 9);
         return orderNumber.toUpperCase();
+    }
+
+    public static String generateDeliveryNumber() {
+        // 운송장 번호로
+        Random random = new Random();
+        Long deliveryNumber = random.nextLong(1000000000000L); //12자리
+
+        return String.format("%12d", deliveryNumber);
     }
 
     public static void main(String[] args) {

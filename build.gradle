@@ -16,6 +16,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -30,9 +31,8 @@ dependencies {
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation "io.springfox:springfox-swagger-ui:3.0.0"
 
-
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-//	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+//  implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
@@ -55,6 +55,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// 아임포트
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 bootJar {
