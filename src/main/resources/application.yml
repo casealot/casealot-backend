@@ -69,6 +69,8 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+
+
 # jwt
 jwt.secret-key: ${JWT_SECRET_KEY}
 
@@ -104,3 +106,6 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: error
+
+delivery:
+  key: ${DELIVERY_KEY}
