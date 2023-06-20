@@ -104,3 +104,8 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: error
+
+pgmodule:
+  app-id: ${APP_ID}
+  api-key: ${API_KEY}
+  secret-key: ${SECRET_API_KEY}

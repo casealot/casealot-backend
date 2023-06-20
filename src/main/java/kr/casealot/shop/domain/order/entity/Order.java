@@ -3,6 +3,7 @@ package kr.casealot.shop.domain.order.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
+import kr.casealot.shop.domain.payment.entity.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,11 @@ public class Order{
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+
     public void addOrderProduct(OrderProduct orderProduct) {
         orderProducts.add(orderProduct);
         orderProduct.setOrder(this);
@@ -57,9 +63,6 @@ public class Order{
         setTotalAmount(totalAmount);
     }
 
-//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "delivery_id")
-//    private Delivery delivery; //배송정보
 
     //==생성 메서드==//
 //    public static Order createOrder(Customer customer, Delivery delivery, OrderItem... orderItems) {
@@ -86,13 +89,5 @@ public class Order{
 //        }
 //    }
 //
-//    //==조회 로직==//
-//    /** 전체 주문 가격 조회 */
-//    public int getTotalPrice() {
-//        int totalPrice = 0;
-//        for (OrderItem orderItem : orderItems) {
-//            totalPrice += orderItem.getTotalPrice();
-//        }
-//        return totalPrice;
-//    }
+
 }
