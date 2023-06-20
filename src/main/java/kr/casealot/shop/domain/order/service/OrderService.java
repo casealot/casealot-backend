@@ -54,6 +54,7 @@ public class OrderService {
 
             OrderProduct orderProduct = new OrderProduct();
             orderProduct.setProduct(product);
+            orderProduct.setName(product.getName());
             orderProduct.setPrice(product.getPrice());
             orderProduct.setQuantity(productDTO.getQuantity());
 
@@ -124,6 +125,8 @@ public class OrderService {
                 .map(orderProduct -> OrderDTO.OrderProductDTO.builder()
                         .productId(orderProduct.getProduct().getId())
                         .quantity(orderProduct.getQuantity())
+                        .name(orderProduct.getName())
+                        .price(orderProduct.getPrice())
                         .build())
                 .collect(Collectors.toList());
 
