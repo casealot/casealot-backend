@@ -104,7 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/notice/**",
             "/cal/v1/qna/**",
             "/cal/v1/cart/**",
-              "/cal/v1/order/**"
+                "/cal/v1/order/**",
+                "/cal/v1/verifyIamport/**"
         ).hasRole("USER")
         .antMatchers(
             "/cal/v1/admin/**",
@@ -112,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/admin/qna/**",
             "/cal/v1/file/**",
             "/cal/v1/function/**",
-            "/cal/v1/delivery/**"
+                "cal/v1/delivery/**"
         ).hasRole("ADMIN")
         .antMatchers("/",
             "/error",

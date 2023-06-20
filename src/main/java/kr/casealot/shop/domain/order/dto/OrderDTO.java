@@ -16,6 +16,7 @@ public class OrderDTO {
     @AllArgsConstructor
     public static class createOrder{
         private List<OrderProductDTO> orderProducts;
+
     }
 
     @Getter
@@ -27,6 +28,11 @@ public class OrderDTO {
         private Long id;
         private String orderNumber;
         private String customerId;
+        private String name;
+        private String phoneNumber;
+        private String email;
+        private String address;
+        private String addressDetail;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime orderDt;
         private OrderStatus orderStatus;
