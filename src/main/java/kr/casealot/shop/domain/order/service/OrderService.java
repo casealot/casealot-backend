@@ -134,6 +134,11 @@ public class OrderService {
                 .orderStatus(order.getOrderStatus())
                 .totalAmount(order.getTotalAmount())
                 .customerId(order.getCustomer().getId())
+                .name(order.getCustomer().getName())
+                .phoneNumber(order.getCustomer().getPhoneNumber())
+                .email(order.getCustomer().getEmail())
+                .address(order.getCustomer().getAddress())
+                .addressDetail(order.getCustomer().getAddressDetail())
                 .orderProducts(orderProductDTOs)
                 .build();
     }
