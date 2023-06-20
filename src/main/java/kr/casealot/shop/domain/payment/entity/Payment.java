@@ -36,8 +36,6 @@ public class Payment {
 
     private PaymentMethod method; // 결제 수단
 
-    private String name; // 결제 이름
-
     @Column(nullable = false)
     private BigDecimal amount; // 결제 금액
 

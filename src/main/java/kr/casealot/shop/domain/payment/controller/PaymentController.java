@@ -39,7 +39,7 @@ public class PaymentController {
     ) {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         BigDecimal amount = new BigDecimal(request.getAmount());
-        Payment payment = paymentService.requestPayment(customer, request.getName(), amount);
+        Payment payment = paymentService.requestPayment(customer, request.getOrderNumber(), amount);
         return ResponseEntity.ok(payment);
     }
 

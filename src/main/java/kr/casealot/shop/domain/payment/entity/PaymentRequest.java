@@ -12,9 +12,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @NoArgsConstructor
 public class PaymentRequest {
-    @NotBlank(message = "name must be provided.")
-    private String name;
-
     @NotBlank(message = "amount must be provided.")
     private String amount;
 
@@ -23,7 +20,6 @@ public class PaymentRequest {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("name", name)
                 .append("amount", amount)
                 .toString();
     }

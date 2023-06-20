@@ -37,11 +37,10 @@ public class PaymentService {
     private String apiSecret;
 
     @Transactional
-    public Payment requestPayment(Customer customer, String name, BigDecimal amount) {
+    public Payment requestPayment(Customer customer, String orderNumber, BigDecimal amount) {
         Payment payment = new Payment();
         payment.setCustomer(customer);
-        payment.setOrderId(customer.getName() + "_" + Objects.hash(customer, name, amount, System.currentTimeMillis()));
-        payment.setName(name);
+        payment.setOrderId(orderNumber);
         payment.setAmount(amount);
         return paymentRepository.save(payment);
     }
