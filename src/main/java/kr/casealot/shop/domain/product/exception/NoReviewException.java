@@ -1,4 +1,4 @@
-package kr.casealot.shop.global.exception;
+package kr.casealot.shop.domain.product.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

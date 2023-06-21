@@ -7,11 +7,16 @@ import kr.casealot.shop.domain.product.dto.ProductDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.service.ProductService;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.DuplicateEmailException;
 import kr.casealot.shop.global.exception.DuplicateProductException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
@@ -24,7 +29,7 @@ public class ProductAdminController {
     @ApiOperation(value = "ADMIN 상품 등록", notes = "상품을 등록한다.")
     @PostMapping
     public APIResponse<Product> createProduct(
-           @ApiParam(value = "상품 등록 요청 DTO") @RequestBody ProductDTO.Request createRequest) throws DuplicateEmailException, DuplicateProductException {
+           @ApiParam(value = "상품 등록 요청 DTO") @RequestBody ProductDTO.Request createRequest) throws DuplicateProductException {
         return productService.createProduct(createRequest);
     }
 

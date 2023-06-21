@@ -1,5 +1,9 @@
 package kr.casealot.shop.domain.product.service;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
@@ -9,13 +13,11 @@ import kr.casealot.shop.domain.product.dto.SortDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewProductResDTO;
-import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentProductResDTO;
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.support.ProductSpecification;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.DuplicateEmailException;
 import kr.casealot.shop.global.exception.DuplicateProductException;
 import kr.casealot.shop.global.exception.NotFoundProductException;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +29,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -147,7 +144,7 @@ public class ProductService {
 
     @Transactional
     public APIResponse<Product> createProduct(
-            ProductDTO.Request createRequest) throws DuplicateEmailException, DuplicateProductException {
+            ProductDTO.Request createRequest) throws DuplicateProductException {
 
         if (productRepository.findByName(createRequest.getName()) == null) {
 

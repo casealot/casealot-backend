@@ -10,7 +10,7 @@ import kr.casealot.shop.domain.product.review.entity.Review;
 import kr.casealot.shop.domain.product.review.repository.ReviewRepository;
 import kr.casealot.shop.domain.product.review.reviewcomment.service.ReviewCommentService;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.NoReviewException;
+import kr.casealot.shop.domain.product.exception.NoReviewException;
 import kr.casealot.shop.global.exception.NotFoundProductException;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
