@@ -2,7 +2,7 @@ package kr.casealot.shop.domain.customer.dto;
 
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.global.exception.DuplicateEmailException;
+import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

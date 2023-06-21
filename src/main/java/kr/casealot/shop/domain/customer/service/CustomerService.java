@@ -1,10 +1,8 @@
 package kr.casealot.shop.domain.customer.service;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import io.jsonwebtoken.Claims;
 import java.security.Principal;
 import java.util.Date;
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import kr.casealot.shop.domain.auth.entity.BlacklistToken;
@@ -25,9 +23,9 @@ import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
-import kr.casealot.shop.global.exception.DuplicateEmailException;
-import kr.casealot.shop.global.exception.DuplicateIdException;
-import kr.casealot.shop.global.exception.IncorrectPasswordException;
+import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
+import kr.casealot.shop.domain.customer.exception.DuplicateIdException;
+import kr.casealot.shop.domain.customer.exception.IncorrectPasswordException;
 import kr.casealot.shop.global.exception.NotFoundUserException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;

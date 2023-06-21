@@ -9,7 +9,7 @@ import kr.casealot.shop.domain.product.review.reviewcomment.dto.ReviewCommentRes
 import kr.casealot.shop.domain.product.review.reviewcomment.entity.ReviewComment;
 import kr.casealot.shop.domain.product.review.reviewcomment.repository.ReviewCommentRepository;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.global.exception.NoReviewException;
+import kr.casealot.shop.domain.product.exception.NoReviewException;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
