@@ -63,7 +63,8 @@ public class PaymentService {
         if (!payment.getCustomer().getId().equals(customer.getId())) {
             throw new NotFoundException("Could not found payment for " + customer.getName() + ".");
         }
-
+        log.info("payment OrderId => {}, ReceiptId => {}"
+                , payment.getOrderId(), payment.getReceiptId());
         try {
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(payment.getReceiptId());
 
