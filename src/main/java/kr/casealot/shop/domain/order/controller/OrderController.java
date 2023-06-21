@@ -33,14 +33,14 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     @ApiOperation(value = "주문 취소", notes = "주문 취소 - 주문 상태를 취소로 변경")
-    public APIResponse<Void> cancelOrder(@ApiParam(value = "주문 취소 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> cancelOrder(@ApiParam(value = "주문 취소 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
 
         return orderService.cancelOrder(orderId, principal);
     }
 
     @PostMapping("/{orderId}/complete")
     @ApiOperation(value = "주문 완료", notes = "주문 완료 - 주문 상태를 완료로 변경")
-    public APIResponse<Void> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
 
         return orderService.completeOrder(orderId, principal);
     }
