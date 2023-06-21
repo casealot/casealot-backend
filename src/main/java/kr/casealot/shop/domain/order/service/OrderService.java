@@ -72,8 +72,9 @@ public class OrderService {
     }
 
     @Transactional
-    public APIResponse<Void> cancelOrder(Long orderId, Principal principal){
+    public APIResponse<OrderDTO.Response> cancelOrder(Long orderId, Principal principal){
         Customer customer = customerRepository.findById(principal.getName());
+        String customerId = principal.getName();
 
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
@@ -84,7 +85,7 @@ public class OrderService {
             throw new OrderCancelException();
         }
 
-        if(!order.getCustomer().getId().equals(customer.getName())){
+        if(!order.getCustomer().getId().equals(customerId)){
             // 본인 주문건 아닐경우
             throw new PermissionException();
         }
@@ -92,11 +93,15 @@ public class OrderService {
         order.setOrderStatus(CANCEL);
         orderRepository.save(order);
 
-        return APIResponse.success(API_NAME, null);
+        OrderDTO.Response orderResponse = orderResponse(order);
+
+        return APIResponse.success(API_NAME, orderResponse);
     }
 
-    public APIResponse<Void> completeOrder(Long orderId, Principal principal) {
+    @Transactional
+    public APIResponse<OrderDTO.Response> completeOrder(Long orderId, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
+        String customerId = principal.getName();
 
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
@@ -108,7 +113,7 @@ public class OrderService {
         }
         Optional.of(!order.getOrderStatus().equals(ORDER)).orElseThrow();
 
-        if(!order.getCustomer().getId().equals(customer.getName())){
+        if(!order.getCustomer().getId().equals(customerId)){
             // 본인 주문건 아닐경우
             throw new PermissionException();
         }
@@ -117,7 +122,9 @@ public class OrderService {
         order.setOrderStatus(COMPLETE);
         orderRepository.save(order);
 
-        return APIResponse.success(API_NAME, null);
+        OrderDTO.Response orderResponse = orderResponse(order);
+
+        return APIResponse.success(API_NAME, orderResponse);
     }
 
     public APIResponse<OrderDTO.Response> getOrderDetail(Long orderId, Principal principal) {
