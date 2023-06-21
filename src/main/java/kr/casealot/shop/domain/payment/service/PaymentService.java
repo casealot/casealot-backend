@@ -66,6 +66,7 @@ public class PaymentService {
         log.info("payment OrderId => {}, ReceiptId => {}"
                 , payment.getOrderId(), payment.getReceiptId());
         try {
+            // TODO : 여기서 에러가 발생함. 결제한 데이터를 갖고오는 부분 인데 원인파악 필요
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(payment.getReceiptId());
 
             if (Objects.nonNull(paymentResponse.getResponse())) {
