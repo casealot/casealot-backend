@@ -12,6 +12,7 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentMethod;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
+import kr.casealot.shop.domain.payment.exception.NotFoundPaymentException;
 import kr.casealot.shop.domain.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class PaymentService {
             PrepareData prepareReqData = new PrepareData(orderNumber, amount);
             //사전 검증 데이터 생성 요청
             IamportResponse<Prepare> response = iamportClient.postPrepare(prepareReqData);
-        }catch(IamportResponseException e){
+        } catch (IamportResponseException e) {
             // TODO 예외처리 메시지 정의 필요
             throw new ConnectException(e.getMessage());
         }
@@ -67,9 +68,12 @@ public class PaymentService {
 
         try {
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(payment.getReceiptId());
+
             if (Objects.nonNull(paymentResponse.getResponse())) {
                 com.siot.IamportRestClient.response.Payment paymentData = paymentResponse.getResponse();
-                if (payment.getReceiptId().equals(paymentData.getImpUid()) && payment.getOrderId().equals(paymentData.getMerchantUid()) && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
+                if (payment.getReceiptId().equals(paymentData.getImpUid())
+                        && payment.getOrderId().equals(paymentData.getMerchantUid())
+                        && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
                     PaymentMethod method = PaymentMethod.valueOf(paymentData.getPayMethod().toUpperCase());
                     PaymentStatus status = PaymentStatus.valueOf(paymentData.getStatus().toUpperCase());
                     payment.setMethod(method);
@@ -94,28 +98,26 @@ public class PaymentService {
                 throw new NotFoundException("Could not found payment for " + payment.getReceiptId() + ".");
             }
         } catch (IamportResponseException e) {
-            e.printStackTrace();
             switch (e.getHttpStatusCode()) {
-                case 404 -> throw new NotFoundException("Could not found payment for " + payment.getReceiptId() + ".");
+                case 404 -> throw new NotFoundException(e.getMessage() + payment.getReceiptId());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         return payment;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Payment verifyPayment(String receiptId, String orderId, Customer customer) {
         checkNotNull(receiptId, "receiptId must be provided.");
 
-        Optional<Payment> optionalPayment = paymentRepository.findByOrderIdAndCustomer(orderId, customer);
-        if (optionalPayment.isPresent()) {
-            Payment payment = optionalPayment.get();
-            payment.setReceiptId(receiptId);
-            return verifyPayment(payment, customer);
-        } else {
-            throw new NotFoundException("Could not found payment for " + orderId + ".");
-        }
+        Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
+                .orElseThrow(NotFoundPaymentException::new);
+
+        Customer buyer = payment.getCustomer();
+        payment.setReceiptId(receiptId);
+
+        return verifyPayment(payment, customer);
     }
 }

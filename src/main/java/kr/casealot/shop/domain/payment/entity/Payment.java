@@ -1,5 +1,6 @@
 package kr.casealot.shop.domain.payment.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import lombok.*;
 
@@ -44,10 +45,13 @@ public class Payment {
     private PaymentStatus status = PaymentStatus.READY; // 상태
 
     @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createAt; // 결제 요청 일시
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime paidAt; // 결제 완료 일시
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime failedAt; // 결제 실패 일시
 
     @Builder.Default
