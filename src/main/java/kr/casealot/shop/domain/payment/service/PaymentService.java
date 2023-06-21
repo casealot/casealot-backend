@@ -59,8 +59,6 @@ public class PaymentService {
 
     @Transactional
     public Payment verifyPayment(Payment payment, Customer customer) {
-        checkNotNull(payment, "payment must be provided.");
-        checkNotNull(customer, "customer must be provided.");
 
         if (!payment.getCustomer().getId().equals(customer.getId())) {
             throw new NotFoundException("Could not found payment for " + customer.getName() + ".");
@@ -110,7 +108,6 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public Payment verifyPayment(String receiptId, String orderId, Customer customer) {
-        checkNotNull(receiptId, "receiptId must be provided.");
 
         Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
                 .orElseThrow(NotFoundPaymentException::new);
