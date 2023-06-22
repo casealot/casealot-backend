@@ -71,14 +71,13 @@ public class PaymentService {
         if (!payment.getCustomer().getId().equals(customer.getId())) {
             throw new NotFoundException("Could not find payment for " + customer.getName() + ".");
         }
-
         log.info("payment OrderId => {}, ReceiptId => {}", payment.getOrderId(), receiptId);
-
         try {
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(receiptId);
 
             if (Objects.nonNull(paymentResponse.getResponse())) {
                 com.siot.IamportRestClient.response.Payment paymentData = paymentResponse.getResponse();
+
                 log.info("===============================================================");
                 log.info(paymentData.getImpUid() + " = ? " + receiptId);
                 log.info(paymentData.getMerchantUid() + " = ? " + orderId);
@@ -87,6 +86,7 @@ public class PaymentService {
                 if (receiptId.equals(paymentData.getImpUid())
                         && orderId.equals(paymentData.getMerchantUid())
                         && Objects.equals(payment.getAmount(), paymentData.getAmount())) {
+
                     PaymentMethod method = PaymentMethod.valueOf(paymentData.getPayMethod().toUpperCase());
                     PaymentStatus status = PaymentStatus.valueOf(paymentData.getStatus().toUpperCase());
                     payment.setMethod(method);
@@ -144,5 +144,16 @@ public class PaymentService {
         paymentDTO.setCancelledAt(payment.getCancelledAt());
 
         return paymentDTO;
+  
+    @Transactional(readOnly = true)
+    public Payment verifyPayment(String receiptId, String orderId, Customer customer) {
+
+        Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
+            .orElseThrow(NotFoundPaymentException::new);
+
+        Customer buyer = payment.getCustomer();
+        payment.setReceiptId(receiptId);
+
+        return verifyPayment(payment, customer);
     }
 }
