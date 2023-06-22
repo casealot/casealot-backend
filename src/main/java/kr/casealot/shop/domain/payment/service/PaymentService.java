@@ -64,7 +64,7 @@ public class PaymentService {
             throw new NotFoundException("Could not found payment for " + customer.getName() + ".");
         }
         log.info("payment OrderId => {}, ReceiptId => {}"
-                , payment.getOrderId(), payment.getReceiptId());
+            , payment.getOrderId(), payment.getReceiptId());
         try {
             // TODO : 여기서 에러가 발생함. 결제한 데이터를 갖고오는 부분 인데 원인파악 필요
             IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(payment.getReceiptId());
@@ -72,8 +72,8 @@ public class PaymentService {
             if (Objects.nonNull(paymentResponse.getResponse())) {
                 com.siot.IamportRestClient.response.Payment paymentData = paymentResponse.getResponse();
                 if (payment.getReceiptId().equals(paymentData.getImpUid())
-                        && payment.getOrderId().equals(paymentData.getMerchantUid())
-                        && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
+                    && payment.getOrderId().equals(paymentData.getMerchantUid())
+                    && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
                     PaymentMethod method = PaymentMethod.valueOf(paymentData.getPayMethod().toUpperCase());
                     PaymentStatus status = PaymentStatus.valueOf(paymentData.getStatus().toUpperCase());
                     payment.setMethod(method);
@@ -112,7 +112,7 @@ public class PaymentService {
     public Payment verifyPayment(String receiptId, String orderId, Customer customer) {
 
         Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
-                .orElseThrow(NotFoundPaymentException::new);
+            .orElseThrow(NotFoundPaymentException::new);
 
         Customer buyer = payment.getCustomer();
         payment.setReceiptId(receiptId);

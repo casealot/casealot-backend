@@ -42,6 +42,7 @@ public class Payment {
 
     @Builder.Default
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING) //상태 String 형태로 표시
     private PaymentStatus status = PaymentStatus.READY; // 상태
 
     @CreatedDate
