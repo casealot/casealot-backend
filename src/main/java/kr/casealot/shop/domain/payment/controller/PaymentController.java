@@ -46,7 +46,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentDTO);
     }
 
-    @PutMapping("{orderId}")
+    @PutMapping("/{orderId}")
     public ResponseEntity<PaymentDTO> verifyPayment(
             Principal principal,
             @PathVariable String orderId,
