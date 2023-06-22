@@ -35,6 +35,8 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String orderId; // 우리가 생성한 주문 번호
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method; // 결제 수단
 
     @Column(nullable = false)
