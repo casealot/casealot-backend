@@ -51,7 +51,7 @@ public class PaymentController {
             Principal principal,
             @PathVariable String orderId,
             @Valid @RequestBody String receiptId
-    ) {
+    ) throws IamportResponseException, IOException {
         PaymentDTO payment = paymentService.verifyPayment(principal, orderId, receiptId);
         return ResponseEntity.ok(payment);
     }
