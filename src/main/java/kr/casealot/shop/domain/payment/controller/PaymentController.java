@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
+import kr.casealot.shop.domain.payment.dto.PaymentDTO;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentRequest;
 import kr.casealot.shop.domain.payment.service.PaymentService;
@@ -41,18 +42,17 @@ public class PaymentController {
     ) throws IamportResponseException, IOException {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         BigDecimal amount = new BigDecimal(request.getAmount());
-        Payment payment = paymentService.requestPayment(customer, request.getOrderNumber(), amount);
-        return ResponseEntity.ok(payment);
+        PaymentDTO paymentDTO = paymentService.requestPayment(customer, request.getOrderNumber(), amount);
+        return ResponseEntity.ok(paymentDTO);
     }
 
     @PutMapping("{orderId}")
-    public ResponseEntity<?> verifyPayment(
+    public ResponseEntity<PaymentDTO> verifyPayment(
             Principal principal,
             @PathVariable String orderId,
             @Valid @RequestBody String receiptId
     ) {
-        Customer customer = customerRepository.findById(principal.getName());
-        Payment payment = paymentService.verifyPayment(receiptId, orderId, customer);
+        PaymentDTO payment = paymentService.verifyPayment(principal, orderId, receiptId);
         return ResponseEntity.ok(payment);
     }
 }
