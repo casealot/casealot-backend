@@ -86,11 +86,13 @@ public class PaymentService {
                 log.info("===============================================================");
                 if (receiptId.equals(paymentData.getImpUid())
                         && orderId.equals(paymentData.getMerchantUid())
-                        && Objects.equals(payment.getAmount(), paymentData.getAmount())) {
+                        && paymentData.getAmount().compareTo(paymentData.getAmount()) == 0) {
                     PaymentMethod method = PaymentMethod.valueOf(paymentData.getPayMethod().toUpperCase());
                     PaymentStatus status = PaymentStatus.valueOf(paymentData.getStatus().toUpperCase());
+                    payment.setReceiptId(paymentData.getImpUid());
                     payment.setMethod(method);
                     payment.setStatus(status);
+
                     log.info("=======================성공?=======================");
                     paymentRepository.save(payment);
                     if (status.equals(PaymentStatus.READY)) {
