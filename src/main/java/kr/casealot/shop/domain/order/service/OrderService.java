@@ -9,6 +9,8 @@ import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.entity.OrderProduct;
+import kr.casealot.shop.domain.order.exception.OrderAlreadyCompleteException;
+import kr.casealot.shop.domain.order.exception.OrderCanceledException;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
@@ -112,13 +114,13 @@ public class OrderService {
 
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
-        Payment payment = paymentRepository.findByOrderId(order.getOrderNumber());
 
-
-        // 이미 취소된 주문, 배송중인 주문 취소불가
         // TODO 배송완료된 주문 취소불가 적용해야됨
-        if(!order.getOrderStatus().equals(ORDER)){
-            throw new OrderCancelException();
+        if(order.getOrderStatus().equals(CANCEL)){
+            throw new OrderCanceledException();
+        }
+        if(order.getOrderStatus().equals(COMPLETE)){
+            throw new OrderAlreadyCompleteException();
         }
 
         if(!order.getCustomer().getId().equals(customerId)){
@@ -132,7 +134,6 @@ public class OrderService {
 
        //주문 완료
         order.setOrderStatus(COMPLETE);
-        order.setPayment(payment);
         orderRepository.save(order);
 
         OrderDTO.Response orderResponse = orderResponse(order);

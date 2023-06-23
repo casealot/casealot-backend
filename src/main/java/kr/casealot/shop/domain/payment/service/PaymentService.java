@@ -14,6 +14,8 @@ import java.time.ZoneId;
 import java.util.Objects;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.order.entity.Order;
+import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.payment.dto.PaymentDTO;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentMethod;
@@ -35,6 +37,7 @@ public class PaymentService {
   private final CustomerRepository customerRepository;
   private final PaymentRepository paymentRepository;
   private final IamportClient iamportClient;
+  private final OrderRepository orderRepository;
 
   @Transactional
   public PaymentDTO requestPayment(Customer customer, String orderNumber, BigDecimal amount)
@@ -60,7 +63,7 @@ public class PaymentService {
   public PaymentDTO verifyPayment(Principal principal, String orderId, String receiptId)
       throws IamportResponseException, IOException {
     Customer customer = customerRepository.findCustomerById(principal.getName());
-
+    Order order = orderRepository.findByOrderNumber(orderId);
     Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
         .orElseThrow(NotFoundPaymentException::new);
 
@@ -91,7 +94,9 @@ public class PaymentService {
           payment.setReceiptId(paymentData.getImpUid());
           payment.setMethod(method);
           payment.setStatus(status);
+          order.setPayment(payment);
 
+          orderRepository.save(order);
           paymentRepository.save(payment);
           if (status.equals(PaymentStatus.READY)) {
             if (method.equals(PaymentMethod.VBANK)) {
@@ -114,11 +119,6 @@ public class PaymentService {
       } else {
         // receiptId 로 결제 정보 찾을 수 없는 경우
         throw new NotFoundPaymentException();
-      }
-    } catch (IamportResponseException e) {
-      switch (e.getHttpStatusCode()) {
-        case 401 -> throw new PermissionException();
-        case 404 -> throw new NotFoundPaymentException();
       }
     } catch (IOException e) {
       log.error(e.getMessage());
