@@ -54,9 +54,6 @@ public class Payment {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime paidAt; // 결제 완료 일시
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private LocalDateTime failedAt; // 결제 실패 일시
-
     @Builder.Default
     private BigDecimal cancelledAmount = BigDecimal.ZERO; // 취소된 금액
 
