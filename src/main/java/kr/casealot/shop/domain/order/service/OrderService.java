@@ -80,12 +80,12 @@ public class OrderService {
     }
 
     @Transactional
-    public APIResponse<OrderDTO.Response> cancelOrder(Long orderId, Principal principal){
+    public APIResponse<OrderDTO.Response> cancelOrder(String orderId, Principal principal){
         Customer customer = customerRepository.findById(principal.getName());
         String customerId = principal.getName();
 
         // 주문내역이 존재하지않을 경우
-        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+        Order order = orderRepository.findByOrderNumber(orderId);
 
         // 이미 취소된 주문, 배송중인 주문 취소불가
         // TODO 배송완료된 주문 취소불가 적용해야됨
@@ -107,12 +107,12 @@ public class OrderService {
     }
 
     @Transactional
-    public APIResponse<OrderDTO.Response> completeOrder(Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> completeOrder(String orderId, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
         String customerId = principal.getName();
 
         // 주문내역이 존재하지않을 경우
-        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+        Order order = orderRepository.findByOrderNumber(orderId);
 
         // TODO 배송완료된 주문 취소불가 적용해야됨
         if(order.getOrderStatus().equals(CANCEL)){
@@ -140,9 +140,9 @@ public class OrderService {
         return APIResponse.success(API_NAME, orderResponse);
     }
 
-    public APIResponse<OrderDTO.Response> getOrderDetail(Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> getOrderDetail(String orderId, Principal principal) {
         Customer customer = customerRepository.findById(principal.getName());
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findByOrderNumber(orderId);
 
         if (!order.getCustomer().getId().equals(customer.getId())) {
             // 본인 주문건이 아닌 경우

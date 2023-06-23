@@ -33,21 +33,21 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     @ApiOperation(value = "주문 취소", notes = "주문 취소 - 주문 상태를 취소로 변경")
-    public APIResponse<OrderDTO.Response> cancelOrder(@ApiParam(value = "주문 취소 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> cancelOrder(@ApiParam(value = "주문 취소 요청 DTO - 우리가 생성한 주문번호") @PathVariable String orderId, Principal principal) {
 
         return orderService.cancelOrder(orderId, principal);
     }
 
     @PostMapping("/{orderId}/complete")
     @ApiOperation(value = "주문 완료", notes = "주문 완료 - 주문 상태를 완료로 변경")
-    public APIResponse<OrderDTO.Response> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+    public APIResponse<OrderDTO.Response> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 우리가 생성한 주문번호") @PathVariable String orderId, Principal principal) {
 
         return orderService.completeOrder(orderId, principal);
     }
 
     @GetMapping("/{orderId}")
     @ApiOperation(value = "주문 상세 조회", notes = "본인의 주문 내역 상세조회")
-    public APIResponse<OrderDTO.Response> getOrderDetail(@ApiParam(value = "주문 상세 조회 DTO - 주문 ID") @PathVariable Long orderId,
+    public APIResponse<OrderDTO.Response> getOrderDetail(@ApiParam(value = "주문 상세 조회 DTO - 우리가 생성한 주문번호") @PathVariable String orderId,
                                                          Principal principal) {
 
         return orderService.getOrderDetail(orderId, principal);
