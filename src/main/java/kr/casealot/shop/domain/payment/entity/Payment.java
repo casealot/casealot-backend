@@ -25,6 +25,8 @@ public class Payment {
     @Id
     private Long id;
 
+    private Long oId;
+
     @JoinColumn(name = "CUSTOMER_SEQ")
     @ManyToOne
     private Customer customer; // 구매자

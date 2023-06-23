@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 public class PaymentDTO {
     private Long id;
+    private Long oId;
     private String customerId;
     private String receiptId;
     private String orderId;

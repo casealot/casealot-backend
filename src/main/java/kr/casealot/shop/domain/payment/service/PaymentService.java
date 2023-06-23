@@ -94,6 +94,7 @@ public class PaymentService {
           payment.setReceiptId(paymentData.getImpUid());
           payment.setMethod(method);
           payment.setStatus(status);
+          payment.setOId(order.getId());
           order.setPayment(payment);
 
           orderRepository.save(order);
@@ -130,6 +131,7 @@ public class PaymentService {
   private PaymentDTO convertToDTO(Payment payment) {
     PaymentDTO paymentDTO = new PaymentDTO();
     paymentDTO.setId(payment.getId());
+    paymentDTO.setOId(payment.getOId());
     paymentDTO.setCustomerId(payment.getCustomer().getId());
     paymentDTO.setReceiptId(payment.getReceiptId());
     paymentDTO.setOrderId(payment.getOrderId());
