@@ -112,7 +112,7 @@ public class OrderService {
 
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
-        Payment payment = paymentRepository.findByOrderNumber(order.getOrderNumber());
+        Payment payment = paymentRepository.findByOrderId(order.getOrderNumber());
 
 
         // 이미 취소된 주문, 배송중인 주문 취소불가

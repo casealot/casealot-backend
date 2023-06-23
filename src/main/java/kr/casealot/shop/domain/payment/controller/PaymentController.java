@@ -5,6 +5,8 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.customer.service.CustomerService;
@@ -36,9 +38,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
+    @ApiOperation(value = "결제 요청, 사전 검증")
     public ResponseEntity<?> requestPayment(
             Principal principal,
-            @Valid @RequestBody PaymentRequest request
+            @ApiParam(value = "가격, 주문번호") @Valid @RequestBody PaymentRequest request
     ) throws IamportResponseException, IOException {
         Customer customer = customerRepository.findCustomerById(principal.getName());
         BigDecimal amount = new BigDecimal(request.getAmount());
@@ -47,10 +50,11 @@ public class PaymentController {
     }
 
     @PutMapping("/{orderId}")
+    @ApiOperation(value = "결제 검증", notes = "요청이 들어온 결제 건에 대하여 검증")
     public ResponseEntity<PaymentDTO> verifyPayment(
             Principal principal,
-            @PathVariable String orderId,
-            @Valid @RequestBody String receiptId
+            @ApiParam(value = "우리가 생성한 주문 번호")@PathVariable String orderId,
+            @ApiParam(value = "PG사 생성 주문 번호") @Valid @RequestBody String receiptId
     ) throws IamportResponseException, IOException {
         PaymentDTO payment = paymentService.verifyPayment(principal, orderId, receiptId);
         return ResponseEntity.ok(payment);
