@@ -15,4 +15,6 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByCustomer(Customer customer);
+
+    Order findByOrderNumber(String orderId);
 }

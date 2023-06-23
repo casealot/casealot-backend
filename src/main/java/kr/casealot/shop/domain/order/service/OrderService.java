@@ -3,11 +3,18 @@ package kr.casealot.shop.domain.order.service;
 
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.order.delivery.domain.Delivery;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.entity.OrderProduct;
+import kr.casealot.shop.domain.order.exception.OrderAlreadyCompleteException;
+import kr.casealot.shop.domain.order.exception.OrderCanceledException;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
+import kr.casealot.shop.domain.payment.entity.Payment;
+import kr.casealot.shop.domain.payment.entity.PaymentStatus;
+import kr.casealot.shop.domain.payment.exception.PaymentRequiredException;
+import kr.casealot.shop.domain.payment.repository.PaymentRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
@@ -37,6 +44,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public APIResponse<OrderDTO.Response> createOrder(OrderDTO.createOrder createOrder, Principal principal) {
@@ -106,19 +114,24 @@ public class OrderService {
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
 
-        // 이미 취소된 주문, 배송중인 주문 취소불가
         // TODO 배송완료된 주문 취소불가 적용해야됨
-        if(!order.getOrderStatus().equals(ORDER)){
-            throw new OrderCancelException();
+        if(order.getOrderStatus().equals(CANCEL)){
+            throw new OrderCanceledException();
         }
-        Optional.of(!order.getOrderStatus().equals(ORDER)).orElseThrow();
+        if(order.getOrderStatus().equals(COMPLETE)){
+            throw new OrderAlreadyCompleteException();
+        }
 
         if(!order.getCustomer().getId().equals(customerId)){
             // 본인 주문건 아닐경우
             throw new PermissionException();
         }
+        if(!order.getPayment().getStatus().equals(PaymentStatus.PAID)){
+            throw new PaymentRequiredException();
+        }
 
-        //주문 완료
+
+       //주문 완료
         order.setOrderStatus(COMPLETE);
         orderRepository.save(order);
 
