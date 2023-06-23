@@ -4,7 +4,6 @@ package kr.casealot.shop.domain.order.service;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.order.delivery.domain.Delivery;
-import kr.casealot.shop.domain.order.delivery.repository.DeliveryRepository;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
