@@ -31,13 +31,13 @@ public class FunctionController {
   LocalDateTime today = LocalDateTime.now().with(LocalTime.MIN);
 
   @GetMapping("/daily")
-  @ApiOperation(value = "오늘의 할일", notes = "오늘의 할일에 들어갈 데이터를 제공한다.")
+  @ApiOperation(value = "상단 오늘의 할일", notes = "오늘의 할일에 들어갈 데이터를 제공한다.")
   public APIResponse<FunctionDTO> getDailyOrderData() {
     return functionService.getTodayFunction(today);
   }
 
   @GetMapping("/weekly")
-  @ApiOperation(value = "일자별 요약", notes = "일자별 요약에 들어갈 데이터를 제공한다.")
+  @ApiOperation(value = "7일치 일자별 요약", notes = "일자별 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionWeekDTO>> getWeeklyOrderData() {
     return functionService.getWeekFunction(today);
   }
