@@ -87,16 +87,19 @@ public class OrderService {
         // 주문내역이 존재하지않을 경우
         Order order = orderRepository.findByOrderNumber(orderId);
 
-        // 이미 취소된 주문, 배송중인 주문 취소불가
-        // TODO 배송완료된 주문 취소불가 적용해야됨
-        if(!order.getOrderStatus().equals(ORDER)){
-            throw new OrderCancelException();
-        }
-
         if(!order.getCustomer().getId().equals(customerId)){
             // 본인 주문건 아닐경우
             throw new PermissionException();
         }
+
+        if(order.getOrderStatus().equals(CANCEL)){
+            throw new OrderCanceledException();
+        }
+
+        if(order.getOrderStatus().equals(COMPLETE)){
+            throw new OrderAlreadyCompleteException();
+        }
+
 
         order.setOrderStatus(CANCEL);
         orderRepository.save(order);
