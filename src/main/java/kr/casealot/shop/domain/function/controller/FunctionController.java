@@ -8,6 +8,7 @@ import java.util.List;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
+import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
@@ -51,5 +52,11 @@ public class FunctionController {
   @ApiOperation(value = "리뷰 요약", notes = "리뷰 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionReviewDTO>> getReviewData() {
     return functionService.getReviewFunction();
+  }
+
+  @GetMapping("/sales")
+  @ApiOperation(value = "주간 판매 요약", notes = "주간 판매액을 일자별로 나열하여 그래프로 표기할 수 있게 한다.")
+  public APIResponse<List<FunctionSalesDTO>> getSalesData() {
+    return functionService.getSalesFunction(today);
   }
 }
