@@ -90,7 +90,15 @@ public class FunctionService {
     List<FunctionQnaDTO> functionQnaDTOList = new ArrayList<>();
     List<Qna> qnaList = qnaRepository.findAllByOrderByModifiedDtDesc();
 
+    // 최대 30개의 QNA만 가져오도록 제한
+    int qnaLimit = 30;
+    int qnaCount = 0;
+
     for (Qna qna : qnaList) {
+      if (qnaCount >= qnaLimit) {
+        break;
+      }
+
       if (qna.getCustomer().getProfileImg() != null) {
         FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
             .id(qna.getId())
@@ -110,16 +118,27 @@ public class FunctionService {
             .build();
         functionQnaDTOList.add(functionQnaDTO);
       }
+      qnaCount++;
     }
+
     return APIResponse.success("function", functionQnaDTOList);
   }
+
 
   public APIResponse<List<FunctionReviewDTO>> getReviewFunction() {
 
     List<FunctionReviewDTO> functionReviewDTOList = new ArrayList<>();
     List<Review> reviewList = reviewRepository.findAllByOrderByModifiedDtDesc();
 
+    // 최대 30개의 Review만 가져오도록 제한
+    int reviewLimit = 30;
+    int reviewCount = 0;
+
     for (Review review : reviewList) {
+      if (reviewCount >= reviewLimit) {
+        break;
+      }
+
       Product product = review.getProduct();
       if (product != null) {
         UploadFile thumbnail = product.getThumbnail();
@@ -144,10 +163,13 @@ public class FunctionService {
 
         }
         functionReviewDTOList.add(functionReviewDTO);
+        reviewCount++;
       }
     }
+
     return APIResponse.success("function", functionReviewDTOList);
   }
+
 
   public APIResponse<List<FunctionSalesDTO>> getSalesFunction(LocalDateTime date) {
     List<FunctionSalesDTO> functionSalesList = new ArrayList<>();

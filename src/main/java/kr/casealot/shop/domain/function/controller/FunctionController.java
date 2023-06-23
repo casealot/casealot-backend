@@ -43,13 +43,13 @@ public class FunctionController {
   }
 
   @GetMapping("/qna")
-  @ApiOperation(value = "QNA 요약", notes = "QNA 요약에 들어갈 데이터를 제공한다.")
+  @ApiOperation(value = "전체 QNA 최신순 목록", notes = "QNA 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionQnaDTO>> getQnaData() {
     return functionService.getQnaFunction();
   }
 
   @GetMapping("/review")
-  @ApiOperation(value = "리뷰 요약", notes = "리뷰 요약에 들어갈 데이터를 제공한다.")
+  @ApiOperation(value = "전체 리뷰 최신순 목록", notes = "리뷰 요약에 들어갈 데이터를 제공한다.")
   public APIResponse<List<FunctionReviewDTO>> getReviewData() {
     return functionService.getReviewFunction();
   }
