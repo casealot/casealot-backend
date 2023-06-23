@@ -15,7 +15,7 @@ public class FunctionDTO {
 
   private long todayOrder;
   private long todayCancel;
-  private long todayReturn;
+//  private long todayReturn;
   private long todayChange;
   private long todayQna;
 }

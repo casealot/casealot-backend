@@ -9,7 +9,9 @@ import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
+import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
+import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.entity.Review;
@@ -34,17 +36,22 @@ public class FunctionService {
 
   private final QnaRepository qnaRepository;
 
+  private final OrderRepository orderRepository;
+
   public APIResponse<FunctionDTO> getTodayFunction(LocalDateTime date) {
     LocalDateTime startDate = date.toLocalDate().atStartOfDay();
     LocalDateTime endDate = date.toLocalDate().atTime(LocalTime.MAX);
     int todaysEmptyComments = qnaRepository.countByModifiedDtBetweenAndQnaCommentListIsNull(
         startDate, endDate);
+    int todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
+    int todayCancel = orderRepository.getCanceledOrderCountBetween(startDate, endDate);
+    int todayChange = orderRepository.getChangedOrderCountBetween(startDate, endDate);
 
     FunctionDTO functionDTO = new FunctionDTO().builder()
-        .todayOrder(0L)
-        .todayCancel(0L)
-        .todayReturn(0L)
-        .todayChange(0L)
+        .todayOrder(todayOrder)
+        .todayCancel(todayCancel)
+//        .todayReturn(0L)
+        .todayChange(todayChange)
         .todayQna(todaysEmptyComments)
         .build();
 
@@ -59,16 +66,16 @@ public class FunctionService {
       LocalDateTime currentDate = date.minusDays(i);
       LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
       LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
-//    int todayOrder = qnaRepository.countByModifiedDtBetween(startDate, endDate);
-//    int todayCash = qnaRepository.countByModifiedDtBetween(startDate, endDate);
+      int todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
+      long todayCash = orderRepository.getTotalAmountBetween(startDate, endDate);
       int readySignIn = customerRepository.countByModifiedDtBetween(startDate, endDate);
       int todayQna = qnaRepository.countByModifiedDtBetween(startDate, endDate);
       int todayReview = reviewRepository.countByModifiedDtBetween(startDate, endDate);
 
       FunctionWeekDTO functionWeekDTO = new FunctionWeekDTO().builder()
           .today(currentDate)
-          .todayOrder(0L)
-          .todayCash(0L)
+          .todayOrder(todayOrder)
+          .todayCash(todayCash)
           .todaySignIn(readySignIn)
           .todayQna(todayQna)
           .todayReview(todayReview)
@@ -84,7 +91,7 @@ public class FunctionService {
     List<Qna> qnaList = qnaRepository.findAllByOrderByModifiedDtDesc();
 
     for (Qna qna : qnaList) {
-      if(qna.getCustomer().getProfileImg()!= null) {
+      if (qna.getCustomer().getProfileImg() != null) {
         FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
             .id(qna.getId())
             .profileImg(qna.getCustomer().getProfileImg().getUrl())
@@ -93,7 +100,7 @@ public class FunctionService {
             .modifiedDt(qna.getModifiedDt())
             .build();
         functionQnaDTOList.add(functionQnaDTO);
-      }else{
+      } else {
         FunctionQnaDTO functionQnaDTO = FunctionQnaDTO.builder()
             .id(qna.getId())
             .profileImg(null)
@@ -142,5 +149,23 @@ public class FunctionService {
     return APIResponse.success("function", functionReviewDTOList);
   }
 
+  public APIResponse<List<FunctionSalesDTO>> getSalesFunction(LocalDateTime date) {
+    List<FunctionSalesDTO> functionSalesList = new ArrayList<>();
+
+    for (int i = 0; i < 7; i++) {
+      LocalDateTime currentDate = date.minusDays(i);
+      LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
+      LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
+      long todayCash = orderRepository.getTotalAmountBetween(startDate, endDate);
+
+
+      FunctionSalesDTO functionSalesDTO = new FunctionSalesDTO().builder()
+          .today(currentDate)
+          .todaySales(todayCash)
+          .build();
+      functionSalesList.add(functionSalesDTO);
+    }
+    return APIResponse.success("function", functionSalesList);
+  }
 
 }
