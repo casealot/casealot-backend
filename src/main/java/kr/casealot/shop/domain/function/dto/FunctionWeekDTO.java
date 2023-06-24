@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FunctionWeekDTO {
 
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy-MM-dd", timezone = "Asia/Seoul")
   private LocalDateTime today;
   private long todayOrder;
   private long todayCash;
