@@ -53,12 +53,36 @@ public class OrderController {
         return orderService.getOrderDetail(orderId, principal);
     }
 
-    @GetMapping
+    //합쳐서 인자로 상태코드 넘겨서 메서드 하나로 해결해도 될듯.
+
+    @GetMapping("/all")
     @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 목록 조회")
     public APIResponse<List<OrderDTO.Response>> getOrderList(Principal principal) {
 
         return orderService.getOrderList(principal);
     }
+
+    @GetMapping("/complete")
+    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 완료 목록 조회")
+    public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
+
+        return orderService.getOrderCompleteList(principal);
+    }
+
+    @GetMapping("/change")
+    @ApiOperation(value = "주문 목록 조회", notes = "본인의 교환 요청 목록 조회")
+    public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
+
+        return orderService.getOrderChangeList(principal);
+    }
+
+    @GetMapping("/cancel")
+    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 취소 목록 조회")
+    public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
+
+        return orderService.getOrderCancelList(principal);
+    }
+
 
 }
 

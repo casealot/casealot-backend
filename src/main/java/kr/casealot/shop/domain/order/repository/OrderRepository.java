@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.order.repository;
 
 import java.time.LocalDateTime;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.product.entity.Product;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
   List<Order> findByCustomer(Customer customer);
+  List<Order> findByCustomerAndOrderStatus(Customer customer, OrderStatus orderStatus);
 
   Order findByOrderNumber(String orderId);
 

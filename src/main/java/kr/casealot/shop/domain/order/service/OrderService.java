@@ -1,8 +1,10 @@
 package kr.casealot.shop.domain.order.service;
 
 
+import java.util.Optional;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.order.delivery.domain.Delivery;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
@@ -166,16 +168,62 @@ public class OrderService {
     return APIResponse.success(API_NAME, orderResponses);
   }
 
+  public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, CANCEL);
+
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success(API_NAME, orderResponses);
+  }
+
+  public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, COMPLETE);
+
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success(API_NAME, orderResponses);
+  }
+
+  public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, CHANGE);
+
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success(API_NAME, orderResponses);
+  }
+
   private OrderDTO.Response orderResponse(Order order) {
+    order.getOrderProducts().size();
+
     List<OrderDTO.OrderProductDTO> orderProductDTOs = order.getOrderProducts()
         .stream()
-        .map(orderProduct -> OrderDTO.OrderProductDTO.builder()
-            .productId(orderProduct.getProduct().getId())
-            .quantity(orderProduct.getQuantity())
-            .thumbnail(orderProduct.getProduct().getThumbnail().getUrl())
-            .name(orderProduct.getName())
-            .price(orderProduct.getPrice())
-            .build())
+        .map(orderProduct -> {
+          Long productId = orderProduct.getProduct().getId();
+          Optional<Product> optionalProduct = productRepository.findById(productId);
+
+          // Optional에서 Product 엔티티를 가져옴
+          Product product = optionalProduct.orElseThrow(() -> new RuntimeException("Product not found"));
+
+          Optional<String> thumbnailUrl = Optional.ofNullable(product.getThumbnail())
+              .map(UploadFile::getUrl);
+
+          return OrderDTO.OrderProductDTO.builder()
+              .productId(productId)
+              .quantity(orderProduct.getQuantity())
+              .thumbnail(thumbnailUrl.orElse(null))
+              .name(orderProduct.getName())
+              .price(orderProduct.getPrice())
+              .build();
+        })
         .collect(Collectors.toList());
 
     return OrderDTO.Response.builder()
@@ -193,4 +241,5 @@ public class OrderService {
         .orderProducts(orderProductDTOs)
         .build();
   }
+
 }
