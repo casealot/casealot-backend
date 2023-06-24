@@ -38,159 +38,159 @@ import static kr.casealot.shop.domain.order.dto.OrderStatus.*;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final String API_NAME = "order";
+  private final String API_NAME = "order";
 
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
-    private final PaymentRepository paymentRepository;
+  private final OrderRepository orderRepository;
+  private final ProductRepository productRepository;
+  private final CustomerRepository customerRepository;
+  private final PaymentRepository paymentRepository;
 
-    @Transactional
-    public APIResponse<OrderDTO.Response> createOrder(OrderDTO.createOrder createOrder, Principal principal) {
-        Customer customer = customerRepository.findById(principal.getName());
-        Order order =  new Order();
-        order.setCustomer(customer);
-        // 배송, 결제 정보
+  @Transactional
+  public APIResponse<OrderDTO.Response> createOrder(OrderDTO.createOrder createOrder,
+      Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    Order order = new Order();
+    order.setCustomer(customer);
+    // 배송, 결제 정보
 
-        order.setOrderNumber(StringUtil.generateOrderNumber());
-        order.setOrderDt(LocalDateTime.now());
-        order.setOrderStatus(OrderStatus.ORDER);
+    order.setOrderNumber(StringUtil.generateOrderNumber());
+    order.setOrderDt(LocalDateTime.now());
+    order.setOrderStatus(OrderStatus.ORDER);
 
-        for (OrderDTO.OrderProductDTO productDTO : createOrder.getOrderProducts()) {
-            Product product = productRepository.findById(productDTO.getProductId())
-                    .orElseThrow(NotFoundProductException::new);
+    for (OrderDTO.OrderProductDTO productDTO : createOrder.getOrderProducts()) {
+      Product product = productRepository.findById(productDTO.getProductId())
+          .orElseThrow(NotFoundProductException::new);
 
-            OrderProduct orderProduct = new OrderProduct();
-            orderProduct.setProduct(product);
-            orderProduct.setName(product.getName());
-            orderProduct.setPrice(product.getPrice());
-            orderProduct.setQuantity(productDTO.getQuantity());
+      OrderProduct orderProduct = new OrderProduct();
+      orderProduct.setProduct(product);
+      orderProduct.setName(product.getName());
+      orderProduct.setPrice(product.getPrice());
+      orderProduct.setQuantity(productDTO.getQuantity());
 
-            order.addOrderProduct(orderProduct);
-        }
-
-        order.calculateTotalAmount();
-
-        orderRepository.save(order);
-
-        OrderDTO.Response orderResponse = orderResponse(order);
-
-        return APIResponse.success(API_NAME, orderResponse);
+      order.addOrderProduct(orderProduct);
     }
 
-    @Transactional
-    public APIResponse<OrderDTO.Response> cancelOrder(Long orderId, Principal principal){
-        Customer customer = customerRepository.findById(principal.getName());
-        String customerId = principal.getName();
+    order.calculateTotalAmount();
 
-        // 주문내역이 존재하지않을 경우
-        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+    orderRepository.save(order);
 
-        if(!order.getCustomer().getId().equals(customerId)){
-            // 본인 주문건 아닐경우
-            throw new PermissionException();
-        }
+    OrderDTO.Response orderResponse = orderResponse(order);
 
-        if(order.getOrderStatus().equals(CANCEL)){
-            throw new OrderCanceledException();
-        }
+    return APIResponse.success(API_NAME, orderResponse);
+  }
 
-        if(order.getOrderStatus().equals(COMPLETE)){
-            throw new OrderAlreadyCompleteException();
-        }
+  @Transactional
+  public APIResponse<OrderDTO.Response> cancelOrder(Long orderId, Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    String customerId = principal.getName();
 
+    // 주문내역이 존재하지않을 경우
+    Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
 
-        order.setOrderStatus(CANCEL);
-        orderRepository.save(order);
-
-        OrderDTO.Response orderResponse = orderResponse(order);
-
-        return APIResponse.success(API_NAME, orderResponse);
+    if (!order.getCustomer().getId().equals(customerId)) {
+      // 본인 주문건 아닐경우
+      throw new PermissionException();
     }
 
-    @Transactional
-    public APIResponse<OrderDTO.Response> completeOrder(Long orderId, Principal principal) {
-        Customer customer = customerRepository.findById(principal.getName());
-        String customerId = principal.getName();
-
-        // 주문내역이 존재하지않을 경우
-        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
-
-        // TODO 배송완료된 주문 취소불가 적용해야됨
-        if(order.getOrderStatus().equals(CANCEL)){
-            throw new OrderCanceledException();
-        }
-        if(order.getOrderStatus().equals(COMPLETE)){
-            throw new OrderAlreadyCompleteException();
-        }
-
-        if(!order.getCustomer().getId().equals(customerId)){
-            // 본인 주문건 아닐경우
-            throw new PermissionException();
-        }
-        if(!order.getPayment().getStatus().equals(PaymentStatus.PAID)){
-            throw new PaymentRequiredException();
-        }
-
-
-       //주문 완료
-        order.setOrderStatus(COMPLETE);
-        orderRepository.save(order);
-
-        OrderDTO.Response orderResponse = orderResponse(order);
-
-        return APIResponse.success(API_NAME, orderResponse);
+    if (order.getOrderStatus().equals(CANCEL)) {
+      throw new OrderCanceledException();
     }
 
-    public APIResponse<OrderDTO.Response> getOrderDetail(Long orderId, Principal principal) {
-        Customer customer = customerRepository.findById(principal.getName());
-        Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
-
-        if (!order.getCustomer().getId().equals(customer.getId())) {
-            // 본인 주문건이 아닌 경우
-            throw new PermissionException();
-        }
-
-        OrderDTO.Response orderResponse = orderResponse(order);
-
-        return APIResponse.success(API_NAME, orderResponse);
+    if (order.getOrderStatus().equals(COMPLETE)) {
+      throw new OrderAlreadyCompleteException();
     }
 
-    public APIResponse<List<OrderDTO.Response>> getOrderList(Principal principal) {
-        Customer customer = customerRepository.findById(principal.getName());
-        List<Order> orders = orderRepository.findByCustomer(customer);
+    order.setOrderStatus(CANCEL);
+    orderRepository.save(order);
 
-        List<OrderDTO.Response> orderResponses = orders.stream()
-                .map(this::orderResponse)
-                .collect(Collectors.toList());
+    OrderDTO.Response orderResponse = orderResponse(order);
 
-        return APIResponse.success(API_NAME, orderResponses);
+    return APIResponse.success(API_NAME, orderResponse);
+  }
+
+  @Transactional
+  public APIResponse<OrderDTO.Response> completeOrder(Long orderId, Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    String customerId = principal.getName();
+
+    // 주문내역이 존재하지않을 경우
+    Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+
+    // TODO 배송완료된 주문 취소불가 적용해야됨
+    if (order.getOrderStatus().equals(CANCEL)) {
+      throw new OrderCanceledException();
+    }
+    if (order.getOrderStatus().equals(COMPLETE)) {
+      throw new OrderAlreadyCompleteException();
     }
 
-    private OrderDTO.Response orderResponse(Order order) {
-        List<OrderDTO.OrderProductDTO> orderProductDTOs = order.getOrderProducts()
-                .stream()
-                .map(orderProduct -> OrderDTO.OrderProductDTO.builder()
-                        .productId(orderProduct.getProduct().getId())
-                        .quantity(orderProduct.getQuantity())
-                        .name(orderProduct.getName())
-                        .price(orderProduct.getPrice())
-                        .build())
-                .collect(Collectors.toList());
-
-        return OrderDTO.Response.builder()
-                .id(order.getId())
-                .orderNumber(order.getOrderNumber())
-                .orderDt(order.getOrderDt())
-                .orderStatus(order.getOrderStatus())
-                .totalAmount(order.getTotalAmount())
-                .customerId(order.getCustomer().getId())
-                .name(order.getCustomer().getName())
-                .phoneNumber(order.getCustomer().getPhoneNumber())
-                .email(order.getCustomer().getEmail())
-                .address(order.getCustomer().getAddress())
-                .addressDetail(order.getCustomer().getAddressDetail())
-                .orderProducts(orderProductDTOs)
-                .build();
+    if (!order.getCustomer().getId().equals(customerId)) {
+      // 본인 주문건 아닐경우
+      throw new PermissionException();
     }
+    if (!order.getPayment().getStatus().equals(PaymentStatus.PAID)) {
+      throw new PaymentRequiredException();
+    }
+
+    //주문 완료
+    order.setOrderStatus(COMPLETE);
+    orderRepository.save(order);
+
+    OrderDTO.Response orderResponse = orderResponse(order);
+
+    return APIResponse.success(API_NAME, orderResponse);
+  }
+
+  public APIResponse<OrderDTO.Response> getOrderDetail(Long orderId, Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+
+    if (!order.getCustomer().getId().equals(customer.getId())) {
+      // 본인 주문건이 아닌 경우
+      throw new PermissionException();
+    }
+
+    OrderDTO.Response orderResponse = orderResponse(order);
+
+    return APIResponse.success(API_NAME, orderResponse);
+  }
+
+  public APIResponse<List<OrderDTO.Response>> getOrderList(Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    List<Order> orders = orderRepository.findByCustomer(customer);
+
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success(API_NAME, orderResponses);
+  }
+
+  private OrderDTO.Response orderResponse(Order order) {
+    List<OrderDTO.OrderProductDTO> orderProductDTOs = order.getOrderProducts()
+        .stream()
+        .map(orderProduct -> OrderDTO.OrderProductDTO.builder()
+            .productId(orderProduct.getProduct().getId())
+            .quantity(orderProduct.getQuantity())
+            .thumbnail(orderProduct.getProduct().getThumbnail().getUrl())
+            .name(orderProduct.getName())
+            .price(orderProduct.getPrice())
+            .build())
+        .collect(Collectors.toList());
+
+    return OrderDTO.Response.builder()
+        .id(order.getId())
+        .orderNumber(order.getOrderNumber())
+        .orderDt(order.getOrderDt())
+        .orderStatus(order.getOrderStatus())
+        .totalAmount(order.getTotalAmount())
+        .customerId(order.getCustomer().getId())
+        .name(order.getCustomer().getName())
+        .phoneNumber(order.getCustomer().getPhoneNumber())
+        .email(order.getCustomer().getEmail())
+        .address(order.getCustomer().getAddress())
+        .addressDetail(order.getCustomer().getAddressDetail())
+        .orderProducts(orderProductDTOs)
+        .build();
+  }
 }

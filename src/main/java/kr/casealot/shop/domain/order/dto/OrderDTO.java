@@ -47,6 +47,7 @@ public class OrderDTO {
     public static class OrderProductDTO {
         private String name;
         private Long productId;
+        private String thumbnail;
         private int quantity;
         private int price;
     }
