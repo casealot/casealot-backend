@@ -57,6 +57,6 @@ public class FunctionController {
   @GetMapping("/sales")
   @ApiOperation(value = "주간 판매 요약", notes = "주간 판매액을 일자별로 나열하여 그래프로 표기할 수 있게 한다.")
   public APIResponse<List<FunctionSalesDTO>> getSalesData() {
-    return functionService.getSalesFunction(today);
+    return functionService.getSalesAndOrderFunction(today);
   }
 }
