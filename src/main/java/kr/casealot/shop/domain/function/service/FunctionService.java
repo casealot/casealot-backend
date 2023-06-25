@@ -146,6 +146,7 @@ public class FunctionService {
         if (thumbnail != null) {
           functionReviewDTO = FunctionReviewDTO.builder()
               .id(review.getSeq())
+              .productName(product.getName())
               .productThumbnail(thumbnail.getUrl())
               .reviewText(review.getReviewText())
               .customerId(review.getCustomer().getId())
@@ -155,6 +156,7 @@ public class FunctionService {
         } else {
           functionReviewDTO = FunctionReviewDTO.builder()
               .id(review.getSeq())
+              .productName(product.getName())
               .productThumbnail(null)
               .reviewText(review.getReviewText())
               .customerId(review.getCustomer().getId())
@@ -171,7 +173,7 @@ public class FunctionService {
   }
 
 
-  public APIResponse<List<FunctionSalesDTO>> getSalesFunction(LocalDateTime date) {
+  public APIResponse<List<FunctionSalesDTO>> getSalesAndOrderFunction(LocalDateTime date) {
     List<FunctionSalesDTO> functionSalesList = new ArrayList<>();
 
     for (int i = 0; i < 7; i++) {
@@ -179,10 +181,12 @@ public class FunctionService {
       LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
       LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
       long todayCash = orderRepository.getTotalAmountBetween(startDate, endDate);
+      long todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
 
 
       FunctionSalesDTO functionSalesDTO = new FunctionSalesDTO().builder()
           .today(currentDate)
+          .orderCounts(todayOrder)
           .todaySales(todayCash)
           .build();
       functionSalesList.add(functionSalesDTO);

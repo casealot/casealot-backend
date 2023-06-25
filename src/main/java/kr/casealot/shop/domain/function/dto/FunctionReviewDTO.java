@@ -24,6 +24,8 @@ public class FunctionReviewDTO {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String productName;
+
   private String productThumbnail;
 
   private String reviewText;

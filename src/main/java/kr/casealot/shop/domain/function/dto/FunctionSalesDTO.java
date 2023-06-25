@@ -16,5 +16,6 @@ import lombok.Setter;
 public class FunctionSalesDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy-MM-dd", timezone = "Asia/Seoul")
   private LocalDateTime today;
+  private long orderCounts;
   private long todaySales;
 }
