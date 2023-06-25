@@ -96,7 +96,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/notice/list/**",
             "/cal/v1/customer/join",
             "/cal/v1/customer/login",
-                "/cal/v1/autocomplete"
+            "/cal/v1/autocomplete"
         ).permitAll()
         .antMatchers(
             "/cal/v1/review/**",
@@ -104,8 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/notice/**",
             "/cal/v1/qna/**",
             "/cal/v1/cart/**",
-              "/cal/v1/order/**",
-                "/cal/v1/verifyIamport/**"
+            "/cal/v1/order/**",
+            "/cal/v1/verifyIamport/**"
         ).hasRole("USER")
         .antMatchers(
             "/cal/v1/admin/**",
