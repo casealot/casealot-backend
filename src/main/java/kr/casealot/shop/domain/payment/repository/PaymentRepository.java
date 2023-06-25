@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    Optional<Payment> findByOrderIdAndCustomer(String orderId, Customer customer);
+    Optional<Payment> findByOrderNumberAndCustomer(String orderNumber, Customer customer);
 
-    Payment findByOrderId(String orderNumber);
+    Payment findByOrderNumber(String orderNumber);
 
     List<Payment> findByCustomerSeq(Long customerSeq);
 

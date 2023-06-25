@@ -71,14 +71,14 @@ public class PaymentService {
       throws IamportResponseException, IOException {
     Customer customer = customerRepository.findCustomerById(principal.getName());
     Order order = orderRepository.findByOrderNumber(orderNumber);
-    Payment payment = paymentRepository.findByOrderIdAndCustomer(orderNumber, customer)
+    Payment payment = paymentRepository.findByOrderNumberAndCustomer(orderNumber, customer)
         .orElseThrow(NotFoundPaymentException::new);
 
     if (!payment.getCustomer().getId().equals(customer.getId())) {
       throw new PermissionException();
     }
 
-    log.info("payment OrderId => {}, ReceiptId => {}", payment.getOrderNumber(), receiptId);
+    log.info("payment OrderNumber => {}, ReceiptId => {}", payment.getOrderNumber(), receiptId);
 
     IamportResponse<AccessToken> auth = iamportClient.getAuth();
     log.info("auth Token => {}", auth.getResponse().getToken());
@@ -138,7 +138,7 @@ public class PaymentService {
   @Transactional
   public PaymentDTO cancelPayment(Principal principal, String orderNumber) throws IamportResponseException, IOException {
     Customer customer = customerRepository.findCustomerById(principal.getName());
-    Payment payment = paymentRepository.findByOrderIdAndCustomer(orderNumber, customer)
+    Payment payment = paymentRepository.findByOrderNumberAndCustomer(orderNumber, customer)
             .orElseThrow(NotFoundPaymentException::new);
 
     CancelData cancelData = new CancelData(orderNumber, false);
