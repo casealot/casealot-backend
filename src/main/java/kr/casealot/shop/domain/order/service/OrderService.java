@@ -1,28 +1,24 @@
 package kr.casealot.shop.domain.order.service;
 
 
-import java.util.Optional;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
-import kr.casealot.shop.domain.order.delivery.domain.Delivery;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.entity.OrderProduct;
+import kr.casealot.shop.domain.order.exception.NotFoundOrderException;
 import kr.casealot.shop.domain.order.exception.OrderAlreadyCompleteException;
 import kr.casealot.shop.domain.order.exception.OrderCanceledException;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
-import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
 import kr.casealot.shop.domain.payment.exception.PaymentRequiredException;
 import kr.casealot.shop.domain.payment.repository.PaymentRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
-import kr.casealot.shop.domain.order.exception.NotFoundOrderException;
 import kr.casealot.shop.global.exception.NotFoundProductException;
-import kr.casealot.shop.domain.order.exception.OrderCancelException;
 import kr.casealot.shop.global.exception.PermissionException;
 import kr.casealot.shop.global.util.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static kr.casealot.shop.domain.order.dto.OrderStatus.*;
@@ -96,10 +93,6 @@ public class OrderService {
 
     if (order.getOrderStatus().equals(CANCEL)) {
       throw new OrderCanceledException();
-    }
-
-    if (order.getOrderStatus().equals(COMPLETE)) {
-      throw new OrderAlreadyCompleteException();
     }
 
     order.setOrderStatus(CANCEL);

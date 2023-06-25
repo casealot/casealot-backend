@@ -32,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/cancel")
-    @ApiOperation(value = "주문 취소", notes = "주문 취소 - 주문 상태를 취소로 변경")
+    @ApiOperation(value = "주문 취소", notes = "주문을 취소한다.")
     public APIResponse<OrderDTO.Response> cancelOrder(@ApiParam(value = "주문 취소 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
 
         return orderService.cancelOrder(orderId, principal);
