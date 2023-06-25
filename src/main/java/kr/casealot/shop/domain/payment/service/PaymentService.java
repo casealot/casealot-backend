@@ -2,20 +2,16 @@ package kr.casealot.shop.domain.payment.service;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Prepare;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.security.Principal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Objects;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
+import kr.casealot.shop.domain.payment.dto.CancelPaymentReq;
 import kr.casealot.shop.domain.payment.dto.PaymentDTO;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentMethod;
@@ -27,6 +23,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Objects;
+
+import static kr.casealot.shop.domain.payment.entity.PaymentStatus.CANCELED;
 
 
 @Slf4j
@@ -110,7 +115,7 @@ public class PaymentService {
             paymentRepository.save(payment);
           } else if (status.equals(PaymentStatus.FAILED)) {
             throw new PaymentFailedException();
-          } else if (status.equals(PaymentStatus.CANCELLED)) {
+          } else if (status.equals(CANCELED)) {
             throw new PaymentCanceledException();
           }
         } else {
@@ -127,6 +132,27 @@ public class PaymentService {
 
     return convertToDTO(payment);
   }
+
+  @Transactional
+  public PaymentDTO cancelPayment(Principal principal, CancelPaymentReq cancelPaymentReq) throws IamportResponseException, IOException {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+    Order order = orderRepository.findByOrderNumber(cancelPaymentReq.getOrderId());
+    Payment payment = paymentRepository.findByOrderIdAndCustomer(cancelPaymentReq.getOrderId(), customer)
+            .orElseThrow(NotFoundPaymentException::new);
+
+    CancelData cancelData = new CancelData(cancelPaymentReq.getReceiptId(), true);
+    IamportResponse<com.siot.IamportRestClient.response.Payment> response = iamportClient.cancelPaymentByImpUid(cancelData);
+    com.siot.IamportRestClient.response.Payment cancelResponse = response.getResponse();
+
+    payment.setCancelledAt(cancelResponse.getCancelledAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+    payment.setCancelledAmount(cancelResponse.getCancelAmount());
+    payment.setStatus(CANCELED);
+
+    paymentRepository.save(payment);
+
+    return convertToDTO(payment);
+  }
+
 
   private PaymentDTO convertToDTO(Payment payment) {
     PaymentDTO paymentDTO = new PaymentDTO();
@@ -145,4 +171,6 @@ public class PaymentService {
 
     return paymentDTO;
   }
+
+
 }
