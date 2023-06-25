@@ -11,13 +11,13 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
-import kr.casealot.shop.domain.payment.dto.CancelPaymentReq;
 import kr.casealot.shop.domain.payment.dto.PaymentDTO;
 import kr.casealot.shop.domain.payment.entity.Payment;
 import kr.casealot.shop.domain.payment.entity.PaymentMethod;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
 import kr.casealot.shop.domain.payment.exception.*;
 import kr.casealot.shop.domain.payment.repository.PaymentRepository;
+import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +29,8 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static kr.casealot.shop.domain.payment.entity.PaymentStatus.CANCELED;
@@ -49,7 +51,7 @@ public class PaymentService {
       throws IamportResponseException, IOException {
     Payment payment = new Payment();
     payment.setCustomer(customer);
-    payment.setOrderId(orderNumber);
+    payment.setOrderNumber(orderNumber);
     payment.setAmount(amount);
     payment.setCreateAt(LocalDateTime.now());
     try {
@@ -65,18 +67,18 @@ public class PaymentService {
   }
 
   @Transactional
-  public PaymentDTO verifyPayment(Principal principal, String orderId, String receiptId)
+  public PaymentDTO verifyPayment(Principal principal, String orderNumber, String receiptId)
       throws IamportResponseException, IOException {
     Customer customer = customerRepository.findCustomerById(principal.getName());
-    Order order = orderRepository.findByOrderNumber(orderId);
-    Payment payment = paymentRepository.findByOrderIdAndCustomer(orderId, customer)
+    Order order = orderRepository.findByOrderNumber(orderNumber);
+    Payment payment = paymentRepository.findByOrderIdAndCustomer(orderNumber, customer)
         .orElseThrow(NotFoundPaymentException::new);
 
     if (!payment.getCustomer().getId().equals(customer.getId())) {
       throw new PermissionException();
     }
 
-    log.info("payment OrderId => {}, ReceiptId => {}", payment.getOrderId(), receiptId);
+    log.info("payment OrderId => {}, ReceiptId => {}", payment.getOrderNumber(), receiptId);
 
     IamportResponse<AccessToken> auth = iamportClient.getAuth();
     log.info("auth Token => {}", auth.getResponse().getToken());
@@ -88,18 +90,18 @@ public class PaymentService {
         com.siot.IamportRestClient.response.Payment paymentData = paymentResponse.getResponse();
         log.info("===============================================================");
         log.info(paymentData.getImpUid() + " = ? " + receiptId + " : " + (paymentData.getImpUid().equals(receiptId)));
-        log.info(paymentData.getMerchantUid() + " = ? " + orderId + " : " + (paymentData.getMerchantUid().equals(orderId)));
+        log.info(paymentData.getMerchantUid() + " = ? " + orderNumber + " : " + (paymentData.getMerchantUid().equals(orderNumber)));
         log.info(paymentData.getAmount() + " = ? " + payment.getAmount() + " : " +  (Objects.equals(paymentData.getAmount(), payment.getAmount())));
         log.info("===============================================================");
         if (receiptId.equals(paymentData.getImpUid())
-            && orderId.equals(paymentData.getMerchantUid())
+            && orderNumber.equals(paymentData.getMerchantUid())
             && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
           PaymentMethod method = PaymentMethod.valueOf(paymentData.getPayMethod().toUpperCase());
           PaymentStatus status = PaymentStatus.valueOf(paymentData.getStatus().toUpperCase());
           payment.setReceiptId(paymentData.getImpUid());
           payment.setMethod(method);
           payment.setStatus(status);
-          payment.setOId(order.getId());
+          payment.setOrderId(order.getId());
           order.setPayment(payment);
 
           orderRepository.save(order);
@@ -134,13 +136,12 @@ public class PaymentService {
   }
 
   @Transactional
-  public PaymentDTO cancelPayment(Principal principal, CancelPaymentReq cancelPaymentReq) throws IamportResponseException, IOException {
+  public PaymentDTO cancelPayment(Principal principal, String orderNumber) throws IamportResponseException, IOException {
     Customer customer = customerRepository.findCustomerById(principal.getName());
-    Order order = orderRepository.findByOrderNumber(cancelPaymentReq.getOrderId());
-    Payment payment = paymentRepository.findByOrderIdAndCustomer(cancelPaymentReq.getOrderId(), customer)
+    Payment payment = paymentRepository.findByOrderIdAndCustomer(orderNumber, customer)
             .orElseThrow(NotFoundPaymentException::new);
 
-    CancelData cancelData = new CancelData(cancelPaymentReq.getReceiptId(), true);
+    CancelData cancelData = new CancelData(orderNumber, false);
     IamportResponse<com.siot.IamportRestClient.response.Payment> response = iamportClient.cancelPaymentByImpUid(cancelData);
     com.siot.IamportRestClient.response.Payment cancelResponse = response.getResponse();
 
@@ -151,16 +152,45 @@ public class PaymentService {
     paymentRepository.save(payment);
 
     return convertToDTO(payment);
+
   }
+
+  public List<PaymentDTO> getPayment(Principal principal) {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+    List<Payment> payments = paymentRepository.findByCustomerSeq(customer.getSeq());
+
+    // 본인 주문건이 아닌 경우, 결제 내역이 없는 경우 등의 처리
+
+    List<PaymentDTO> paymentDTOs = new ArrayList<>();
+    for (Payment payment : payments) {
+      PaymentDTO paymentDTO = convertToDTO(payment);
+      paymentDTOs.add(paymentDTO);
+    }
+
+    return paymentDTOs;
+  }
+
+  public APIResponse<List<PaymentDTO>> getPaymentsByStatus(PaymentStatus status) {
+    List<Payment> payments = paymentRepository.findByStatus(status);
+
+    List<PaymentDTO> paymentDTOs = new ArrayList<>();
+    for (Payment payment : payments) {
+      PaymentDTO paymentDTO = convertToDTO(payment);
+      paymentDTOs.add(paymentDTO);
+    }
+
+    return APIResponse.success("", paymentDTOs);
+  }
+
 
 
   private PaymentDTO convertToDTO(Payment payment) {
     PaymentDTO paymentDTO = new PaymentDTO();
     paymentDTO.setId(payment.getId());
-    paymentDTO.setOId(payment.getOId());
+    paymentDTO.setOrderId(payment.getOrderId());
     paymentDTO.setCustomerId(payment.getCustomer().getId());
     paymentDTO.setReceiptId(payment.getReceiptId());
-    paymentDTO.setOrderId(payment.getOrderId());
+    paymentDTO.setOrderNumber(payment.getOrderNumber());
     paymentDTO.setMethod(payment.getMethod());
     paymentDTO.setAmount(payment.getAmount());
     paymentDTO.setStatus(payment.getStatus());
@@ -171,6 +201,4 @@ public class PaymentService {
 
     return paymentDTO;
   }
-
-
 }

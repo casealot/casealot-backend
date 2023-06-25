@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @Setter
 public class PaymentDTO {
     private Long id;
-    private Long oId;
+    private Long orderId;
     private String customerId;
     private String receiptId;
-    private String orderId;
+    private String orderNumber;
     private PaymentMethod method;
     private BigDecimal amount;
     private PaymentStatus status;
@@ -25,5 +25,6 @@ public class PaymentDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime paidAt;
     private BigDecimal cancelledAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime cancelledAt;
 }

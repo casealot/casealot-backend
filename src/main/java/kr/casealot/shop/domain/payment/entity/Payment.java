@@ -25,7 +25,7 @@ public class Payment {
     @Id
     private Long id;
 
-    private Long oId;
+    private Long orderId;
 
     @JoinColumn(name = "CUSTOMER_SEQ")
     @ManyToOne
@@ -35,7 +35,7 @@ public class Payment {
     private String receiptId; // PG 사에서 생성한 주문 번호
 
     @Column(nullable = false, unique = true)
-    private String orderId; // 우리가 생성한 주문 번호
+    private String orderNumber; // 우리가 생성한 주문 번호
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
