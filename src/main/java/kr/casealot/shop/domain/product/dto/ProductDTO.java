@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.dto.ReviewProductResDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
@@ -89,6 +90,7 @@ public class ProductDTO {
         private Long id;
         private String name;
         private String content;
+        private UploadFile thumbnail;
         private int price;
         private int sale;
         private String color;
