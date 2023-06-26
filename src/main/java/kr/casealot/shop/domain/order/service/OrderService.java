@@ -194,6 +194,17 @@ public class OrderService {
     return APIResponse.success(API_NAME, orderResponses);
   }
 
+  public APIResponse<List<OrderDTO.Response>> getOrderListByStatus(Principal principal, OrderStatus orderStatus) {
+    Customer customer = customerRepository.findById(principal.getName());
+    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, orderStatus);
+
+    List<OrderDTO.Response> orderResponses = orders.stream()
+            .map(this::orderResponse)
+            .collect(Collectors.toList());
+
+    return APIResponse.success(API_NAME, orderResponses);
+  }
+
   private OrderDTO.Response orderResponse(Order order) {
     order.getOrderProducts().size();
 

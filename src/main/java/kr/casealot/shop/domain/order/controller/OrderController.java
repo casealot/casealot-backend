@@ -4,10 +4,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
+import kr.casealot.shop.domain.order.dto.OrderStatus;
+import kr.casealot.shop.domain.order.exception.OrderAlreadyCompleteException;
+import kr.casealot.shop.domain.order.exception.OrderStatusException;
 import kr.casealot.shop.domain.order.service.OrderService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -53,36 +57,53 @@ public class OrderController {
         return orderService.getOrderDetail(orderId, principal);
     }
 
+
     //합쳐서 인자로 상태코드 넘겨서 메서드 하나로 해결해도 될듯.
 
-    @GetMapping("/all")
+    @GetMapping("/list")
     @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 목록 조회")
     public APIResponse<List<OrderDTO.Response>> getOrderList(Principal principal) {
 
         return orderService.getOrderList(principal);
     }
 
-    @GetMapping("/complete")
-    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 완료 목록 조회")
-    public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
 
-        return orderService.getOrderCompleteList(principal);
+    @GetMapping("/list/{status}")
+    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 상태별 목록 조회")
+    public APIResponse<List<OrderDTO.Response>> getOrderListByStatus(
+            @ApiParam(value = "주문 상태 ex) complete,change,cancel") @PathVariable("status") String status,
+            Principal principal) {
+
+        OrderStatus orderStatus = switch (status) {
+            case "complete" -> OrderStatus.COMPLETE;
+            case "change" -> OrderStatus.CHANGE;
+            case "cancel" -> OrderStatus.CANCEL;
+            default -> throw new OrderStatusException();
+        };
+
+        return orderService.getOrderListByStatus(principal, orderStatus);
     }
 
-    @GetMapping("/change")
-    @ApiOperation(value = "주문 목록 조회", notes = "본인의 교환 요청 목록 조회")
-    public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
-
-        return orderService.getOrderChangeList(principal);
-    }
-
-    @GetMapping("/cancel")
-    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 취소 목록 조회")
-    public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
-
-        return orderService.getOrderCancelList(principal);
-    }
-
-
+//
+//    @GetMapping("/complete")
+//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 완료 목록 조회")
+//    public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
+//
+//        return orderService.getOrderCompleteList(principal);
+//    }
+//
+//    @GetMapping("/change")
+//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 교환 요청 목록 조회")
+//    public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
+//
+//        return orderService.getOrderChangeList(principal);
+//    }
+//
+//    @GetMapping("/cancel")
+//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 취소 목록 조회")
+//    public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
+//
+//        return orderService.getOrderCancelList(principal);
+//    }
 }
 
