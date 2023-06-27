@@ -1,7 +1,15 @@
 package kr.casealot.shop.domain.order.service;
 
 
-import kr.casealot.shop.domain.cart.cartitem.service.CartItemService;
+import static kr.casealot.shop.domain.order.dto.OrderStatus.CANCEL;
+import static kr.casealot.shop.domain.order.dto.OrderStatus.CHANGE;
+import static kr.casealot.shop.domain.order.dto.OrderStatus.COMPLETE;
+
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -14,6 +22,7 @@ import kr.casealot.shop.domain.order.entity.OrderProduct;
 import kr.casealot.shop.domain.order.exception.NotFoundOrderException;
 import kr.casealot.shop.domain.order.exception.OrderAlreadyCompleteException;
 import kr.casealot.shop.domain.order.exception.OrderCanceledException;
+import kr.casealot.shop.domain.order.repository.OrderProductRepository;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.payment.entity.PaymentStatus;
 import kr.casealot.shop.domain.payment.exception.PaymentRequiredException;
@@ -28,14 +37,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static kr.casealot.shop.domain.order.dto.OrderStatus.*;
-
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -43,6 +44,7 @@ public class OrderService {
   private final String API_NAME = "order";
 
   private final OrderRepository orderRepository;
+  private final OrderProductRepository orderProductRepository;
   private final ProductRepository productRepository;
   private final CustomerRepository customerRepository;
   private final CartRepository cartRepository;
@@ -69,7 +71,6 @@ public class OrderService {
       orderProduct.setName(product.getName());
       orderProduct.setPrice(product.getPrice());
       orderProduct.setQuantity(productDTO.getQuantity());
-
       order.addOrderProduct(orderProduct);
     }
 
@@ -100,7 +101,18 @@ public class OrderService {
     }
 
     order.setOrderStatus(CANCEL);
+
     orderRepository.save(order);
+
+    List<OrderProduct> orderProductList = orderProductRepository.findAllByOrderId(orderId);
+    //상품 판매량 증가
+    for (OrderProduct orderProduct : orderProductList) {
+      Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(
+          orderProduct.getProduct().getId()).orElseThrow(NotFoundProductException::new));
+      Product product = productOptional.get();
+      product.setSells(product.getSells() - orderProduct.getQuantity());
+      productRepository.save(product);
+    }
 
     OrderDTO.Response orderResponse = orderResponse(order);
 
@@ -114,7 +126,6 @@ public class OrderService {
 
     // 주문내역이 존재하지않을 경우
     Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
-
     // TODO 배송완료된 주문 취소불가 적용해야됨
     if (order.getOrderStatus().equals(CANCEL)) {
       throw new OrderCanceledException();
@@ -135,20 +146,30 @@ public class OrderService {
     order.setOrderStatus(COMPLETE);
     Cart cart = customer.getCartList();
     List<OrderProduct> orderProducts = order.getOrderProducts();
-    for(OrderProduct orderProduct : orderProducts){
+    for (OrderProduct orderProduct : orderProducts) {
       // 주문한 상품 개수
       int quantity = orderProduct.getQuantity();
       cart.getCartItems().stream()
-              .filter(item -> item.getProduct().getId().equals(orderProduct.getProduct().getId()))
-              .findFirst().ifPresent(cartItem -> {
-                // 남은 상품 개수
-                int remainQuantity = cartItem.getQuantity() - quantity;
-                if(remainQuantity > 0){
-                  cartItem.setQuantity(remainQuantity);
-                } else {
-                  cart.removeCartItem(cartItem);
-                }
-              });
+          .filter(item -> item.getProduct().getId().equals(orderProduct.getProduct().getId()))
+          .findFirst().ifPresent(cartItem -> {
+            // 남은 상품 개수
+            int remainQuantity = cartItem.getQuantity() - quantity;
+            if (remainQuantity > 0) {
+              cartItem.setQuantity(remainQuantity);
+            } else {
+              cart.removeCartItem(cartItem);
+            }
+          });
+    }
+
+    List<OrderProduct> orderProductList = orderProductRepository.findAllByOrderId(orderId);
+    //상품 판매량 증가
+    for (OrderProduct orderProduct : orderProductList) {
+      Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(
+          orderProduct.getProduct().getId()).orElseThrow(NotFoundProductException::new));
+      Product product = productOptional.get();
+      product.setSells(product.getSells() + orderProduct.getQuantity());
+      productRepository.save(product);
     }
 
     orderRepository.save(order);
@@ -187,6 +208,15 @@ public class OrderService {
     order.setOrderStatus(COMPLETE);
 
     orderRepository.save(order);
+    //상품 판매량 증가
+    List<OrderProduct> orderProductList = orderProductRepository.findAllByOrderId(orderId);
+    for (OrderProduct orderProduct : orderProductList) {
+      Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(
+          orderProduct.getProduct().getId()).orElseThrow(NotFoundProductException::new));
+      Product product = productOptional.get();
+      product.setSells(product.getSells() + orderProduct.getQuantity());
+      productRepository.save(product);
+    }
 
     OrderDTO.Response orderResponse = orderResponse(order);
 
@@ -251,13 +281,14 @@ public class OrderService {
     return APIResponse.success(API_NAME, orderResponses);
   }
 
-  public APIResponse<List<OrderDTO.Response>> getOrderListByStatus(Principal principal, OrderStatus orderStatus) {
+  public APIResponse<List<OrderDTO.Response>> getOrderListByStatus(Principal principal,
+      OrderStatus orderStatus) {
     Customer customer = customerRepository.findById(principal.getName());
     List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, orderStatus);
 
     List<OrderDTO.Response> orderResponses = orders.stream()
-            .map(this::orderResponse)
-            .collect(Collectors.toList());
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
 
     return APIResponse.success(API_NAME, orderResponses);
   }
@@ -272,7 +303,8 @@ public class OrderService {
           Optional<Product> optionalProduct = productRepository.findById(productId);
 
           // Optional에서 Product 엔티티를 가져옴
-          Product product = optionalProduct.orElseThrow(() -> new RuntimeException("Product not found"));
+          Product product = optionalProduct.orElseThrow(
+              () -> new RuntimeException("Product not found"));
 
           Optional<String> thumbnailUrl = Optional.ofNullable(product.getThumbnail())
               .map(UploadFile::getUrl);
