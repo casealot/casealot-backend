@@ -35,7 +35,7 @@ public class ReviewController {
   //수정
   @PutMapping("/{reviewId}")
   @ApiOperation(value = "리뷰 수정", notes = "리뷰를 작성한 사용자가 리뷰를 수정한다.")
-  private APIResponse<ReviewResDTO> createReview(
+  private APIResponse<ReviewResDTO> fixReview(
       @ApiParam(value = "리뷰 ID") @PathVariable Long reviewId,
       @ApiParam(value = "리뷰 등록/수정 DTO") @RequestBody ReviewReqDTO reviewReqDTO,
       Principal principal) {
