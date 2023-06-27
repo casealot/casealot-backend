@@ -39,5 +39,10 @@ public class Cart {
         cart.setCustomer(customer);
         return cart;
     }
+
+    public void removeCartItem(CartItem cartItem){
+        cartItems.remove(cartItem);
+        cartItem.setCart(null);
+    }
 }
 
