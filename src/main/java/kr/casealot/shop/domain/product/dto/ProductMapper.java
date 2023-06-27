@@ -4,7 +4,6 @@ import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
-import kr.casealot.shop.domain.wishlist.wishlistItem.entity.WishlistItem;
 import kr.casealot.shop.domain.wishlist.wishlistItem.repository.WishlistItemRepository;
 import kr.casealot.shop.global.exception.NotFoundProductException;
 import lombok.RequiredArgsConstructor;
@@ -74,8 +73,8 @@ public class ProductMapper {
           .sale(product.getSale())
           .thumbnail(product.getThumbnail())
           .sells(product.getSells())
-          .ratingAvg(product.getRating())
-          .ratingPeopleNum(product.getRatingCount())
+          .rating(product.getRating())
+          .ratingCount(product.getRatingCount())
           .color(product.getColor())
           .type(product.getType())
           .wishCount(wishCount)
@@ -110,8 +109,8 @@ public class ProductMapper {
         .sale(product.getSale())
         .color(product.getColor())
         .thumbnail(product.getThumbnail())
-        .ratingAvg(product.getRating())
-        .ratingPeopleNum(product.getRatingCount())
+        .rating(product.getRating())
+        .ratingCount(product.getRatingCount())
         .type(product.getType())
         .sells(product.getSells())
         .wishCount(wishCount)

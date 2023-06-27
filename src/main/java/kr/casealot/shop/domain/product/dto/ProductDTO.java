@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.product.review.dto.ReviewProductResDTO;
-import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -95,8 +94,8 @@ public class ProductDTO {
         private int sale;
         private String color;
         private int sells;
-        private double ratingPeopleNum;
-        private double ratingAvg;
+        private double ratingCount;
+        private double rating;
         private String season;
         private String type;
         private int wishCount;
