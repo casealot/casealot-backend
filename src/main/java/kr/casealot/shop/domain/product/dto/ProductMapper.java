@@ -29,6 +29,10 @@ public class ProductMapper {
         .price(request.getPrice())
         .sale(request.getSale())
         .color(request.getColor())
+        .sells(0)
+        .rating(0.0)
+        .ratingCount(0.0)
+        .totalRating(0.0)
         .season(request.getSeason())
         .type(request.getType())
         .build();
@@ -48,6 +52,10 @@ public class ProductMapper {
         .color(request.getColor())
         .season(request.getSeason())
         .type(request.getType())
+        .rating(savedProduct.getRating())
+        .sells(savedProduct.getSells())
+        .ratingCount(savedProduct.getRatingCount())
+        .totalRating(savedProduct.getTotalRating())
         .thumbnail(savedProduct.getThumbnail())
         .images(savedProduct.getImages())
         .build();
