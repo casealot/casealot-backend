@@ -95,6 +95,8 @@ public class ProductDTO {
         private int sale;
         private String color;
         private int sells;
+        private double ratingPeopleNum;
+        private double ratingAvg;
         private String season;
         private String type;
         private int wishCount;
