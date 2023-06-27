@@ -1,6 +1,9 @@
 package kr.casealot.shop.domain.order.service;
 
 
+import kr.casealot.shop.domain.cart.cartitem.service.CartItemService;
+import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
@@ -42,6 +45,7 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final ProductRepository productRepository;
   private final CustomerRepository customerRepository;
+  private final CartRepository cartRepository;
   private final PaymentRepository paymentRepository;
 
   @Transactional
@@ -104,7 +108,7 @@ public class OrderService {
   }
 
   @Transactional
-  public APIResponse<OrderDTO.Response> completeOrder(Long orderId, Principal principal) {
+  public APIResponse<OrderDTO.Response> completeCartOrder(Long orderId, Principal principal) {
     Customer customer = customerRepository.findById(principal.getName());
     String customerId = principal.getName();
 
@@ -129,6 +133,59 @@ public class OrderService {
 
     //주문 완료
     order.setOrderStatus(COMPLETE);
+    Cart cart = customer.getCartList();
+    List<OrderProduct> orderProducts = order.getOrderProducts();
+    for(OrderProduct orderProduct : orderProducts){
+      // 주문한 상품 개수
+      int quantity = orderProduct.getQuantity();
+      cart.getCartItems().stream()
+              .filter(item -> item.getProduct().getId().equals(orderProduct.getProduct().getId()))
+              .findFirst().ifPresent(cartItem -> {
+                // 남은 상품 개수
+                int remainQuantity = cartItem.getQuantity() - quantity;
+                if(remainQuantity > 0){
+                  cartItem.setQuantity(remainQuantity);
+                } else {
+                  cart.removeCartItem(cartItem);
+                }
+              });
+    }
+
+    orderRepository.save(order);
+    cartRepository.save(cart);
+
+    OrderDTO.Response orderResponse = orderResponse(order);
+
+    return APIResponse.success(API_NAME, orderResponse);
+  }
+
+  @Transactional
+  public APIResponse<OrderDTO.Response> completeDirectOrder(Long orderId, Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
+    String customerId = principal.getName();
+
+    // 주문내역이 존재하지않을 경우
+    Order order = orderRepository.findById(orderId).orElseThrow(NotFoundOrderException::new);
+
+    // TODO 배송완료된 주문 취소불가 적용해야됨
+    if (order.getOrderStatus().equals(CANCEL)) {
+      throw new OrderCanceledException();
+    }
+    if (order.getOrderStatus().equals(COMPLETE)) {
+      throw new OrderAlreadyCompleteException();
+    }
+
+    if (!order.getCustomer().getId().equals(customerId)) {
+      // 본인 주문건 아닐경우
+      throw new PermissionException();
+    }
+    if (!order.getPayment().getStatus().equals(PaymentStatus.PAID)) {
+      throw new PaymentRequiredException();
+    }
+
+    //주문 완료
+    order.setOrderStatus(COMPLETE);
+
     orderRepository.save(order);
 
     OrderDTO.Response orderResponse = orderResponse(order);

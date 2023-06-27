@@ -42,11 +42,18 @@ public class OrderController {
         return orderService.cancelOrder(orderId, principal);
     }
 
-    @PostMapping("/{orderId}/complete")
-    @ApiOperation(value = "주문 완료", notes = "주문 완료 - 주문 상태를 완료로 변경")
-    public APIResponse<OrderDTO.Response> completeOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+    @PostMapping("/{orderId}/cartComplete")
+    @ApiOperation(value = "주문 완료", notes = "주문 완료(장바구니) - 주문 상태를 완료로 변경, 장바구니에서 상품 삭제")
+    public APIResponse<OrderDTO.Response> completeCartOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
 
-        return orderService.completeOrder(orderId, principal);
+        return orderService.completeCartOrder(orderId, principal);
+    }
+
+    @PostMapping("/{orderId}/directComplete")
+    @ApiOperation(value = "주문 완료", notes = "주문 완료(바로결제) - 주문 상태를 완료로 변경")
+    public APIResponse<OrderDTO.Response> completeDirectOrder(@ApiParam(value = "주문 완료 요청 DTO - 주문 ID") @PathVariable Long orderId, Principal principal) {
+
+        return orderService.completeDirectOrder(orderId, principal);
     }
 
     @GetMapping("/{orderId}")
