@@ -25,115 +25,129 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
-    private final ReviewRepository reviewRepository;
-    private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
 
-    private final ReviewCommentService reviewCommentService;
+  private final ReviewRepository reviewRepository;
+  private final ProductRepository productRepository;
+  private final CustomerRepository customerRepository;
 
-    public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO,  Long productId, Principal principal) {
-        Customer customer = customerRepository.findById(principal.getName());
+  private final ReviewCommentService reviewCommentService;
 
-        Optional<Product> productOptional = productRepository.findById(productId);
+  @Transactional
+  public APIResponse<ReviewResDTO> createReview(ReviewReqDTO reviewReqDTO, Long productId,
+      Principal principal) {
+    Customer customer = customerRepository.findById(principal.getName());
 
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
+    Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(productId)
+        .orElseThrow(NotFoundProductException::new));
 
-            Review review = reviewRepository.save(Review.builder()
-                    .customer(customer)
-                    .product(product)
-                    .rating(reviewReqDTO.getRating())
-                    .reviewText(reviewReqDTO.getReviewText())
-                    .build());
+    Product product = productOptional.get();
+    Review review = reviewRepository.save(Review.builder()
+        .customer(customer)
+        .product(product)
+        .rating(reviewReqDTO.getRating())
+        .reviewText(reviewReqDTO.getReviewText())
+        .build());
 
-            ReviewResDTO reviewResDTO = new ReviewResDTO();
-            reviewResDTO.setId(review.getSeq());
-            reviewResDTO.setCustomerName(review.getCustomer().getName());
-            reviewResDTO.setRating(review.getRating());
-            reviewResDTO.setReviewText(review.getReviewText());
-            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-            reviewResDTO.setCreatedDt(review.getCreatedDt());
-            reviewResDTO.setModifiedDt(review.getModifiedDt());
+    ReviewResDTO reviewResDTO = new ReviewResDTO();
+    reviewResDTO.setId(review.getSeq());
+    reviewResDTO.setCustomerName(review.getCustomer().getName());
+    reviewResDTO.setRating(review.getRating());
+    reviewResDTO.setReviewText(review.getReviewText());
+    reviewResDTO.setReviewCommentList(
+        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+    reviewResDTO.setCreatedDt(review.getCreatedDt());
+    reviewResDTO.setModifiedDt(review.getModifiedDt());
 
-            return APIResponse.success("review", reviewResDTO);
-        } else {
-            throw new NotFoundProductException();
-        }
+    product.updateRating(reviewReqDTO.getRating());
+    productRepository.saveAndFlush(product);
+
+    return APIResponse.success("review", reviewResDTO);
+  }
+
+  @Transactional
+  public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO,
+      Principal principal) {
+    Optional<Review> optionalReview = Optional.ofNullable(
+        reviewRepository.findReviewBySeqAndCustomerId(reviewId,
+            principal.getName()).orElseThrow(PermissionException::new));
+    Review review = optionalReview.get();
+    Double reviewOldRating = review.getRating();
+    review.setRating(reviewReqDTO.getRating());
+    review.setReviewText(reviewReqDTO.getReviewText());
+    reviewRepository.save(review);
+
+    Optional<Product> productOptional = Optional.ofNullable(
+        productRepository.findById(review.getProduct().getId())
+            .orElseThrow(NotFoundProductException::new));
+    Product product = productOptional.get();
+
+    product.fixRating(reviewOldRating, reviewReqDTO.getRating());
+    productRepository.save(product);
+
+    ReviewResDTO reviewResDTO = new ReviewResDTO();
+    reviewResDTO.setId(review.getSeq());
+    reviewResDTO.setCustomerName(principal.getName());
+    reviewResDTO.setRating(review.getRating());
+    reviewResDTO.setReviewText(review.getReviewText());
+    reviewResDTO.setReviewCommentList(
+        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+    reviewResDTO.setCreatedDt(review.getCreatedDt());
+    reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+    return APIResponse.success("review", reviewResDTO);
+  }
+
+  @Transactional
+  public APIResponse<ReviewResDTO> deleteReview(Long reviewId, Principal principal) {
+    Optional<Review> optionalReview = Optional.ofNullable(
+        reviewRepository.findReviewBySeqAndCustomerId(reviewId,
+            principal.getName()).orElseThrow(PermissionException::new));
+    Review review = optionalReview.get();
+    reviewRepository.delete(review);
+
+    Optional<Product> productOptional = Optional.ofNullable(
+        productRepository.findById(review.getProduct().getId())
+            .orElseThrow(NotFoundProductException::new));
+    Product product = productOptional.get();
+    product.revertRating(optionalReview.get().getRating());
+    productRepository.saveAndFlush(product);
+
+    ReviewResDTO reviewResDTO = new ReviewResDTO();
+    reviewResDTO.setId(review.getSeq());
+    reviewResDTO.setCustomerName(principal.getName());
+    reviewResDTO.setRating(review.getRating());
+    reviewResDTO.setReviewText(review.getReviewText());
+    reviewResDTO.setReviewCommentList(
+        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+    reviewResDTO.setCreatedDt(review.getCreatedDt());
+    reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+    return APIResponse.success("review", reviewResDTO);
+
+  }
+
+  @Transactional(readOnly = true)
+  public APIResponse<ReviewResDTO> getReview(Long reviewSeq) {
+    Optional<Review> reviewOptional = reviewRepository.findById(reviewSeq);
+
+    if (reviewOptional.isPresent()) {
+      Review review = reviewOptional.get();
+
+      ReviewResDTO reviewResDTO = new ReviewResDTO();
+      reviewResDTO.setId(review.getSeq());
+      reviewResDTO.setCustomerName(review.getCustomer().getName());
+      reviewResDTO.setRating(review.getRating());
+      reviewResDTO.setReviewText(review.getReviewText());
+      reviewResDTO.setReviewCommentList(
+          reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+      reviewResDTO.setCreatedDt(review.getCreatedDt());
+      reviewResDTO.setModifiedDt(review.getModifiedDt());
+
+      return APIResponse.success("review", reviewResDTO);
+    } else {
+      // Optional이 비어있을 경우에 대한 처리
+      log.warn("리뷰Optional이 존재하지 않음.");
+      throw new NoReviewException();
     }
-
-    public APIResponse<ReviewResDTO> fixReview(Long reviewId, ReviewReqDTO reviewReqDTO, Principal principal) {
-        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-        if (optionalReview.isPresent()) {
-            Review review = optionalReview.get();
-            String reviewCustomerId = review.getCustomer().getId();
-            if (principal.getName().equals(reviewCustomerId)) {
-                review.setRating(reviewReqDTO.getRating());
-                review.setReviewText(reviewReqDTO.getReviewText());
-                reviewRepository.save(review);
-            } else {
-                throw new PermissionException();
-            }
-            ReviewResDTO reviewResDTO = new ReviewResDTO();
-            reviewResDTO.setId(review.getSeq());
-            reviewResDTO.setCustomerName(principal.getName());
-            reviewResDTO.setRating(review.getRating());
-            reviewResDTO.setReviewText(review.getReviewText());
-            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-            reviewResDTO.setCreatedDt(review.getCreatedDt());
-            reviewResDTO.setModifiedDt(review.getModifiedDt());
-
-            return APIResponse.success("review", reviewResDTO);
-        } else {
-            throw new PermissionException();
-        }
-    }
-
-    public APIResponse<ReviewResDTO> deleteReview(Long reviewId, Principal principal) {
-        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-        if (optionalReview.isPresent()) {
-            Review review = optionalReview.get();
-            String reviewCustomerId = review.getCustomer().getId();
-            if (principal.getName().equals(reviewCustomerId)) {
-                reviewRepository.delete(review);
-                ReviewResDTO reviewResDTO = new ReviewResDTO();
-                reviewResDTO.setId(review.getSeq());
-                reviewResDTO.setCustomerName(principal.getName());
-                reviewResDTO.setRating(review.getRating());
-                reviewResDTO.setReviewText(review.getReviewText());
-                reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-                reviewResDTO.setCreatedDt(review.getCreatedDt());
-                reviewResDTO.setModifiedDt(review.getModifiedDt());
-
-                return APIResponse.success("review", reviewResDTO);
-            } else {
-                throw new PermissionException();
-            }
-        } else {
-            throw new PermissionException();
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public APIResponse<ReviewResDTO> getReview(Long reviewSeq){
-        Optional<Review> reviewOptional = reviewRepository.findById(reviewSeq);
-
-        if (reviewOptional.isPresent()) {
-            Review review = reviewOptional.get();
-
-            ReviewResDTO reviewResDTO = new ReviewResDTO();
-            reviewResDTO.setId(review.getSeq());
-            reviewResDTO.setCustomerName(review.getCustomer().getName());
-            reviewResDTO.setRating(review.getRating());
-            reviewResDTO.setReviewText(review.getReviewText());
-            reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-            reviewResDTO.setCreatedDt(review.getCreatedDt());
-            reviewResDTO.setModifiedDt(review.getModifiedDt());
-
-            return APIResponse.success("review", reviewResDTO);
-        } else {
-            // Optional이 비어있을 경우에 대한 처리
-            log.warn("리뷰Optional이 존재하지 않음.");
-            throw new NoReviewException();
-        }
-    }
+  }
 }
