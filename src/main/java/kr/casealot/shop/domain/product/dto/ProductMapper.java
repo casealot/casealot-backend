@@ -32,6 +32,7 @@ public class ProductMapper {
         .rating(0.0)
         .ratingCount(0.0)
         .totalRating(0.0)
+        .wishlistCount(0)
         .season(request.getSeason())
         .type(request.getType())
         .build();
@@ -55,6 +56,7 @@ public class ProductMapper {
         .sells(savedProduct.getSells())
         .ratingCount(savedProduct.getRatingCount())
         .totalRating(savedProduct.getTotalRating())
+        .wishlistCount(savedProduct.getWishlistCount())
         .thumbnail(savedProduct.getThumbnail())
         .images(savedProduct.getImages())
         .build();
