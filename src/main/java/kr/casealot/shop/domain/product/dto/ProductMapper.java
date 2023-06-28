@@ -32,7 +32,7 @@ public class ProductMapper {
         .rating(0.0)
         .ratingCount(0.0)
         .totalRating(0.0)
-        .wishlistCount(0)
+        .wishCount(0)
         .season(request.getSeason())
         .type(request.getType())
         .build();
@@ -56,7 +56,7 @@ public class ProductMapper {
         .sells(savedProduct.getSells())
         .ratingCount(savedProduct.getRatingCount())
         .totalRating(savedProduct.getTotalRating())
-        .wishlistCount(savedProduct.getWishlistCount())
+        .wishCount(savedProduct.getWishCount())
         .thumbnail(savedProduct.getThumbnail())
         .images(savedProduct.getImages())
         .build();
@@ -66,7 +66,7 @@ public class ProductMapper {
   public List<ProductDTO.ProductInfo> convertEntityToDTOS(List<Product> products) {
     List<ProductDTO.ProductInfo> productInfos = new ArrayList<>();
     for (Product product : products) {
-      int wishCount = wishlistItemRepository.countByProduct_Id(product.getId());
+//      int wishCount = wishlistItemRepository.countByProduct_Id(product.getId());
       productInfos.add(ProductDTO.ProductInfo.builder()
           .id(product.getId())
           .name(product.getName())
@@ -79,7 +79,7 @@ public class ProductMapper {
           .ratingCount(product.getRatingCount())
           .color(product.getColor())
           .type(product.getType())
-          .wishCount(wishCount)
+          .wishCount(product.getWishCount())
           .wishYn("N")
           .createdDt(product.getCreatedDt())
           .modifiedDt(product.getModifiedDt())
@@ -102,7 +102,7 @@ public class ProductMapper {
         wishYn = "Y";
       }
     }
-    int wishCount = wishlistItemRepository.countByProduct_Id(product.getId());
+//    int wishCount = wishlistItemRepository.countByProduct_Id(product.getId());
     return ProductDTO.ProductInfo.builder()
         .id(product.getId())
         .name(product.getName())
@@ -115,7 +115,7 @@ public class ProductMapper {
         .ratingCount(product.getRatingCount())
         .type(product.getType())
         .sells(product.getSells())
-        .wishCount(wishCount)
+        .wishCount(product.getWishCount())
         .wishYn(wishYn)
         .createdDt(product.getCreatedDt())
         .modifiedDt(product.getModifiedDt())
