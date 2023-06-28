@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WishlistService {
+
     private final String API_NAME = "wishlist";
 
     private final WishlistRepository wishlistRepository;
@@ -46,6 +47,8 @@ public class WishlistService {
         }
 
         Product product = productRepository.findById(productId).orElse(null);
+        product.setWishCount(product.getWishCount() + 1);
+        productRepository.save(product);
 
         if (product == null) {
             throw new NotFoundProductException();
@@ -101,6 +104,8 @@ public class WishlistService {
         String customerId = principal.getName();
         Wishlist wishlist = wishlistRepository.findByCustomerId(customerId);
         Product product = productRepository.findById(productId).orElseThrow(NotFoundProductException::new);
+        product.setWishCount(product.getWishCount() - 1);
+        productRepository.save(product);
 
         List<WishlistItem> wishlistItems = wishlist.getWishlistItemList();
         boolean isItemDeleted = wishlistItems.removeIf(item -> item.getProduct().getId().equals(product.getId()));

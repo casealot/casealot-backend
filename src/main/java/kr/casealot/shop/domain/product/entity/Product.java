@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Table(name = "PRODUCT")
 @Slf4j
 public class Product extends BaseTimeEntity {
-
   @Id
   @GeneratedValue
   @Column(name = "PRODUCT_ID")
@@ -79,7 +78,7 @@ public class Product extends BaseTimeEntity {
   private Double ratingCount; // 별점 준 횟수
 
   @Column(name = "PRODUCT_LIKE")
-  private Integer wishlistCount;
+  private Integer wishCount;
 
   //상품 1개에 리뷰 n개 (1:n 설정)
   @JsonIgnore
@@ -89,7 +88,7 @@ public class Product extends BaseTimeEntity {
 
   @Builder
   public Product(String name, String content, int price, int sale,
-      String color, String season, String type) {
+                 String color, String season, String type) {
     this.name = name;
     this.content = content;
     this.price = price;
@@ -148,3 +147,4 @@ public class Product extends BaseTimeEntity {
     setRating(newTotalRating / newRatingCount);
   }
 }
+
