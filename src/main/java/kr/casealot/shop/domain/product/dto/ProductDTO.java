@@ -19,14 +19,13 @@ public class ProductDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Request{
+    public static class Request {
         private String name;
         private String content;
         private int price;
         private int sale;
         private String color;
         private String season;
-        private String type;
     }
 
 
@@ -38,7 +37,7 @@ public class ProductDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GetRequest{
+    public static class GetRequest {
         @ApiModelProperty(value = "검색어", example = "모자")
         private String query;
         @ApiModelProperty(value = "필터 옵션")
@@ -50,7 +49,7 @@ public class ProductDTO {
         @ApiModelProperty(value = "정렬 옵션", example = "0")
         private List<SortDTO> sort;
     }
-    
+
     /**
      * 상품 조회 응답
      */
@@ -85,7 +84,7 @@ public class ProductDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ProductInfo{
+    public static class ProductInfo {
         private Long id;
         private String name;
         private String content;

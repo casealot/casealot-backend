@@ -1,9 +1,5 @@
 package kr.casealot.shop.domain.product.service;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
@@ -26,9 +22,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -63,10 +66,10 @@ public class ProductService {
         List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(products.getContent());
 
         ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
-                .items(productInfos)
-                .count((long) products.getContent().size())
-                .totalCount(products.getTotalElements())
-                .totalPages((long) products.getTotalPages()).build();
+                 .items(productInfos)
+                 .count((long) products.getContent().size())
+                 .totalCount(products.getTotalElements())
+                 .totalPages((long) products.getTotalPages()).build();
 
         return APIResponse.success(API_NAME, response);
     }
@@ -87,49 +90,49 @@ public class ProductService {
             for (ReviewComment reviewComment : review.getReviewCommentList()) {
                 if (principal != null && principal.getName().equals(reviewComment.getCustomer().getId())) {
                     ReviewCommentProductResDTO reviewCommentDTO = ReviewCommentProductResDTO.builder()
-                            .id(reviewComment.getSeq())
-                            .customerName(reviewComment.getCustomer().getName())
-                            .reviewCommentText(reviewComment.getReviewCommentText())
-                            .available("Y")
-                            .createdDt(reviewComment.getCreatedDt())
-                            .modifiedDt(reviewComment.getModifiedDt())
-                            .build();
+                             .id(reviewComment.getSeq())
+                             .customerName(reviewComment.getCustomer().getName())
+                             .reviewCommentText(reviewComment.getReviewCommentText())
+                             .available("Y")
+                             .createdDt(reviewComment.getCreatedDt())
+                             .modifiedDt(reviewComment.getModifiedDt())
+                             .build();
                     reviewCommentList.add(reviewCommentDTO);
                 } else {
                     ReviewCommentProductResDTO reviewCommentDTO = ReviewCommentProductResDTO.builder()
-                            .id(reviewComment.getSeq())
-                            .customerName(reviewComment.getCustomer().getName())
-                            .reviewCommentText(reviewComment.getReviewCommentText())
-                            .available("N")
-                            .createdDt(reviewComment.getCreatedDt())
-                            .modifiedDt(reviewComment.getModifiedDt())
-                            .build();
+                             .id(reviewComment.getSeq())
+                             .customerName(reviewComment.getCustomer().getName())
+                             .reviewCommentText(reviewComment.getReviewCommentText())
+                             .available("N")
+                             .createdDt(reviewComment.getCreatedDt())
+                             .modifiedDt(reviewComment.getModifiedDt())
+                             .build();
                     reviewCommentList.add(reviewCommentDTO);
                 }
             }
             if (principal != null && principal.getName().equals(review.getCustomer().getId())) {
                 ReviewProductResDTO reviewDTO = ReviewProductResDTO.builder()
-                        .id(review.getSeq())
-                        .customerName(review.getCustomer().getName())
-                        .rating(review.getRating())
-                        .reviewText(review.getReviewText())
-                        .available("Y")
-                        .reviewCommentList(reviewCommentList)
-                        .createdDt(review.getCreatedDt())
-                        .modifiedDt(review.getModifiedDt())
-                        .build();
+                         .id(review.getSeq())
+                         .customerName(review.getCustomer().getName())
+                         .rating(review.getRating())
+                         .reviewText(review.getReviewText())
+                         .available("Y")
+                         .reviewCommentList(reviewCommentList)
+                         .createdDt(review.getCreatedDt())
+                         .modifiedDt(review.getModifiedDt())
+                         .build();
                 reviewList.add(reviewDTO);
             } else {
                 ReviewProductResDTO reviewDTO = ReviewProductResDTO.builder()
-                        .id(review.getSeq())
-                        .customerName(review.getCustomer().getName())
-                        .rating(review.getRating())
-                        .reviewText(review.getReviewText())
-                        .available("N")
-                        .reviewCommentList(reviewCommentList)
-                        .createdDt(review.getCreatedDt())
-                        .modifiedDt(review.getModifiedDt())
-                        .build();
+                         .id(review.getSeq())
+                         .customerName(review.getCustomer().getName())
+                         .rating(review.getRating())
+                         .reviewText(review.getReviewText())
+                         .available("N")
+                         .reviewCommentList(reviewCommentList)
+                         .createdDt(review.getCreatedDt())
+                         .modifiedDt(review.getModifiedDt())
+                         .build();
                 reviewList.add(reviewDTO);
             }
         }
@@ -137,9 +140,9 @@ public class ProductService {
         ProductDTO.ProductInfo productInfo = productMapper.convertEntityToDTO(savedProduct, principal);
 
         return APIResponse.success(ProductDTO.DetailResponse.builder()
-                .product(productInfo)
-                .reviewList(reviewList)
-                .build());
+                 .product(productInfo)
+                 .reviewList(reviewList)
+                 .build());
     }
 
     @Transactional
@@ -170,17 +173,17 @@ public class ProductService {
             Long id, MultipartFile thumbnailFile, List<MultipartFile> imagesFiles) throws Exception {
 
         Product savedProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundProductException());
+                 .orElseThrow(() -> new NotFoundProductException());
 
         UploadFile thumbnail = null;
         if (null != thumbnailFile) {
             String path = s3UploadService.uploadFile(thumbnailFile);
             thumbnail = uploadFileService.create(UploadFile.builder()
-                    .name(thumbnailFile.getOriginalFilename())
-                    .url(path)
-                    .fileType(thumbnailFile.getContentType())
-                    .fileSize(thumbnailFile.getSize())
-                    .build());
+                     .name(thumbnailFile.getOriginalFilename())
+                     .url(path)
+                     .fileType(thumbnailFile.getContentType())
+                     .fileSize(thumbnailFile.getSize())
+                     .build());
             savedProduct.setThumbnail(thumbnail);
         }
 
@@ -190,11 +193,11 @@ public class ProductService {
             for (MultipartFile imageFile : imagesFiles) {
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
-                        .name(thumbnailFile.getOriginalFilename())
-                        .url(path)
-                        .fileType(thumbnailFile.getContentType())
-                        .fileSize(thumbnailFile.getSize())
-                        .build()));
+                         .name(thumbnailFile.getOriginalFilename())
+                         .url(path)
+                         .fileType(thumbnailFile.getContentType())
+                         .fileSize(thumbnailFile.getSize())
+                         .build()));
             }
             savedProduct.setImages(images);
         } else {
@@ -223,11 +226,11 @@ public class ProductService {
 
             String path = s3UploadService.uploadFile(thumbnailFile);
             thumbnail = uploadFileService.create(UploadFile.builder()
-                    .name(thumbnailFile.getOriginalFilename())
-                    .url(path)
-                    .fileType(thumbnailFile.getContentType())
-                    .fileSize(thumbnailFile.getSize())
-                    .build());
+                     .name(thumbnailFile.getOriginalFilename())
+                     .url(path)
+                     .fileType(thumbnailFile.getContentType())
+                     .fileSize(thumbnailFile.getSize())
+                     .build());
             savedProduct.setThumbnail(thumbnail);
         }
 
@@ -246,11 +249,11 @@ public class ProductService {
             for (MultipartFile imageFile : imagesFiles) {
                 String path = s3UploadService.uploadFile(imageFile);
                 images.add(uploadFileService.create(UploadFile.builder()
-                        .name(thumbnailFile.getOriginalFilename())
-                        .url(path)
-                        .fileType(thumbnailFile.getContentType())
-                        .fileSize(thumbnailFile.getSize())
-                        .build()));
+                         .name(thumbnailFile.getOriginalFilename())
+                         .url(path)
+                         .fileType(thumbnailFile.getContentType())
+                         .fileSize(thumbnailFile.getSize())
+                         .build()));
             }
             savedProduct.setImages(images);
         }
@@ -286,4 +289,29 @@ public class ProductService {
         return APIResponse.delete();
     }
 
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
+//    @Scheduled(cron = "0 */5 * * * ?") // 테스트
+    public void updateProductType() {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+//        LocalDateTime oneWeekAgo = now.minusMinutes(5);
+
+        // 1주일 지나면 new 사라짐
+        List<Product> productsToUpdate = productRepository.findByCreatedDtBefore(oneWeekAgo);
+        for (Product product : productsToUpdate) {
+            product.setType(null);
+        }
+
+        // 판매량 순 TOP 10
+        List<Product> bestProductList = productRepository.findTop10ByOrderBySellsDesc();
+        for (Product product : bestProductList) {
+            if (bestProductList.contains(product)) {
+                product.setType("best");
+            }
+        }
+
+        productRepository.saveAll(productsToUpdate);
+        productRepository.saveAll(bestProductList);
+    }
 }
