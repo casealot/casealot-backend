@@ -23,7 +23,7 @@ public class StringUtil {
         Random random = new Random();
         Long deliveryNumber = random.nextLong(1000000000000L); //12자리
 
-        return String.format("%12d", deliveryNumber);
+        return String.format("%012d", deliveryNumber);
     }
 
     public static void main(String[] args) {
