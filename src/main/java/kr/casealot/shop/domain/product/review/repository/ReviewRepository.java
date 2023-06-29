@@ -15,7 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findReviewBySeqAndCustomerId(Long seq, String customerSeq);
 
-    boolean existsByCustomerSeqAndProductId(Long customerSeq, Long productId)
+    boolean existsByCustomerSeqAndProductId(Long customerSeq, Long productId);
 
 
 }
