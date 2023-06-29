@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.function.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -10,6 +11,7 @@ import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
+import kr.casealot.shop.domain.function.dto.MyPageDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,11 @@ public class FunctionController {
   @ApiOperation(value = "주간 판매 요약", notes = "주간 판매액을 일자별로 나열하여 그래프로 표기할 수 있게 한다.")
   public APIResponse<List<FunctionSalesDTO>> getSalesData() {
     return functionService.getSalesAndOrderFunction(today);
+  }
+
+  @GetMapping("/mypage")
+  @ApiOperation(value = "마이페이지 프로필 사진 및 배송상태", notes = "나의 프로필 사진과, 내가 주문한 상품들의 배송상태를 볼 수 있게 한다.")
+  public APIResponse<MyPageDTO> getMyPageData(Principal principal) {
+    return functionService.getMyPageFunction(principal);
   }
 }
