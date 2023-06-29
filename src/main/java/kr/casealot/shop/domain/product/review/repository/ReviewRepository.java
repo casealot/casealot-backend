@@ -13,7 +13,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     int countByModifiedDtBetween(LocalDateTime startDate, LocalDateTime endDate); // 날짜별 요청의 총 수를 조회하는 메서드
     List<Review> findAllByOrderByModifiedDtDesc(); // 날짜별 요청의 총 수를 조회하는 메서드
 
-    Optional<Review> findReviewBySeqAndCustomerId(Long seq, String customerId);
+    Optional<Review> findReviewBySeqAndCustomerId(Long seq, String customerSeq);
+
+    boolean existsByCustomerSeqAndProductId(Long customerSeq, Long productId)
 
 
 }
