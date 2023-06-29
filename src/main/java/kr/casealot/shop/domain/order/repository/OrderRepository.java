@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.order.repository;
 
 import java.time.LocalDateTime;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.order.delivery.dto.DeliveryStatus;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.product.entity.Product;
@@ -34,4 +35,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDt BETWEEN :startTime AND :endTime AND o.orderStatus = 'CHANGE'")
   int getChangedOrderCountBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+  long countByCustomerSeqAndDeliveryStatus(Long customerId, DeliveryStatus deliveryStatus);
 }

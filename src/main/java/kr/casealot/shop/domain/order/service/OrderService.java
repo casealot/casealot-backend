@@ -15,6 +15,7 @@ import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
+import kr.casealot.shop.domain.order.delivery.dto.DeliveryStatus;
 import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.entity.Order;
@@ -99,7 +100,8 @@ public class OrderService {
     if (order.getOrderStatus().equals(CANCEL)) {
       throw new OrderCanceledException();
     }
-
+    order.setDeliveryStatus(DeliveryStatus.CANCELED);
+    order.setDeliveryNumber("");
     order.setOrderStatus(CANCEL);
 
     orderRepository.save(order);
@@ -141,7 +143,8 @@ public class OrderService {
     if (!order.getPayment().getStatus().equals(PaymentStatus.PAID)) {
       throw new PaymentRequiredException();
     }
-
+    order.setDeliveryStatus(DeliveryStatus.READY);
+    order.setDeliveryNumber(StringUtil.generateDeliveryNumber());
     //주문 완료
     order.setOrderStatus(COMPLETE);
     Cart cart = customer.getCartList();
@@ -204,6 +207,8 @@ public class OrderService {
       throw new PaymentRequiredException();
     }
 
+    order.setDeliveryStatus(DeliveryStatus.READY);
+    order.setDeliveryNumber(StringUtil.generateDeliveryNumber());
     //주문 완료
     order.setOrderStatus(COMPLETE);
 

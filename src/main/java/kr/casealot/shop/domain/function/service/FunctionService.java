@@ -1,9 +1,11 @@
 package kr.casealot.shop.domain.function.service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
@@ -11,6 +13,8 @@ import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
+import kr.casealot.shop.domain.function.dto.MyPageDTO;
+import kr.casealot.shop.domain.order.delivery.dto.DeliveryStatus;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
@@ -194,4 +198,20 @@ public class FunctionService {
     return APIResponse.success("function", functionSalesList);
   }
 
+  public APIResponse<MyPageDTO> getMyPageFunction(Principal principal) {
+    Customer customer =customerRepository.findById(principal.getName());
+
+    MyPageDTO myPageDTO = MyPageDTO.builder()
+        .profileImg(customer.getProfileImg())
+        .ready(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
+            DeliveryStatus.READY))
+        .start(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
+            DeliveryStatus.DELIVERING))
+        .finish(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
+            DeliveryStatus.COMPLETE))
+        .canceled(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
+            DeliveryStatus.CANCELED))
+        .build();
+    return APIResponse.success("function", myPageDTO);
+  }
 }
