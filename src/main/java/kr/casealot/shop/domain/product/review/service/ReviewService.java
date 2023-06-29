@@ -1,8 +1,13 @@
 package kr.casealot.shop.domain.product.review.service;
 
+import java.util.List;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.order.entity.Order;
+import kr.casealot.shop.domain.order.repository.OrderProductRepository;
+import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.exception.CantReplyException;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
@@ -15,6 +20,7 @@ import kr.casealot.shop.global.exception.NotFoundProductException;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +35,8 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final ProductRepository productRepository;
   private final CustomerRepository customerRepository;
-
+  private final OrderProductRepository orderProductRepository;
+  private final OrderRepository orderRepository;
   private final ReviewCommentService reviewCommentService;
 
   @Transactional
@@ -39,6 +46,9 @@ public class ReviewService {
 
     Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(productId)
         .orElseThrow(NotFoundProductException::new));
+    if (!orderProductRepository.existsByProductIdAndCustomerSeq(productId, customer.getSeq())) {
+      throw new CantReplyException();
+    }
 
     Product product = productOptional.get();
     Review review = reviewRepository.save(Review.builder()

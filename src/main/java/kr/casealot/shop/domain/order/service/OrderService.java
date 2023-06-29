@@ -69,6 +69,7 @@ public class OrderService {
 
       OrderProduct orderProduct = new OrderProduct();
       orderProduct.setProduct(product);
+      orderProduct.setCustomerSeq(customer.getSeq());
       orderProduct.setName(product.getName());
       orderProduct.setPrice(product.getPrice());
       orderProduct.setQuantity(productDTO.getQuantity());
@@ -318,6 +319,7 @@ public class OrderService {
               .productId(productId)
               .quantity(orderProduct.getQuantity())
               .thumbnail(thumbnailUrl.orElse(null))
+              .customerSeq(order.getCustomer().getSeq())
               .name(orderProduct.getName())
               .price(orderProduct.getPrice())
               .build();

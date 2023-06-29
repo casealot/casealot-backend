@@ -20,6 +20,7 @@ public class OrderProduct {
     @Column(name = "order_product_id")
     private Long id;
 
+    private Long customerSeq;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order; //주문
