@@ -2,7 +2,11 @@ package kr.casealot.shop.domain.product.review.service;
 
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
+import kr.casealot.shop.domain.order.repository.OrderProductRepository;
+import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
+import kr.casealot.shop.domain.product.exception.AlreadyReplyException;
+import kr.casealot.shop.domain.product.exception.NoAuthToReplyException;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.dto.ReviewReqDTO;
 import kr.casealot.shop.domain.product.review.dto.ReviewResDTO;
@@ -29,7 +33,8 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final ProductRepository productRepository;
   private final CustomerRepository customerRepository;
-
+  private final OrderProductRepository orderProductRepository;
+  private final OrderRepository orderRepository;
   private final ReviewCommentService reviewCommentService;
 
   @Transactional
@@ -39,6 +44,13 @@ public class ReviewService {
 
     Optional<Product> productOptional = Optional.ofNullable(productRepository.findById(productId)
         .orElseThrow(NotFoundProductException::new));
+    if (!orderProductRepository.existsByProductIdAndCustomerSeq(productId, customer.getSeq())) {
+      throw new NoAuthToReplyException(); //리뷰 작성권한 X
+    }
+
+    if(reviewRepository.existsByCustomerSeqAndProductId(customer.getSeq(), productId)){
+      throw new AlreadyReplyException(); //이미 리뷰 작성한 적 있음
+    }
 
     Product product = productOptional.get();
     Review review = reviewRepository.save(Review.builder()

@@ -46,6 +46,7 @@ public class OrderDTO {
     @AllArgsConstructor
     public static class OrderProductDTO {
         private String name;
+        private Long customerSeq;
         private Long productId;
         private String thumbnail;
         private int quantity;
