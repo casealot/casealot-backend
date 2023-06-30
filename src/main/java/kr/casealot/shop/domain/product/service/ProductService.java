@@ -292,7 +292,6 @@ public class ProductService {
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
 //    @Scheduled(cron = "0 */5 * * * ?") // 테스트
     public void updateProductType() {
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minusWeeks(1);
 //        LocalDateTime oneWeekAgo = now.minusMinutes(5);
@@ -308,6 +307,11 @@ public class ProductService {
         for (Product product : bestProductList) {
             if (bestProductList.contains(product)) {
                 product.setType("best");
+            }else{
+                // new아닌 경우에만 type을 null로 설정
+                if (!product.getType().equals("new")) {
+                    product.setType(null);
+                }
             }
         }
 
