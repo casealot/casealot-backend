@@ -298,53 +298,33 @@ public class ProductService {
     return APIResponse.delete();
   }
 
-  @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
-//    @Scheduled(cron = "0 */5 * * * ?") // 테스트
+  @Scheduled(cron = "0 * * * * *") // 매일 자정
   public void updateProductType() {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime oneWeekAgo = now.minusWeeks(1);
-//        LocalDateTime oneWeekAgo = now.minusMinutes(5);
 
-    // 1주일 지나면 new 사라짐
-    List<Product> productsToUpdate = productRepository.findByCreatedDtBefore(oneWeekAgo);
+    // 1주일 이내에 등록된 상품에 대해서는 "NEW"로 설정
+    List<Product> productsToUpdate = productRepository.findByCreatedDtAfter(oneWeekAgo);
     for (Product product : productsToUpdate) {
-      product.setType(null);
+      product.setType("NEW");
     }
 
-    // 판매량 순 TOP 10
+    // 판매량 순 TOP 10 상품에 대해서는 "BEST"로 설정
     List<Product> bestProductList = productRepository.findTop10ByOrderBySellsDesc();
     for (Product product : bestProductList) {
-      if (bestProductList.contains(product)) {
-        product.setType("best");
-      } else {
-        // new아닌 경우에만 type을 null로 설정
-        if (!product.getType().equals("new")) {
-          product.setType(null);
-        }
+      product.setType("BEST");
+    }
+
+    // 상위 10개 이외의 상품에 대해서는 "BEST"를 삭제하고 NULL로 설정
+    List<Product> otherProducts = productRepository.findAll();
+    for (Product product : otherProducts) {
+      if (!bestProductList.contains(product)) {
+        product.setType(null);
       }
     }
 
+    productRepository.saveAll(otherProducts);
     productRepository.saveAll(productsToUpdate);
     productRepository.saveAll(bestProductList);
-  }
-
-  @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
-  public void updateDeliveryType() {
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime twoDaysAgo = now.minusDays(2);
-
-    List<Order> deliveryToUpdate = orderRepository.findByOrderDtBefore(twoDaysAgo);
-    for (Order order : deliveryToUpdate) {
-      if (order.getDeliveryStatus().equals(DeliveryStatus.READY)) {
-        order.setDeliveryStatus(DeliveryStatus.DELIVERING);
-      } else if (order.getDeliveryStatus().equals(DeliveryStatus.DELIVERING)) {
-        LocalDateTime deliveryDate = order.getOrderDt().plusDays(2);
-        if (now.isAfter(deliveryDate)) {
-          order.setDeliveryStatus(DeliveryStatus.COMPLETE);
-        }
-      }
-    }
-
-    orderRepository.saveAll(deliveryToUpdate);
   }
 }
