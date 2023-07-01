@@ -298,7 +298,7 @@ public class ProductService {
     return APIResponse.delete();
   }
 
-  @Scheduled(cron = "0 * * * * *") // 매일 자정
+  @Scheduled(cron = "0 0 0 * * *") // 매일 자정
   public void updateProductType() {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime oneWeekAgo = now.minusWeeks(1);

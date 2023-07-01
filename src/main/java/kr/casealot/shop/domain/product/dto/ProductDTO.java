@@ -91,6 +91,7 @@ public class ProductDTO {
         private String content;
         private UploadFile thumbnail;
         private int price;
+        private double calculatePrice;
         private int sale;
         private String color;
         private int sells;
