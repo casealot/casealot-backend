@@ -12,6 +12,8 @@ import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.service.CustomerService;
+import kr.casealot.shop.domain.function.dto.MyPageDTO;
+import kr.casealot.shop.domain.function.service.FunctionService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
 import kr.casealot.shop.domain.customer.exception.DuplicateIdException;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
 
   private final CustomerService customerService;
+  private final FunctionService functionService;
 
   @PostMapping("/join")
   @ApiOperation(value = "회원 가입", notes = "회원 가입을 한다.")
@@ -75,5 +78,11 @@ public class CustomerController {
   @ApiOperation(value = "회원 정보", notes = "회원 정보를 보여준다.")
   public APIResponse<CustomerDto> info(Principal principal) {
     return customerService.customerInfo(principal);
+  }
+
+  @GetMapping("/mypage")
+  @ApiOperation(value = "마이페이지 프로필 사진 및 배송상태", notes = "나의 프로필 사진과, 내가 주문한 상품들의 배송상태를 볼 수 있게 한다.")
+  public APIResponse<MyPageDTO> getMyPageData(Principal principal) {
+    return functionService.getMyPageFunction(principal);
   }
 }
