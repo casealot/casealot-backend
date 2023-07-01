@@ -80,6 +80,9 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PRODUCT_LIKE")
     private Integer wishCount;
 
+    @Column(name = "PRODUCT_CATEGORY")
+    private String category;
+
     //상품 1개에 리뷰 n개 (1:n 설정)
     @JsonIgnore
     @JsonBackReference

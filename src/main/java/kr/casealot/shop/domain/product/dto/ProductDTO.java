@@ -26,6 +26,7 @@ public class ProductDTO {
         private int sale;
         private String color;
         private String season;
+        private String category;
     }
 
 
@@ -99,6 +100,7 @@ public class ProductDTO {
         private String type;
         private int wishCount;
         private String wishYn;
+        private String category;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime createdDt;
