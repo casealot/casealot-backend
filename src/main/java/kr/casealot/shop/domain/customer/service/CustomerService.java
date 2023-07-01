@@ -259,8 +259,13 @@ public class CustomerService {
   public APIResponse<CustomerDto> customerInfo(Principal principal) {
     Customer customer = customerRepository.findCustomerById(principal.getName());
 
+    String profileImage = "";
+    if (customer.getProfileImg() != null) {
+      profileImage = customer.getProfileImg().getUrl();
+    }
+
     CustomerDto customerDto = CustomerDto.builder()
-        .profileImageUrl(customer.getProfileImg().getUrl())
+        .profileImageUrl(profileImage)
         .id(customer.getId())
         .name(customer.getName())
         .password(customer.getPassword())
