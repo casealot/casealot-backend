@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -98,11 +99,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // DB 저장
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userInfo.getId());
-        if (customerRefreshToken != null) {
-            customerRefreshToken.setRefreshToken(refreshToken.getToken());
-        } else {
+        Long modifiedTime = customerRefreshToken.getModifiedDt().now()
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toInstant().toEpochMilli();
+
+        if(appProperties.getAuth().getTokenExpiry() < (System.currentTimeMillis() - modifiedTime)){
             customerRefreshToken = new CustomerRefreshToken(customerEntity.getId(), refreshToken.getToken());
             customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
+        }else{
+            customerRefreshToken.setRefreshToken(refreshToken.getToken());
         }
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
