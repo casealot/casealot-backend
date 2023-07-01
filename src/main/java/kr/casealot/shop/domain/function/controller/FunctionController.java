@@ -61,10 +61,4 @@ public class FunctionController {
   public APIResponse<List<FunctionSalesDTO>> getSalesData() {
     return functionService.getSalesAndOrderFunction(today);
   }
-
-  @GetMapping("/mypage")
-  @ApiOperation(value = "마이페이지 프로필 사진 및 배송상태", notes = "나의 프로필 사진과, 내가 주문한 상품들의 배송상태를 볼 수 있게 한다.")
-  public APIResponse<MyPageDTO> getMyPageData(Principal principal) {
-    return functionService.getMyPageFunction(principal);
-  }
 }
