@@ -36,6 +36,7 @@ public class OrderDTO {
         private LocalDateTime orderDt;
         private OrderStatus orderStatus;
         private int totalAmount;
+        private String deliveryNumber;
         private List<OrderProductDTO> orderProducts;
     }
 
