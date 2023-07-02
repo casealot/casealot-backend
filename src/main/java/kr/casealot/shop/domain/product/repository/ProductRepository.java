@@ -26,8 +26,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<String> findProductNames();
 
     List<Product> findByCreatedDtBefore(LocalDateTime date);
+
     List<Product> findByCreatedDtAfter(LocalDateTime date);
 
     List<Product> findTop10ByOrderBySellsDesc();
+
     List<Product> findTop10ByOrderBySellsAsc();
+
+    List<Product> findByType(String type);
+
+    List<Product> findByCategory(String category);
 }

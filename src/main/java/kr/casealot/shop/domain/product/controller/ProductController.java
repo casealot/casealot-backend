@@ -16,16 +16,17 @@ import java.security.Principal;
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = {"PRODUCT API"}, description = "상품 조회(검색), 상세 조회")
-@RequestMapping("/cal/v1")
+@RequestMapping("/cal/v1/product")
 public class ProductController {
 
     private final ProductService productService;
 
     /**
      * 전체 상품 조회
+     *
      * @return
      */
-    @PostMapping("/product")
+    @PostMapping
     @ApiOperation(value = "상품 검색 및 조회", notes = "상품 정보를 갖고온다.")
     public APIResponse<ProductDTO.GetResponse> getProductList(
             @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO
@@ -35,14 +36,27 @@ public class ProductController {
 
     /**
      * 상품 조회
+     *
      * @param id
      * @return
      */
-    @GetMapping("/product/{id}")
+    @GetMapping("/{id}")
     public APIResponse<ProductDTO.DetailResponse> getProductDetail(
-            @ApiParam(value = "상품 요청 DTO")@PathVariable Long id, Principal principal) throws Exception {
+            @ApiParam(value = "상품 요청 DTO") @PathVariable Long id, Principal principal) throws Exception {
         return productService.getDetailProduct(id, principal);
     }
 
+    @GetMapping("/type/{type}")
+    public APIResponse<ProductDTO.GetResponse> getProductByType(
+            @PathVariable String type) {
 
+        return productService.getProductByType(type);
+    }
+
+    @GetMapping("/category/{category}")
+    public APIResponse<ProductDTO.GetResponse> getProductByCategory(
+            @PathVariable String category) {
+
+        return productService.getProductByCategory(category);
+    }
 }
