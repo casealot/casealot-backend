@@ -15,6 +15,7 @@ import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.dto.MyPageDTO;
 import kr.casealot.shop.domain.order.delivery.dto.DeliveryStatus;
+import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
@@ -47,7 +48,8 @@ public class FunctionService {
     LocalDateTime endDate = date.toLocalDate().atTime(LocalTime.MAX);
     int todaysEmptyComments = qnaRepository.countByModifiedDtBetweenAndQnaCommentListIsNull(
         startDate, endDate);
-    int todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
+    int todayOrder = orderRepository.countByOrderDtBetweenAndOrderStatus(startDate, endDate,
+        OrderStatus.COMPLETE);
     int todayCancel = orderRepository.getCanceledOrderCountBetween(startDate, endDate);
     int todayChange = orderRepository.getChangedOrderCountBetween(startDate, endDate);
 
@@ -70,7 +72,8 @@ public class FunctionService {
       LocalDateTime currentDate = date.minusDays(i);
       LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
       LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
-      int todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
+      int todayOrder = orderRepository.countByOrderDtBetweenAndOrderStatus(startDate, endDate,
+          OrderStatus.COMPLETE);
       long todayCash = orderRepository.getTotalAmountBetween(startDate, endDate);
       int readySignIn = customerRepository.countByModifiedDtBetween(startDate, endDate);
       int todayQna = qnaRepository.countByModifiedDtBetween(startDate, endDate);
@@ -185,7 +188,8 @@ public class FunctionService {
       LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
       LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
       long todayCash = orderRepository.getTotalAmountBetween(startDate, endDate);
-      long todayOrder = orderRepository.countByOrderDtBetween(startDate, endDate);
+      int todayOrder = orderRepository.countByOrderDtBetweenAndOrderStatus(startDate, endDate,
+          OrderStatus.COMPLETE);
 
 
       FunctionSalesDTO functionSalesDTO = new FunctionSalesDTO().builder()
