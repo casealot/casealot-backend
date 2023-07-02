@@ -90,27 +90,5 @@ public class OrderController {
 
         return orderService.getOrderListByStatus(principal, orderStatus);
     }
-
-//
-//    @GetMapping("/complete")
-//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 완료 목록 조회")
-//    public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
-//
-//        return orderService.getOrderCompleteList(principal);
-//    }
-//
-//    @GetMapping("/change")
-//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 교환 요청 목록 조회")
-//    public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
-//
-//        return orderService.getOrderChangeList(principal);
-//    }
-//
-//    @GetMapping("/cancel")
-//    @ApiOperation(value = "주문 목록 조회", notes = "본인의 주문 취소 목록 조회")
-//    public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
-//
-//        return orderService.getOrderCancelList(principal);
-//    }
 }
 

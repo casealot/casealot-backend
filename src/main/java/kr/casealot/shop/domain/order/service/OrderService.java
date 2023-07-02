@@ -1,10 +1,6 @@
 package kr.casealot.shop.domain.order.service;
 
 
-import static kr.casealot.shop.domain.order.dto.OrderStatus.CANCEL;
-import static kr.casealot.shop.domain.order.dto.OrderStatus.CHANGE;
-import static kr.casealot.shop.domain.order.dto.OrderStatus.COMPLETE;
-
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +33,8 @@ import kr.casealot.shop.global.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static kr.casealot.shop.domain.order.dto.OrderStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -248,39 +246,7 @@ public class OrderService {
     List<Order> orders = orderRepository.findByCustomer(customer);
 
     List<OrderDTO.Response> orderResponses = orders.stream()
-        .map(this::orderResponse)
-        .collect(Collectors.toList());
-
-    return APIResponse.success(API_NAME, orderResponses);
-  }
-
-  public APIResponse<List<OrderDTO.Response>> getOrderCancelList(Principal principal) {
-    Customer customer = customerRepository.findById(principal.getName());
-    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, CANCEL);
-
-    List<OrderDTO.Response> orderResponses = orders.stream()
-        .map(this::orderResponse)
-        .collect(Collectors.toList());
-
-    return APIResponse.success(API_NAME, orderResponses);
-  }
-
-  public APIResponse<List<OrderDTO.Response>> getOrderCompleteList(Principal principal) {
-    Customer customer = customerRepository.findById(principal.getName());
-    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, COMPLETE);
-
-    List<OrderDTO.Response> orderResponses = orders.stream()
-        .map(this::orderResponse)
-        .collect(Collectors.toList());
-
-    return APIResponse.success(API_NAME, orderResponses);
-  }
-
-  public APIResponse<List<OrderDTO.Response>> getOrderChangeList(Principal principal) {
-    Customer customer = customerRepository.findById(principal.getName());
-    List<Order> orders = orderRepository.findByCustomerAndOrderStatus(customer, CHANGE);
-
-    List<OrderDTO.Response> orderResponses = orders.stream()
+        .filter(order -> !order.getOrderStatus().equals(ORDER))
         .map(this::orderResponse)
         .collect(Collectors.toList());
 
@@ -342,5 +308,4 @@ public class OrderService {
         .orderProducts(orderProductDTOs)
         .build();
   }
-
 }
