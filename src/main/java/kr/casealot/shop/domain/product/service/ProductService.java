@@ -326,30 +326,76 @@ public class ProductService {
         productRepository.saveAll(bestProductList);
     }
 
-    public APIResponse<ProductDTO.GetResponse> getProductByType(String type) {
-        List<Product> products = productRepository.findByType(type);
-        List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(products);
+    public APIResponse<ProductDTO.GetResponse> getProductByType(String type, ProductDTO.GetRequest productReqDTO) {
+        Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery(), productReqDTO.getFilter());
+
+        // Sorting
+        List<SortDTO> sortDTO = productReqDTO.getSort();
+        List<Sort.Order> orders = new ArrayList<>();
+        if (null != sortDTO) {
+            for (SortDTO dto : sortDTO) {
+                orders.add(new Sort.Order(Sort.Direction.fromString(dto.getOption()), dto.getField()));
+            }
+        }
+
+        Pageable pageable = PageRequest.of(productReqDTO.getPage()
+                , productReqDTO.getSize()
+                , Sort.by(orders));
+
+        Specification<Product> typeSpecification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("type"), type);
+
+        Specification<Product> finalSpecification = Specification
+                .where(specification)
+                .and(typeSpecification);
+
+        Page<Product> products = productRepository.findAll(finalSpecification, pageable);
+
+        List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(
+                products.getContent());
 
         ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
                 .items(productInfos)
-                .count((long) productInfos.size())
-                .totalCount((long) productInfos.size())
-                .totalPages(1L)
-                .build();
+                .count((long) products.getContent().size())
+                .totalCount(products.getTotalElements())
+                .totalPages((long) products.getTotalPages()).build();
 
         return APIResponse.success(API_NAME, response);
     }
 
-    public APIResponse<ProductDTO.GetResponse> getProductByCategory(String category) {
-        List<Product> products = productRepository.findByCategory(category);
-        List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(products);
+    public APIResponse<ProductDTO.GetResponse> getProductByCategory(String category, ProductDTO.GetRequest productReqDTO) {
+        Specification<Product> specification = new ProductSpecification(productReqDTO.getQuery(), productReqDTO.getFilter());
+
+        // Sorting
+        List<SortDTO> sortDTO = productReqDTO.getSort();
+        List<Sort.Order> orders = new ArrayList<>();
+        if (null != sortDTO) {
+            for (SortDTO dto : sortDTO) {
+                orders.add(new Sort.Order(Sort.Direction.fromString(dto.getOption()), dto.getField()));
+            }
+        }
+
+        Pageable pageable = PageRequest.of(productReqDTO.getPage()
+                , productReqDTO.getSize()
+                , Sort.by(orders));
+
+        Specification<Product> typeSpecification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("category"), category);
+
+        Specification<Product> finalSpecification = Specification
+                .where(specification)
+                .and(typeSpecification);
+
+        Page<Product> products = productRepository.findAll(finalSpecification, pageable);
+
+        List<ProductDTO.ProductInfo> productInfos = productMapper.convertEntityToDTOS(
+                products.getContent());
 
         ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
                 .items(productInfos)
-                .count((long) productInfos.size())
-                .totalCount((long) productInfos.size())
-                .totalPages(1L)
-                .build();
+                .count((long) products.getContent().size())
+                .totalCount(products.getTotalElements())
+                .totalPages((long) products.getTotalPages()).build();
 
         return APIResponse.success(API_NAME, response);
     }
