@@ -33,7 +33,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findTop10ByOrderBySellsAsc();
 
-    List<Product> findByType(String type);
-
-    List<Product> findByCategory(String category);
 }

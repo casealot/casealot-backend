@@ -46,17 +46,19 @@ public class ProductController {
         return productService.getDetailProduct(id, principal);
     }
 
-    @GetMapping("/type/{type}")
+    @PostMapping("/type/{type}")
     public APIResponse<ProductDTO.GetResponse> getProductByType(
-            @PathVariable String type) {
+            @PathVariable("type") String type,
+            @RequestBody ProductDTO.GetRequest productReqDTO) {
 
-        return productService.getProductByType(type);
+        return productService.getProductByType(type, productReqDTO);
     }
 
-    @GetMapping("/category/{category}")
+    @PostMapping("/category/{category}")
     public APIResponse<ProductDTO.GetResponse> getProductByCategory(
-            @PathVariable String category) {
+            @PathVariable("category") String category,
+            @RequestBody ProductDTO.GetRequest productReqDTO) {
 
-        return productService.getProductByCategory(category);
+        return productService.getProductByCategory(category, productReqDTO);
     }
 }
