@@ -338,6 +338,7 @@ public class OrderService {
         .email(order.getCustomer().getEmail())
         .address(order.getCustomer().getAddress())
         .addressDetail(order.getCustomer().getAddressDetail())
+        .deliveryNumber(order.getDeliveryNumber())
         .orderProducts(orderProductDTOs)
         .build();
   }
