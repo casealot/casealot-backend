@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequiredArgsConstructor
-@Api(tags = {"DELIVERY COMMENT API"}, description = "DELIVERY 관련 API")
+@Api(tags = {"DELIVERY API"}, description = "DELIVERY 관련 API")
 @RequestMapping(value = "/cal/v1/delivery", produces = "application/json; charset=utf8")
 public class DeliveryController {
   private final String t_code = "08"; //롯데택배
