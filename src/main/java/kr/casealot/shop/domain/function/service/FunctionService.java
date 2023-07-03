@@ -247,7 +247,7 @@ public class FunctionService {
   public APIResponse<List<FunctionSalesDTO>> getSalesAndOrderFunction(LocalDateTime date) {
     List<FunctionSalesDTO> functionSalesList = new ArrayList<>();
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 6; i >= 0; i--) {
       LocalDateTime currentDate = date.minusDays(i);
       LocalDateTime startDate = currentDate.toLocalDate().atStartOfDay();
       LocalDateTime endDate = currentDate.toLocalDate().atTime(LocalTime.MAX);
