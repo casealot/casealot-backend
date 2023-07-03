@@ -2,7 +2,6 @@ package kr.casealot.shop.domain.function.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -11,12 +10,14 @@ import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
 import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
-import kr.casealot.shop.domain.function.dto.MyPageDTO;
 import kr.casealot.shop.domain.function.service.FunctionService;
+import kr.casealot.shop.domain.order.dto.OrderDTO.Response;
+import kr.casealot.shop.domain.order.dto.OrderStatus;
 import kr.casealot.shop.global.common.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +37,12 @@ public class FunctionController {
   @ApiOperation(value = "상단 오늘의 할일", notes = "오늘의 할일에 들어갈 데이터를 제공한다.")
   public APIResponse<FunctionDTO> getDailyOrderData() {
     return functionService.getTodayFunction(today);
+  }
+
+  @GetMapping("/daily/{orderStatus}")
+  @ApiOperation(value = "상단 오늘의 할일 상세보기", notes = "오늘의 할일에 들어갈 데이터를 상태별로 제공한다.")
+  public APIResponse<List<Response>> getTodayOrder(@PathVariable OrderStatus orderStatus) {
+    return functionService.getTodayOrder(today, orderStatus);
   }
 
   @GetMapping("/weekly")
