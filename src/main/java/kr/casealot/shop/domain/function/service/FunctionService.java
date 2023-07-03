@@ -1,10 +1,14 @@
 package kr.casealot.shop.domain.function.service;
 
+import static kr.casealot.shop.domain.order.dto.OrderStatus.ORDER;
+
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
@@ -15,8 +19,12 @@ import kr.casealot.shop.domain.function.dto.FunctionSalesDTO;
 import kr.casealot.shop.domain.function.dto.FunctionWeekDTO;
 import kr.casealot.shop.domain.function.dto.MyPageDTO;
 import kr.casealot.shop.domain.order.delivery.dto.DeliveryStatus;
+import kr.casealot.shop.domain.order.dto.OrderDTO;
 import kr.casealot.shop.domain.order.dto.OrderStatus;
+import kr.casealot.shop.domain.order.entity.Order;
 import kr.casealot.shop.domain.order.repository.OrderRepository;
+import kr.casealot.shop.domain.order.service.OrderService;
+import kr.casealot.shop.domain.product.dto.ProductDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.domain.product.review.entity.Review;
@@ -42,6 +50,7 @@ public class FunctionService {
   private final QnaRepository qnaRepository;
 
   private final OrderRepository orderRepository;
+  private final OrderService orderService;
 
   public APIResponse<FunctionDTO> getTodayFunction(LocalDateTime date) {
     LocalDateTime startDate = date.toLocalDate().atStartOfDay();
@@ -62,6 +71,61 @@ public class FunctionService {
         .build();
 
     return APIResponse.success("function", functionDTO);
+  }
+
+  public APIResponse<List<OrderDTO.Response>> getTodayOrder(LocalDateTime date, OrderStatus orderStatus) {
+    LocalDateTime startDate = date.toLocalDate().atStartOfDay();
+    LocalDateTime endDate = date.toLocalDate().atTime(LocalTime.MAX);
+    List<Order> orders = orderRepository.findAllByOrderDtBetweenAndOrderStatus(startDate, endDate, orderStatus);
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success("function", orderResponses);
+  }
+
+  private OrderDTO.Response orderResponse(Order order) {
+    order.getOrderProducts().size();
+
+    List<OrderDTO.OrderProductDTO> orderProductDTOs = order.getOrderProducts()
+        .stream()
+        .map(orderProduct -> {
+          Long productId = orderProduct.getProduct().getId();
+          Optional<Product> optionalProduct = productRepository.findById(productId);
+
+          // Optional에서 Product 엔티티를 가져옴
+          Product product = optionalProduct.orElseThrow(
+              () -> new RuntimeException("Product not found"));
+
+          Optional<String> thumbnailUrl = Optional.ofNullable(product.getThumbnail())
+              .map(UploadFile::getUrl);
+
+          return OrderDTO.OrderProductDTO.builder()
+              .productId(productId)
+              .quantity(orderProduct.getQuantity())
+              .thumbnail(thumbnailUrl.orElse(null))
+              .customerSeq(order.getCustomer().getSeq())
+              .name(orderProduct.getName())
+              .price(orderProduct.getPrice())
+              .build();
+        })
+        .collect(Collectors.toList());
+
+    return OrderDTO.Response.builder()
+        .id(order.getId())
+        .orderNumber(order.getOrderNumber())
+        .orderDt(order.getOrderDt())
+        .orderStatus(order.getOrderStatus())
+        .totalAmount(order.getTotalAmount())
+        .customerId(order.getCustomer().getId())
+        .name(order.getCustomer().getName())
+        .phoneNumber(order.getCustomer().getPhoneNumber())
+        .email(order.getCustomer().getEmail())
+        .address(order.getCustomer().getAddress())
+        .addressDetail(order.getCustomer().getAddressDetail())
+        .deliveryNumber(order.getDeliveryNumber())
+        .orderProducts(orderProductDTOs)
+        .build();
   }
 
   public APIResponse<List<FunctionWeekDTO>> getWeekFunction(LocalDateTime date) {
@@ -191,7 +255,6 @@ public class FunctionService {
       int todayOrder = orderRepository.countByOrderDtBetweenAndOrderStatus(startDate, endDate,
           OrderStatus.COMPLETE);
 
-
       FunctionSalesDTO functionSalesDTO = new FunctionSalesDTO().builder()
           .today(currentDate)
           .orderCounts(todayOrder)
@@ -203,7 +266,7 @@ public class FunctionService {
   }
 
   public APIResponse<MyPageDTO> getMyPageFunction(Principal principal) {
-    Customer customer =customerRepository.findById(principal.getName());
+    Customer customer = customerRepository.findById(principal.getName());
 
     MyPageDTO myPageDTO = MyPageDTO.builder()
         .profileImg(customer.getProfileImg())
