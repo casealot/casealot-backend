@@ -41,23 +41,26 @@ public class ProductController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "상품 상세 조회", notes = "상품의 상세 정보 조회")
     public APIResponse<ProductDTO.DetailResponse> getProductDetail(
             @ApiParam(value = "상품 요청 DTO") @PathVariable Long id, Principal principal) throws Exception {
         return productService.getDetailProduct(id, principal);
     }
 
     @PostMapping("/type/{type}")
+    @ApiOperation(value = "타입별 상품 목록 조회", notes = "EX) NEW, BEST")
     public APIResponse<ProductDTO.GetResponse> getProductByType(
-            @PathVariable("type") String type,
-            @RequestBody ProductDTO.GetRequest productReqDTO) {
+            @ApiParam(value = "타입명") @PathVariable("type") String type,
+            @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO) {
 
         return productService.getProductByType(type, productReqDTO);
     }
 
     @PostMapping("/category/{category}")
+    @ApiOperation(value = "카테고리별 상품 목록 조회", notes = "EX) CAP, TOP, ACC")
     public APIResponse<ProductDTO.GetResponse> getProductByCategory(
-            @PathVariable("category") String category,
-            @RequestBody ProductDTO.GetRequest productReqDTO) {
+            @ApiParam(value = "카테고리명") @PathVariable("category") String category,
+            @ApiParam(value = "상품 요청 DTO") @RequestBody ProductDTO.GetRequest productReqDTO) {
 
         return productService.getProductByCategory(category, productReqDTO);
     }
