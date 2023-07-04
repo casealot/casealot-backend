@@ -60,6 +60,7 @@ public class CustomerService {
   private final CustomerMapper customerMapper;
   private final static String REFRESH_TOKEN = "refresh_token";
 
+  @Transactional
   public APIResponse<String> join(CustomerDto customerDto)
       throws DuplicateEmailException, DuplicateIdException {
     String encodedPassword = passwordEncoder.encode(customerDto.getPassword());
@@ -90,7 +91,7 @@ public class CustomerService {
 
     return APIResponse.success(API_NAME, customer.getId() + " join success!");
   }
-
+  @Transactional
   public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto
       , HttpServletRequest request
       , HttpServletResponse response) {
@@ -111,7 +112,8 @@ public class CustomerService {
     // 토큰 생성 (jwt)
     // 토큰 유효 기간 설정 (30분 후)
     //long jwtExpiry = now.getTime() + appProperties.getAuth().getTokenExpiry() + (60 * 60 * 24 * 30); //1달로 설정
-    long jwtExpiry = now.getTime() + 1000 * 60 * 60 * 24; // 5분
+    //long jwtExpiry = now.getTime() + 1000 * 60 * 60 * 24; // 5분
+    long jwtExpiry = now.getTime() + 1000 * 30; // 30초
 
     AuthToken authToken = authTokenProvider.createAuthToken(
         customer.getId(),
@@ -127,6 +129,7 @@ public class CustomerService {
     long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
 
     AuthToken refreshToken = null;
+    // 있을 경우.....
     if (customerRefreshToken != null) {
       refreshToken = authTokenProvider.convertAuthToken(customerRefreshToken.getRefreshToken());
       // refresh 토큰이 유효 됐을 경우 다시 재발급 한다.
@@ -148,9 +151,10 @@ public class CustomerService {
       customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
     }
 
-    int cookieMaxAge = (int) refreshTokenExpiry / 60;
-    CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-    CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
+    //TODO 나중에 사용시 주석 해제
+//    int cookieMaxAge = (int) refreshTokenExpiry / 60;
+//    CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
+//    CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
     //로그인시 카트 없으면 생성 후 db에 저장
     Cart cart = cartRepository.findByCustomerId(customer.getId());

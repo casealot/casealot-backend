@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -57,6 +58,7 @@ public class AuthController {
 
         // userId refresh token으로 DB 확인
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
+        Optional.of(customerRefreshToken).orElseThrow(NotFoundRefreshTokenException::new);
 
         String userId = customerRefreshToken.getId();
         if(userId == null){
@@ -64,10 +66,6 @@ public class AuthController {
         }
         Customer customer = customerRepository.findById(userId);
         RoleType roleType = customer.getRoleType();
-
-        if (customerRefreshToken == null) {
-            throw new NotFoundRefreshTokenException();
-        }
 
         Date now = new Date();
         AuthToken newAccessToken = tokenProvider.createAuthToken(
