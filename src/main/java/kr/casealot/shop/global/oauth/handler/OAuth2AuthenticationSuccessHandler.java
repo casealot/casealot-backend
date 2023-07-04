@@ -99,16 +99,23 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // DB 저장
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userInfo.getId());
-        Long modifiedTime = customerRefreshToken.getModifiedDt().now()
-                .atZone(ZoneId.of("Asia/Seoul"))
-                .toInstant().toEpochMilli();
 
-        if(appProperties.getAuth().getTokenExpiry() < (System.currentTimeMillis() - modifiedTime)){
-            customerRefreshToken = new CustomerRefreshToken(customerEntity.getId(), refreshToken.getToken());
-            customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
+        if(null != customerRefreshToken){
+            Long modifiedTime = customerRefreshToken.getModifiedDt().now()
+                    .atZone(ZoneId.of("Asia/Seoul"))
+                    .toInstant().toEpochMilli();
+
+            if(appProperties.getAuth().getTokenExpiry() < (System.currentTimeMillis() - modifiedTime)){
+                customerRefreshToken = new CustomerRefreshToken(customerEntity.getId(), refreshToken.getToken());
+            }else{
+                customerRefreshToken.setRefreshToken(refreshToken.getToken());
+            }
         }else{
-            customerRefreshToken.setRefreshToken(refreshToken.getToken());
+            customerRefreshToken = new CustomerRefreshToken(customerEntity.getId(), refreshToken.getToken());
         }
+
+        customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
+
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
 
