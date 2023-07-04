@@ -3,7 +3,6 @@ package kr.casealot.shop.domain.notice.service;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.notice.comment.dto.CommentDetailDTO;
-import kr.casealot.shop.domain.notice.comment.dto.NoticeCommentResDTO;
 import kr.casealot.shop.domain.notice.comment.entity.NoticeComment;
 import kr.casealot.shop.domain.notice.dto.NoticeDetailDTO;
 import kr.casealot.shop.domain.notice.dto.NoticeReqDTO;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +33,12 @@ public class NoticeService {
     private final CustomerRepository customerRepository;
 
 
-
     public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
         Page<Notice> noticePage = noticeRepository.findAll(pageable);
         List<Notice> noticeList = noticePage.getContent();
 
         List<NoticeResDTO> noticeResDTOList = new ArrayList<>();
-        for(Notice notice : noticeList){
+        for (Notice notice : noticeList) {
             String customerId = notice.getCustomer().getId();
             NoticeResDTO noticeResDTO = NoticeResDTO.builder()
                     .id(notice.getId())
@@ -60,10 +57,10 @@ public class NoticeService {
     }
 
     @Transactional
-    public APIResponse<NoticeDetailDTO> getNotice(Long noticeId, Principal principal){
+    public APIResponse<NoticeDetailDTO> getNotice(Long noticeId, Principal principal) {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        if(notice == null){
+        if (notice == null) {
             throw new NotFoundWriteException();
         }
 
@@ -112,14 +109,13 @@ public class NoticeService {
 
     @Transactional
     public APIResponse<NoticeResDTO> createNotice(NoticeReqDTO noticeReqDTO,
-                                                  HttpServletRequest request,
                                                   Principal principal) {
 
         String customerId = principal.getName();
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new PermissionException();
         }
 
@@ -141,11 +137,10 @@ public class NoticeService {
     @Transactional
     public APIResponse<NoticeResDTO> updateNotice(Long noticeId,
                                                   NoticeReqDTO noticeReqDTO,
-                                                  HttpServletRequest request,
-                                                  Principal principal){
+                                                  Principal principal) {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        if(notice == null){
+        if (notice == null) {
             throw new NotFoundWriteException();
         }
 
@@ -153,7 +148,7 @@ public class NoticeService {
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new PermissionException();
         }
 
@@ -170,11 +165,10 @@ public class NoticeService {
 
     @Transactional
     public APIResponse<NoticeResDTO> deleteNotice(Long noticeId,
-                                                  HttpServletRequest request,
-                                                  Principal principal){
+                                                  Principal principal) {
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        if(notice == null){
+        if (notice == null) {
             throw new NotFoundWriteException();
         }
 
@@ -182,7 +176,7 @@ public class NoticeService {
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(!isAdmin){
+        if (!isAdmin) {
             throw new PermissionException();
         }
 

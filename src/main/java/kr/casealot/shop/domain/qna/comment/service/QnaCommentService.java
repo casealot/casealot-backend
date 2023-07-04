@@ -15,7 +15,6 @@ import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
@@ -32,13 +31,12 @@ public class QnaCommentService {
 
     public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
                                                           QnaCommentReqDTO qnaCommentReqDTO,
-                                                          HttpServletRequest request,
                                                           Principal principal) {
 
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 
@@ -69,12 +67,11 @@ public class QnaCommentService {
     }
 
     public APIResponse<QnaCommentResDTO> deleteComment(Long commentId,
-                                                       HttpServletRequest request,
                                                        Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
-        if(qnaComment == null){
+        if (qnaComment == null) {
             throw new NotFoundCommentException();
         }
 
@@ -95,12 +92,11 @@ public class QnaCommentService {
 
     public APIResponse<QnaCommentResDTO> updateComment(Long commentId,
                                                        QnaCommentReqDTO qnaCommentReqDTO,
-                                                       HttpServletRequest request,
                                                        Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
-        if(qnaComment == null){
+        if (qnaComment == null) {
             throw new NotFoundCommentException();
         }
 

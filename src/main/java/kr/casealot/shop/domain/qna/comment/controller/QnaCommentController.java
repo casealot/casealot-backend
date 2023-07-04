@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @RestController
@@ -21,39 +20,36 @@ import java.security.Principal;
 @RequestMapping("/cal/v1/admin/qna")
 public class QnaCommentController {
 
-  private final QnaCommentService qnaCommentService;
+    private final QnaCommentService qnaCommentService;
 
-  @PostMapping("/{qna_id}")
-  @ApiOperation(value = "QNA 댓글 작성", notes = "QNA에 대한 댓글을 작성한다.")
-  public APIResponse<QnaCommentResDTO> createQnaComment(
-      @ApiParam(value = "QNA ID") @PathVariable Long qna_id,
-      @ApiParam(value = "QNA 댓글 작성 DTO") @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
-      HttpServletRequest request,
-      Principal principal) {
+    @PostMapping("/{qna_id}")
+    @ApiOperation(value = "QNA 댓글 작성", notes = "QNA에 대한 댓글을 작성한다.")
+    public APIResponse<QnaCommentResDTO> createQnaComment(
+            @ApiParam(value = "QNA ID") @PathVariable Long qna_id,
+            @ApiParam(value = "QNA 댓글 작성 DTO") @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
+            Principal principal) {
 
-    return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, request, principal);
-  }
+        return qnaCommentService.createQnaComment(qna_id, qnaCommentReqDTO, principal);
+    }
 
-  // 댓글 삭제
-  @DeleteMapping("/{comment_id}")
-  @ApiOperation(value = "QNA 댓글 삭제", notes = "QNA에 댓글을 단 사용자가 자신의 댓글을 삭제한다.")
-  public APIResponse<QnaCommentResDTO> deleteComment(
-      @ApiParam(value = "QNA 댓글 ID") @PathVariable("comment_id") Long commentId,
-      HttpServletRequest request,
-      Principal principal) {
+    // 댓글 삭제
+    @DeleteMapping("/{comment_id}")
+    @ApiOperation(value = "QNA 댓글 삭제", notes = "QNA에 댓글을 단 사용자가 자신의 댓글을 삭제한다.")
+    public APIResponse<QnaCommentResDTO> deleteComment(
+            @ApiParam(value = "QNA 댓글 ID") @PathVariable("comment_id") Long commentId,
+            Principal principal) {
 
-    return qnaCommentService.deleteComment(commentId, request, principal);
-  }
+        return qnaCommentService.deleteComment(commentId, principal);
+    }
 
-  // 댓글 수정
-  @PutMapping("/{comment_id}")
-  @ApiOperation(value = "QNA 댓글 수정", notes = "QNA에 댓글을 단 사용자가 자신의 댓글을 수정한다.")
-  public APIResponse<QnaCommentResDTO> updateComment(
-      @ApiParam(value = "QNA 댓글 ID") @PathVariable("comment_id") Long commentId,
-      @ApiParam(value = "QNA 댓글 DTO") @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
-      HttpServletRequest request,
-      Principal principal) {
+    // 댓글 수정
+    @PutMapping("/{comment_id}")
+    @ApiOperation(value = "QNA 댓글 수정", notes = "QNA에 댓글을 단 사용자가 자신의 댓글을 수정한다.")
+    public APIResponse<QnaCommentResDTO> updateComment(
+            @ApiParam(value = "QNA 댓글 ID") @PathVariable("comment_id") Long commentId,
+            @ApiParam(value = "QNA 댓글 DTO") @RequestBody QnaCommentReqDTO qnaCommentReqDTO,
+            Principal principal) {
 
-    return qnaCommentService.updateComment(commentId, qnaCommentReqDTO, request, principal);
-  }
+        return qnaCommentService.updateComment(commentId, qnaCommentReqDTO, principal);
+    }
 }

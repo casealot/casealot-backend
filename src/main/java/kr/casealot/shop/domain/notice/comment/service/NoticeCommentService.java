@@ -15,7 +15,6 @@ import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 import static kr.casealot.shop.global.oauth.entity.RoleType.ADMIN;
@@ -30,12 +29,11 @@ public class NoticeCommentService {
 
     public APIResponse<NoticeCommentResDTO> createComment(Long noticeId,
                                                           NoticeCommentReqDTO noticeCommentReqDTO,
-                                                          HttpServletRequest request,
-                                                          Principal principal){
+                                                          Principal principal) {
 
         Notice notice = noticeRepository.findById(noticeId).orElse(null);
 
-        if(notice == null){
+        if (notice == null) {
             throw new NotFoundWriteException();
         }
 
@@ -57,12 +55,11 @@ public class NoticeCommentService {
     }
 
     public APIResponse<NoticeCommentResDTO> deleteComment(Long commentId,
-                                                          HttpServletRequest request,
-                                                          Principal principal){
+                                                          Principal principal) {
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
 
-        if(noticeComment == null){
+        if (noticeComment == null) {
             throw new NotFoundCommentException();
         }
 
@@ -70,7 +67,7 @@ public class NoticeCommentService {
 
         boolean isAdmin = checkAdminRole(customerId);
 
-        if(!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())){
+        if (!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())) {
             throw new PermissionException();
         }
 
@@ -83,18 +80,17 @@ public class NoticeCommentService {
 
     public APIResponse<NoticeCommentResDTO> updateComment(Long commentId,
                                                           NoticeCommentReqDTO noticeCommentReqDTO,
-                                                          HttpServletRequest request,
-                                                          Principal principal){
+                                                          Principal principal) {
 
         NoticeComment noticeComment = noticeCommentRepository.findById(commentId).orElse(null);
 
-        if(noticeComment == null){
+        if (noticeComment == null) {
             throw new NotFoundCommentException();
         }
 
         String customerId = principal.getName();
 
-        if(!customerId.equals(noticeComment.getCustomer().getId())){
+        if (!customerId.equals(noticeComment.getCustomer().getId())) {
             throw new PermissionException();
         }
 

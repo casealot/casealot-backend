@@ -17,29 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
-import static org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"NOTICE API"}, description = "NOTICE 관련 API")
 @RequestMapping("/cal/v1/notice/list")
 public class NoticeController {
 
-  private final NoticeService noticeService;
+    private final NoticeService noticeService;
 
-  // 공지 전체 조회
-  @GetMapping
-  @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 전체 공지를 조회한다.")
-  public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
-    return noticeService.getNoticeList(pageable);
-  }
+    // 공지 전체 조회
+    @GetMapping
+    @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 전체 공지를 조회한다.")
+    public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
+        return noticeService.getNoticeList(pageable);
+    }
 
-  // 특정 공지 조회
-  @GetMapping("/{notice_id}")
-  @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
-  public APIResponse<NoticeDetailDTO> getNotice(
-      @ApiParam(value = "공지 ID") @PathVariable("notice_id") Long noticeId,
-      Principal principal) {
-    return noticeService.getNotice(noticeId, principal);
-  }
+    // 특정 공지 조회
+    @GetMapping("/{notice_id}")
+    @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
+    public APIResponse<NoticeDetailDTO> getNotice(
+            @ApiParam(value = "공지 ID") @PathVariable("notice_id") Long noticeId,
+            Principal principal) {
+        return noticeService.getNotice(noticeId, principal);
+    }
 }

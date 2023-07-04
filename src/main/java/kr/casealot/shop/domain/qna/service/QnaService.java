@@ -13,14 +13,12 @@ import kr.casealot.shop.domain.qna.repository.QnaRepository;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
-import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,26 +32,22 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final CustomerRepository customerRepository;
-    private final AuthTokenProvider authTokenProvider;
     private final QnaCommentRepository qnaCommentRepository;
 
-//     qna 등록
-//    @Transactional
-//    public Qna createQna(CreateQna qnaDTO){
-//        Qna qna = Qna.builder()
-//                .title(qnaDTO.getTitle())
-//                .content(qnaDTO.getContent())
-//                .photoUrl(qnaDTO.getPhotoUrl())
-//                .registrationDate(LocalDateTime.now())
-//                .modificationDate(LocalDateTime.now())
-//                .build();
-//        return qnaRepository.save(qna);
-//    }
-
+    private static QnaResDTO getQnaResDTO(Qna qna, String customerId) {
+        QnaResDTO qnaResDTO = new QnaResDTO();
+        qnaResDTO.setId(qna.getId());
+        qnaResDTO.setCustomerId(customerId);
+        qnaResDTO.setTitle(qna.getTitle());
+        qnaResDTO.setContent(qna.getContent());
+        qnaResDTO.setViews(qna.getViews());
+        qnaResDTO.setCreatedDt(qna.getCreatedDt());
+        qnaResDTO.setModifiedDt(qna.getModifiedDt());
+        return qnaResDTO;
+    }
 
     @Transactional
     public APIResponse<QnaResDTO> createQna(QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
                                             Principal principal) {
 
         String customerId = principal.getName();
@@ -71,19 +65,17 @@ public class QnaService {
 
         QnaResDTO qnaResDTO = getQnaResDTO(qna, customerId);
 
-        return APIResponse.success(API_NAME,qnaResDTO);
+        return APIResponse.success(API_NAME, qnaResDTO);
     }
-
 
     // qna 수정
     @Transactional
     public APIResponse<QnaResDTO> updateQna(Long qnaId,
                                             QnaReqDTO qnaReqDTO,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 
@@ -95,7 +87,7 @@ public class QnaService {
             throw new PermissionException();
         }
 
-        if(qna.getQnaCommentList() != null){
+        if (qna.getQnaCommentList() != null) {
             qna.setHasReply(true);
         }
 
@@ -164,16 +156,13 @@ public class QnaService {
         return APIResponse.success(API_NAME, qnaDetailDTO);
     }
 
-
-
     // qna 삭제
     @Transactional
     public APIResponse<QnaResDTO> deleteQna(Long qnaId,
-                                            HttpServletRequest request,
-                                            Principal principal){
+                                            Principal principal) {
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
-        if(qna == null){
+        if (qna == null) {
             throw new NotFoundWriteException();
         }
 
@@ -240,18 +229,6 @@ public class QnaService {
         }
 
         return APIResponse.success(API_NAME, qnaResDTOList);
-    }
-
-    private static QnaResDTO getQnaResDTO(Qna qna, String customerId) {
-        QnaResDTO qnaResDTO = new QnaResDTO();
-        qnaResDTO.setId(qna.getId());
-        qnaResDTO.setCustomerId(customerId);
-        qnaResDTO.setTitle(qna.getTitle());
-        qnaResDTO.setContent(qna.getContent());
-        qnaResDTO.setViews(qna.getViews());
-        qnaResDTO.setCreatedDt(qna.getCreatedDt());
-        qnaResDTO.setModifiedDt(qna.getModifiedDt());
-        return qnaResDTO;
     }
 
     private boolean checkAdminRole(String customerId) {
