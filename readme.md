@@ -17,16 +17,16 @@
 
 ## 💻 기술 스택
 
-- 백엔드
-    - SpringBoot, JPA
-- 프론트엔드
-    - React
-- 데이터베이스
-    - MySQL
+- Backend
+    - <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-square&logo=SpringBoot&logoColor=white"/> <img src="https://img.shields.io/badge/Java-007396?style=for-the-square&logo=java&logoColor=white">
+- FrontEnd
+    - <img src="https://img.shields.io/badge/React-007396?style=for-the-square&logo=SpringBoot&logoColor=blue"/>
+- Database
+    - <img src="https://img.shields.io/badge/Mysql-E6B91E?style=for-the-square&logo=MySql&logoColor=white"/>
+- DevOps
+    - <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-square&logo=Docker&logoColor=white"/> <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-square&logo=amazonaws&logoColor=white">
 
-## 👾 뭘적어야할까?
-
-# ADMIN
+## ADMIN
 
 - Product
     - 상품 등록, 수정, 삭제
@@ -68,3 +68,6 @@
   - 결제 요청, 내역 조회 
 - DELIVERY
   - 배송 내역 조회
+
+## ERD
+![image](https://github.com/casealot/casealot-backend/assets/101981639/db922f8f-fbcf-4375-a714-217930050a71)
