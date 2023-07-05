@@ -113,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/cal/v1/admin/notice/**",
             "/cal/v1/admin/qna/**",
             "/cal/v1/function/**",
-                "/cal/v1/file/**/imamge",
+                "/cal/v1/file/**/image",
             "/cal/v1/delivery/**"
         ).hasRole("ADMIN")
         .antMatchers("/",
