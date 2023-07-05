@@ -1,36 +1,26 @@
 package kr.casealot.shop.domain.customer.service;
 
 import io.jsonwebtoken.Claims;
-import java.security.Principal;
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import kr.casealot.shop.domain.auth.entity.BlacklistToken;
 import kr.casealot.shop.domain.auth.entity.CustomerRefreshToken;
 import kr.casealot.shop.domain.auth.repository.BlacklistTokenRepository;
 import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
-import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
-import kr.casealot.shop.domain.customer.dto.CustomerDto;
-import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
-import kr.casealot.shop.domain.customer.dto.CustomerMapper;
-import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
-import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
+import kr.casealot.shop.domain.customer.dto.*;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
+import kr.casealot.shop.domain.customer.exception.DuplicateIdException;
+import kr.casealot.shop.domain.customer.exception.IncorrectPasswordException;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
 import kr.casealot.shop.domain.file.service.UploadFileService;
 import kr.casealot.shop.global.common.APIResponse;
 import kr.casealot.shop.global.config.properties.AppProperties;
-import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
-import kr.casealot.shop.domain.customer.exception.DuplicateIdException;
-import kr.casealot.shop.domain.customer.exception.IncorrectPasswordException;
 import kr.casealot.shop.global.exception.NotFoundUserException;
 import kr.casealot.shop.global.oauth.entity.RoleType;
 import kr.casealot.shop.global.oauth.token.AuthToken;
 import kr.casealot.shop.global.oauth.token.AuthTokenProvider;
-import kr.casealot.shop.global.util.CookieUtil;
 import kr.casealot.shop.global.util.HeaderUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +28,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -156,13 +151,6 @@ public class CustomerService {
 //    CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
 //    CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
 
-    //로그인시 카트 없으면 생성 후 db에 저장
-    Cart cart = cartRepository.findByCustomerId(customer.getId());
-    if (cart == null) {
-      cart = Cart.createCart(customer);
-      cartRepository.save(cart);
-    }
-
     return APIResponse.success("customerToken",
         new CustomerTokenDto(customer.getId(), accessToken, customerRefreshToken.getRefreshToken(),
             customer.getRoleType()));
@@ -228,6 +216,7 @@ public class CustomerService {
     if (null != profileImgFile) {
       //기존에 이미지가 있다면 삭제
       UploadFile savedCustomerProfileImg = savedCustomer.getProfileImg();
+
       if (null != savedCustomerProfileImg) {
         s3UploadService.deleteFileFromS3Bucket(savedCustomerProfileImg.getUrl());
         uploadFileService.delete(savedCustomerProfileImg);
@@ -241,6 +230,8 @@ public class CustomerService {
           .fileSize(profileImgFile.getSize())
           .build());
       savedCustomer.setProfileImg(profileImg);
+      // 2023/07/05 김창희 추가 upload url 별도 profileImageUrl에 같이 등록
+      savedCustomer.setProfileImageUrl(profileImg.getUrl());
     }
 
     customerRepository.saveAndFlush(savedCustomer);
@@ -263,7 +254,8 @@ public class CustomerService {
   public APIResponse<CustomerDto> customerInfo(Principal principal) {
     Customer customer = customerRepository.findCustomerById(principal.getName());
 
-    String profileImage = "";
+    // SNS 로그인 이미지는 카카오에서 가져오는거기 때문에 profileImageUrl에 기본적으로 설정됨.
+    String profileImage = customer.getProfileImageUrl();
     if (customer.getProfileImg() != null) {
       profileImage = customer.getProfileImg().getUrl();
     }
