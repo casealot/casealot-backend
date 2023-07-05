@@ -27,4 +27,11 @@ public class QnaAdminController {
 
         return qnaService.getAdminQnaList(pageable);
     }
+
+    @GetMapping("/today")
+    @ApiOperation(value = "댓글이 달리지 않고, 오늘 작성된 QNA 내역 조회", notes = "관리자가 댓글이 달리지 않은, 오늘 작성된 QNA 내역을 조회한다.")
+    public APIResponse<List<QnaResDTO>> getAdminTodayQnaList(Pageable pageable) {
+
+        return qnaService.getAdminTodayQnaList(pageable);
+    }
 }

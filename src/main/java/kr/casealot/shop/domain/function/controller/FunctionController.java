@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
+import io.swagger.annotations.ApiParam;
 import kr.casealot.shop.domain.function.dto.FunctionDTO;
 import kr.casealot.shop.domain.function.dto.FunctionQnaDTO;
 import kr.casealot.shop.domain.function.dto.FunctionReviewDTO;
@@ -41,7 +43,7 @@ public class FunctionController {
 
   @GetMapping("/daily/{orderStatus}")
   @ApiOperation(value = "상단 오늘의 할일 상세보기(오늘 데이터 제공)", notes = "오늘의 할일에 들어갈 데이터를 상태별로 제공한다.(오늘 데이터 제공)")
-  public APIResponse<List<Response>> getTodayOrder(@PathVariable OrderStatus orderStatus) {
+  public APIResponse<List<Response>> getTodayOrder(@ApiParam(value = "주문 상태") @PathVariable OrderStatus orderStatus) {
     return functionService.getTodayOrder(today, orderStatus);
   }
 
@@ -53,7 +55,7 @@ public class FunctionController {
 
   @GetMapping("/all/{orderStatus}")
   @ApiOperation(value = "상단 오늘의 할일 상세보기(전체 데이터 상태별 제공)", notes = "오늘의 할일에 들어갈 데이터를 상태별로 제공한다.(전체 데이터 상태별 제공)")
-  public APIResponse<List<Response>> getAllOrderByStatus(@PathVariable OrderStatus orderStatus) {
+  public APIResponse<List<Response>> getAllOrderByStatus(@ApiParam(value = "주문 상태") @PathVariable OrderStatus orderStatus) {
     return functionService.getAllOrderByStatus(orderStatus);
   }
 

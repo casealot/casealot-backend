@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -214,6 +217,37 @@ public class QnaService {
         for (Qna qna : qnaList) {
             boolean hasReply = qnaCommentRepository.existsByQna(qna);
             if (!hasReply) {
+                String customerId = qna.getCustomer().getId();
+                QnaResDTO qnaResDTO = QnaResDTO.builder()
+                        .id(qna.getId())
+                        .customerId(customerId)
+                        .title(qna.getTitle())
+                        .content(qna.getContent())
+                        .views(qna.getViews())
+                        .createdDt(qna.getCreatedDt())
+                        .modifiedDt(qna.getModifiedDt())
+                        .build();
+                qnaResDTOList.add(qnaResDTO);
+            }
+        }
+
+        return APIResponse.success(API_NAME, qnaResDTOList);
+    }
+
+    public APIResponse<List<QnaResDTO>> getAdminTodayQnaList(Pageable pageable) {
+        Page<Qna> qnaPage = qnaRepository.findAll(pageable);
+        List<Qna> qnaList = qnaPage.getContent();
+
+        List<QnaResDTO> qnaResDTOList = new ArrayList<>();
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = LocalDateTime.of(today, LocalTime.MIN);
+        LocalDateTime end = LocalDateTime.of(today, LocalTime.MAX);
+
+        for (Qna qna : qnaList) {
+            boolean hasReply = qnaCommentRepository.existsByQna(qna);
+            LocalDateTime created = qna.getCreatedDt();
+            if (!hasReply && created.isAfter(start) && created.isBefore(end)) {
                 String customerId = qna.getCustomer().getId();
                 QnaResDTO qnaResDTO = QnaResDTO.builder()
                         .id(qna.getId())
