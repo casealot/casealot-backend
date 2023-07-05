@@ -229,6 +229,7 @@ public class CustomerService {
           .fileType(profileImgFile.getContentType())
           .fileSize(profileImgFile.getSize())
           .build());
+
       savedCustomer.setProfileImg(profileImg);
       // 2023/07/05 김창희 추가 upload url 별도 profileImageUrl에 같이 등록
       savedCustomer.setProfileImageUrl(profileImg.getUrl());

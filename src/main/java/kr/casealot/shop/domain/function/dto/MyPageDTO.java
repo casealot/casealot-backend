@@ -19,5 +19,5 @@ public class MyPageDTO {
   private Long start;
   private Long finish;
   private Long canceled;
-  private UploadFile profileImg;
+  private String profileImageUrl;
 }

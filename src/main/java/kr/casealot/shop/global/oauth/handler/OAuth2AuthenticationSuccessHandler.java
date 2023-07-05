@@ -27,14 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
 import static kr.casealot.shop.global.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
 @Component
 @RequiredArgsConstructor
@@ -82,7 +80,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         Date now = new Date();
 
-        Customer customerEntity = customerRepository.findByEmail(userInfo.getEmail());
+        Customer customerEntity = customerRepository.findByEmailAndProviderType(
+                userInfo.getEmail()
+                , providerType);
 
         AuthToken accessToken = tokenProvider.createAuthToken(
                 customerEntity.getId(),
@@ -122,7 +122,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         //-int cookieMaxAge = (int) refreshTokenExpiry / 60;
         //CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
         //CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
-        
+
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", accessToken.getToken())
                 .queryParam("refreshToken", refreshToken.getToken())

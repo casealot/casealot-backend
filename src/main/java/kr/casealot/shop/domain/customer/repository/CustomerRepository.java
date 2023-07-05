@@ -2,6 +2,7 @@ package kr.casealot.shop.domain.customer.repository;
 
 import java.time.LocalDateTime;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.global.oauth.entity.ProviderType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Customer findById(String id);
 
-    Customer findByEmail(String email);
+    Customer findByEmailAndProviderType(String email, ProviderType type);
 
     void deleteById(String id);
 

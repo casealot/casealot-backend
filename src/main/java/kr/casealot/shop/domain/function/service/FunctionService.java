@@ -287,7 +287,7 @@ public class FunctionService {
     Customer customer = customerRepository.findById(principal.getName());
 
     MyPageDTO myPageDTO = MyPageDTO.builder()
-        .profileImg(customer.getProfileImg())
+        .profileImageUrl(customer.getProfileImageUrl())
         .ready(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
             DeliveryStatus.READY))
         .start(orderRepository.countByCustomerSeqAndDeliveryStatus(customer.getSeq(),
