@@ -28,6 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   int countByOrderDtBetweenAndOrderStatus(LocalDateTime startDate, LocalDateTime endDate, OrderStatus orderStatus);
   List<Order> findAllByOrderDtBetweenAndOrderStatus(LocalDateTime startDate, LocalDateTime endDate, OrderStatus orderStatus);
+  List<Order> findAllByOrderStatus(OrderStatus orderStatus);
 
 
   @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDt BETWEEN :startTime AND :endTime AND o.orderStatus = 'COMPLETE'")

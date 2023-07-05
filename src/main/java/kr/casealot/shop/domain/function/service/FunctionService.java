@@ -84,6 +84,24 @@ public class FunctionService {
     return APIResponse.success("function", orderResponses);
   }
 
+  public APIResponse<List<OrderDTO.Response>> getAllOrder() {
+    List<Order> orders = orderRepository.findAll();
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success("function", orderResponses);
+  }
+
+  public APIResponse<List<OrderDTO.Response>> getAllOrderByStatus(OrderStatus orderStatus) {
+    List<Order> orders = orderRepository.findAllByOrderStatus(orderStatus);
+    List<OrderDTO.Response> orderResponses = orders.stream()
+        .map(this::orderResponse)
+        .collect(Collectors.toList());
+
+    return APIResponse.success("function", orderResponses);
+  }
+
   private OrderDTO.Response orderResponse(Order order) {
     order.getOrderProducts().size();
 
