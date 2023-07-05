@@ -33,7 +33,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
 
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
-        Customer savedCustomer = customerRepository.findById(providerType.getValue() + "_" + userInfo.getId());
+        // providerType과 userId를 혼합하여 ID로 지정한다.
+        Customer savedCustomer = customerRepository.findById(providerType.getValue() + userInfo.getId());
 
         if (savedCustomer != null) {
             if (providerType != savedCustomer.getProviderType()) {
@@ -52,8 +53,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Customer createCustomer(OAuth2UserInfo userInfo, ProviderType providerType) {
         LocalDateTime now = LocalDateTime.now();
+        // providerType과 userId를 혼합하여 ID로 지정한다.
         Customer user = new Customer(
-                providerType.getValue() + "_" +userInfo.getId(),
+                providerType.getValue() + userInfo.getId(),
                 userInfo.getName(),
                 userInfo.getEmail(),
                 "Y",
