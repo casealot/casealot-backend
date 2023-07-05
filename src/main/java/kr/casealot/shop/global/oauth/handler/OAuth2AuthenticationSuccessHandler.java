@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
@@ -117,15 +118,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         customerRefreshTokenRepository.saveAndFlush(customerRefreshToken);
 
 
-        int cookieMaxAge = (int) refreshTokenExpiry / 60;
-
         // TODO 나중에 Cookie를 쓸건지 고민해봐야함.
+        //-int cookieMaxAge = (int) refreshTokenExpiry / 60;
         //CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
         //CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken.getToken(), cookieMaxAge);
-
+        
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", accessToken.getToken())
                 .queryParam("refreshToken", refreshToken.getToken())
+                .queryParam("role", RoleType.USER.getCode())
                 .build().toUriString();
     }
 
