@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class CommentDetailDTO {
     private Long id;
     private String customerId;
-    private String title;
     private String content;
     private String available;
 

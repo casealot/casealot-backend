@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QnaCommentReqDTO {
-    private String title;
     private String content;
 }

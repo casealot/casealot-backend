@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class NoticeCommentReqDTO {
-    private String title;
     private String content;
 }

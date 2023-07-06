@@ -25,7 +25,6 @@ public class NoticeComment extends BaseTimeEntity {
     @JoinColumn(name = "notice_id")
     private Notice notice;
 
-    private String title;
     private String content;
 
 

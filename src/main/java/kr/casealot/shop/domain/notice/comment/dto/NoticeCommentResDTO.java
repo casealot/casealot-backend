@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class NoticeCommentResDTO {
     private Long id;
     private String customerId;
-    private String title;
     private String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

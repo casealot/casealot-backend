@@ -29,9 +29,7 @@ public class QnaCommentService {
     private final QnaRepository qnaRepository;
     private final CustomerRepository customerRepository;
 
-    public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId,
-                                                          QnaCommentReqDTO qnaCommentReqDTO,
-                                                          Principal principal) {
+    public APIResponse<QnaCommentResDTO> createQnaComment(Long qnaId, QnaCommentReqDTO qnaCommentReqDTO, Principal principal) {
 
         Qna qna = qnaRepository.findById(qnaId).orElse(null);
 
@@ -50,12 +48,7 @@ public class QnaCommentService {
             throw new PermissionException();
         }
 
-        QnaComment qnaComment = QnaComment.builder()
-                .qna(qna)
-                .customer(customer)
-                .title(qnaCommentReqDTO.getTitle())
-                .content(qnaCommentReqDTO.getContent())
-                .build();
+        QnaComment qnaComment = QnaComment.builder().qna(qna).customer(customer).content(qnaCommentReqDTO.getContent()).build();
 
         qnaCommentRepository.save(qnaComment);
 
@@ -66,8 +59,7 @@ public class QnaCommentService {
         return APIResponse.success(API_NAME, qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId,
-                                                       Principal principal) {
+    public APIResponse<QnaCommentResDTO> deleteComment(Long commentId, Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
@@ -90,9 +82,7 @@ public class QnaCommentService {
         return APIResponse.success(API_NAME, qnaCommentResDTO);
     }
 
-    public APIResponse<QnaCommentResDTO> updateComment(Long commentId,
-                                                       QnaCommentReqDTO qnaCommentReqDTO,
-                                                       Principal principal) {
+    public APIResponse<QnaCommentResDTO> updateComment(Long commentId, QnaCommentReqDTO qnaCommentReqDTO, Principal principal) {
 
         QnaComment qnaComment = qnaCommentRepository.findById(commentId).orElse(null);
 
@@ -102,13 +92,13 @@ public class QnaCommentService {
 
         String customerId = principal.getName();
 
+
         boolean isAdmin = checkAdminRole(customerId);
 
         if (!isAdmin) {
             throw new PermissionException();
         }
 
-        qnaComment.setTitle(qnaCommentReqDTO.getTitle());
         qnaComment.setContent(qnaCommentReqDTO.getContent());
 
 
@@ -129,7 +119,6 @@ public class QnaCommentService {
         QnaCommentResDTO qnaCommentResDTO = new QnaCommentResDTO();
         qnaCommentResDTO.setId(qnaComment.getId());
         qnaCommentResDTO.setCustomerId(customerId);
-        qnaCommentResDTO.setTitle(qnaComment.getTitle());
         qnaCommentResDTO.setContent(qnaComment.getContent());
         qnaCommentResDTO.setCreatedDt(qnaComment.getCreatedDt());
         qnaCommentResDTO.setModifiedDt(qnaComment.getModifiedDt());

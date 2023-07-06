@@ -43,7 +43,6 @@ public class NoticeCommentService {
         NoticeComment noticeComment = NoticeComment.builder()
                 .notice(notice)
                 .customer(customer)
-                .title(noticeCommentReqDTO.getTitle())
                 .content(noticeCommentReqDTO.getContent())
                 .build();
 
@@ -94,7 +93,6 @@ public class NoticeCommentService {
             throw new PermissionException();
         }
 
-        noticeComment.setTitle(noticeCommentReqDTO.getTitle());
         noticeComment.setContent(noticeCommentReqDTO.getContent());
 
         noticeCommentRepository.save(noticeComment);
@@ -108,7 +106,6 @@ public class NoticeCommentService {
         NoticeCommentResDTO noticeCommentResDTO = new NoticeCommentResDTO();
         noticeCommentResDTO.setId(noticeComment.getId());
         noticeCommentResDTO.setCustomerId(customerId);
-        noticeCommentResDTO.setTitle(noticeComment.getTitle());
         noticeCommentResDTO.setContent(noticeComment.getContent());
         noticeCommentResDTO.setCreatedDt(noticeComment.getCreatedDt());
         noticeCommentResDTO.setModifiedDt(noticeComment.getModifiedDt());

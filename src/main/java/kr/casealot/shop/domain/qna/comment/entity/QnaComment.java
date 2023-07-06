@@ -25,12 +25,10 @@ public class QnaComment extends BaseTimeEntity {
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
-    private String title;
     private String content;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CUSTOMER_SEQ")
     private Customer customer;
-
 }

@@ -11,6 +11,4 @@ import java.util.List;
 @Repository
 public interface QnaCommentRepository extends JpaRepository<QnaComment, Long> {
     boolean existsByQna(Qna qna);
-    List<QnaComment> findByQnaId(Long qnaId);
-
 }
