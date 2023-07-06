@@ -48,7 +48,11 @@ public class QnaCommentService {
             throw new PermissionException();
         }
 
-        QnaComment qnaComment = QnaComment.builder().qna(qna).customer(customer).content(qnaCommentReqDTO.getContent()).build();
+        QnaComment qnaComment = QnaComment.builder()
+                .qna(qna)
+                .customer(customer)
+                .content(qnaCommentReqDTO.getContent())
+                .build();
 
         qnaCommentRepository.save(qnaComment);
 
@@ -91,7 +95,7 @@ public class QnaCommentService {
         }
 
         String customerId = principal.getName();
-
+        Customer customer = customerRepository.findCustomerById(customerId);
 
         boolean isAdmin = checkAdminRole(customerId);
 
@@ -99,6 +103,7 @@ public class QnaCommentService {
             throw new PermissionException();
         }
 
+        qnaComment.setCustomer(customer);
         qnaComment.setContent(qnaCommentReqDTO.getContent());
 
 
