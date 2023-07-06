@@ -128,7 +128,7 @@ public class WishlistService {
         List<WishlistItem> wishlistItemList = wishlistItemRepository.findAllByWishlist(wishlist);
         for(WishlistItem wishlistItem : wishlistItemList){
             Product product = wishlistItem.getProduct();
-            product.setRatingCount(product.getRatingCount() -1);
+            product.setWishCount(product.getWishCount() -1);
             productRepository.saveAndFlush(product);
         }
         wishlistRepository.deleteCartItemsByCart(wishlist);
