@@ -91,7 +91,6 @@ public class NoticeService {
             CommentDetailDTO commentDetailDTO = CommentDetailDTO.builder()
                     .id(noticeComment.getId())
                     .customerId(noticeComment.getCustomer().getId())
-                    .title(noticeComment.getTitle())
                     .content(noticeComment.getContent())
                     .available(available)
                     .createdDt(noticeComment.getCreatedDt())

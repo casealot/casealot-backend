@@ -145,7 +145,6 @@ public class QnaService {
             QnaCommentResDTO qnaCommentDTO = QnaCommentResDTO.builder()
                     .id(qnaComment.getId())
                     .customerId(qnaComment.getCustomer().getId())
-                    .title(qnaComment.getTitle())
                     .content(qnaComment.getContent())
                     .createdDt(qnaComment.getCreatedDt())
                     .modifiedDt(qnaComment.getModifiedDt())
