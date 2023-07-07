@@ -1,5 +1,7 @@
 package kr.casealot.shop.domain.cart.cartitem.service;
 
+import static kr.casealot.shop.domain.cart.dto.CartGetDTO.buildCartGetDTO;
+
 import com.amazonaws.services.kms.model.NotFoundException;
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
@@ -25,190 +27,103 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CartItemService {
-    private final String API_NAME = "cart";
-    private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final CustomerRepository customerRepository;
 
-    @Transactional
-    public APIResponse<CartGetDTO> reduceCartItemQuantity(Principal principal, Long cartItemId) {
-        Customer customer = customerRepository.findCustomerById(principal.getName());
-        if (customer == null) {
-            throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
-        }
+  private final String API_NAME = "cart";
+  private final CartRepository cartRepository;
+  private final CartItemRepository cartItemRepository;
+  private final CustomerRepository customerRepository;
 
-        Cart cart = cartRepository.findByCustomerId(customer.getId());
-        if (cart == null) {
-            throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
-        }
-
-        CartItem cartItem = getCartItemFromCart(cart, cartItemId);
-        if (cartItem == null) {
-            throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
-        }
-
-        int currentQuantity = cartItem.getQuantity();
-        if (currentQuantity <= 1) {
-            removeCartItem(principal, cartItemId);
-        } else {
-            cartItem.setQuantity(currentQuantity - 1);
-            cartItemRepository.save(cartItem);
-        }
-
-//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
-//
-//        return APIResponse.success(API_NAME, cartResDTOList);
-
-        CartGetDTO cartGetDto = new CartGetDTO();
-        cartGetDto.setCustomerSeq(customer.getSeq());
-        cartGetDto.setCustomerName(customer.getName());
-        cartGetDto.setCartId(cart.getSeq());
-        cartGetDto.setProducts(cart.getCartItems().stream()
-                .map(myCartItem -> {
-                    ProductCartDTO productCartDTO = new ProductCartDTO();
-                    productCartDTO.setId(myCartItem.getProduct().getId());
-                    productCartDTO.setName(myCartItem.getProduct().getName());
-                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
-                    productCartDTO.setQuantity(myCartItem.getQuantity());
-                    if(myCartItem.getProduct().getThumbnail() == null){
-                        productCartDTO.setThumbnail(null);
-                    }else{
-                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
-                    }
-                    productCartDTO.setContent(myCartItem.getProduct().getContent());
-                    productCartDTO.setColor(myCartItem.getProduct().getColor());
-                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
-                    productCartDTO.setType(myCartItem.getProduct().getType());
-                    return productCartDTO;
-                })
-                .collect(Collectors.toList()));
-
-        return APIResponse.success(API_NAME, cartGetDto);
+  @Transactional
+  public APIResponse<CartGetDTO> reduceCartItemQuantity(Principal principal, Long cartItemId) {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+    if (customer == null) {
+      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
     }
 
-    @Transactional
-    public APIResponse<CartGetDTO> addCartItemQuantity(Principal principal, Long cartItemId) {
-        Customer customer = customerRepository.findCustomerById(principal.getName());
-        if (customer == null) {
-            throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
-        }
-
-        Cart cart = cartRepository.findByCustomerId(customer.getId());
-        if (cart == null) {
-            throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
-        }
-
-        CartItem cartItem = getCartItemFromCart(cart, cartItemId);
-        if (cartItem == null) {
-            throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
-        }
-
-        int currentQuantity = cartItem.getQuantity();
-
-        cartItem.setQuantity(currentQuantity + 1);
-        cartItemRepository.save(cartItem);
-//
-//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
-//
-//        return APIResponse.success(API_NAME, cartResDTOList);
-        CartGetDTO cartGetDto = new CartGetDTO();
-        cartGetDto.setCustomerSeq(customer.getSeq());
-        cartGetDto.setCustomerName(customer.getName());
-        cartGetDto.setCartId(cart.getSeq());
-        cartGetDto.setProducts(cart.getCartItems().stream()
-                .map(myCartItem -> {
-                    ProductCartDTO productCartDTO = new ProductCartDTO();
-                    productCartDTO.setId(myCartItem.getProduct().getId());
-                    productCartDTO.setName(myCartItem.getProduct().getName());
-                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
-                    productCartDTO.setQuantity(myCartItem.getQuantity());
-                    if(myCartItem.getProduct().getThumbnail() == null){
-                        productCartDTO.setThumbnail(null);
-                    }else{
-                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
-                    }
-                    productCartDTO.setContent(myCartItem.getProduct().getContent());
-                    productCartDTO.setColor(myCartItem.getProduct().getColor());
-                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
-                    productCartDTO.setType(myCartItem.getProduct().getType());
-                    return productCartDTO;
-                })
-                .collect(Collectors.toList()));
-
-        return APIResponse.success(API_NAME, cartGetDto);
+    Cart cart = cartRepository.findByCustomerId(customer.getId());
+    if (cart == null) {
+      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
     }
 
-    @Transactional
-    public APIResponse<CartGetDTO> removeCartItem(Principal principal, Long cartItemId) {
-        Customer customer = customerRepository.findCustomerById(principal.getName());
-        if (customer == null) {
-            throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
-        }
-
-        Cart cart = cartRepository.findByCustomerId(customer.getId());
-        if (cart == null) {
-            throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
-        }
-
-        CartItem cartItem = getCartItemFromCart(cart, cartItemId);
-        if (cartItem == null) {
-            throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
-        }
-
-        cart.getCartItems().remove(cartItem);
-        cartItemRepository.delete(cartItem);
-//
-//        List<CartResDTO> cartResDTOList = getCartResDtoList(cart.getSeq());
-//
-//        return APIResponse.success(API_NAME, cartResDTOList);
-        CartGetDTO cartGetDto = new CartGetDTO();
-        cartGetDto.setCustomerSeq(customer.getSeq());
-        cartGetDto.setCustomerName(customer.getName());
-        cartGetDto.setCartId(cart.getSeq());
-        cartGetDto.setProducts(cart.getCartItems().stream()
-                .map(myCartItem -> {
-                    ProductCartDTO productCartDTO = new ProductCartDTO();
-                    productCartDTO.setId(myCartItem.getProduct().getId());
-                    productCartDTO.setName(myCartItem.getProduct().getName());
-                    productCartDTO.setPrice(myCartItem.getProduct().getPrice());
-                    productCartDTO.setQuantity(myCartItem.getQuantity());
-                    if(myCartItem.getProduct().getThumbnail() == null){
-                        productCartDTO.setThumbnail(null);
-                    }else{
-                        productCartDTO.setThumbnail(myCartItem.getProduct().getThumbnail().getUrl());
-                    }
-                    productCartDTO.setContent(myCartItem.getProduct().getContent());
-                    productCartDTO.setColor(myCartItem.getProduct().getColor());
-                    productCartDTO.setSeason(myCartItem.getProduct().getSeason());
-                    productCartDTO.setType(myCartItem.getProduct().getType());
-                    return productCartDTO;
-                })
-                .collect(Collectors.toList()));
-
-        return APIResponse.success(API_NAME, cartGetDto);
+    CartItem cartItem = getCartItemFromCart(cart, cartItemId);
+    if (cartItem == null) {
+      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
     }
 
-
-    private List<CartResDTO> getCartResDtoList(Long cartId) {
-        Optional<Cart> cart = cartRepository.findById(cartId);
-        List<CartItem> cartItems = cartItemRepository.findByCart(cart);
-        return cartItems.stream()
-                .map(cartItem -> new CartResDTO(cartId, cartItem.getProduct().getName(), cartItem.getQuantity()))
-//                .map(cartItem -> new CartResDto(cartId, cartItem.getSeq(), cartItem.getProduct().getName(), cartItem.getQuantity()))
-                .collect(Collectors.toList());
+    int currentQuantity = cartItem.getQuantity();
+    if (currentQuantity <= 1) {
+      removeCartItem(principal, cartItemId);
+    } else {
+      cartItem.setQuantity(currentQuantity - 1);
+      cartItemRepository.save(cartItem);
     }
 
-    private CartItem getCartItemFromCart(Cart cart, Long cartItemId) {
-        if (cart == null || cart.getCartItems() == null) {
-            return null;
-        }
+    CartGetDTO cartGetDto = buildCartGetDTO(customer, cart, cart.getCartItems());
 
-        for (CartItem cartItem : cart.getCartItems()) {
-            if (cartItem.getProduct().getId().equals(cartItemId)) {
-                return cartItem;
-            }
-        }
+    return APIResponse.success(API_NAME, cartGetDto);
+  }
 
-        return null;
+  @Transactional
+  public APIResponse<CartGetDTO> addCartItemQuantity(Principal principal, Long cartItemId) {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+    if (customer == null) {
+      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
     }
+
+    Cart cart = cartRepository.findByCustomerId(customer.getId());
+    if (cart == null) {
+      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
+    }
+
+    CartItem cartItem = getCartItemFromCart(cart, cartItemId);
+    if (cartItem == null) {
+      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
+    }
+
+    int currentQuantity = cartItem.getQuantity();
+
+    cartItem.setQuantity(currentQuantity + 1);
+    cartItemRepository.save(cartItem);
+    CartGetDTO cartGetDto = buildCartGetDTO(customer, cart, cart.getCartItems());
+
+    return APIResponse.success(API_NAME, cartGetDto);
+  }
+
+  @Transactional
+  public APIResponse<CartGetDTO> removeCartItem(Principal principal, Long cartItemId) {
+    Customer customer = customerRepository.findCustomerById(principal.getName());
+    if (customer == null) {
+      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
+    }
+
+    Cart cart = cartRepository.findByCustomerId(customer.getId());
+    if (cart == null) {
+      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
+    }
+
+    CartItem cartItem = getCartItemFromCart(cart, cartItemId);
+    if (cartItem == null) {
+      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
+    }
+
+    cart.getCartItems().remove(cartItem);
+    cartItemRepository.delete(cartItem);
+    CartGetDTO cartGetDto = buildCartGetDTO(customer, cart, cart.getCartItems());
+
+    return APIResponse.success(API_NAME, cartGetDto);
+  }
+
+  private CartItem getCartItemFromCart(Cart cart, Long cartItemId) {
+    if (cart == null || cart.getCartItems() == null) {
+      return null;
+    }
+
+    for (CartItem cartItem : cart.getCartItems()) {
+      if (cartItem.getProduct().getId().equals(cartItemId)) {
+        return cartItem;
+      }
+    }
+
+    return null;
+  }
 }
