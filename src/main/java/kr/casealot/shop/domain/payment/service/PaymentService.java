@@ -78,21 +78,21 @@ public class PaymentService {
       throw new PermissionException();
     }
 
-    log.info("payment OrderNumber => {}, ReceiptId => {}", payment.getOrderNumber(), receiptId);
+//    log.info("payment OrderNumber => {}, ReceiptId => {}", payment.getOrderNumber(), receiptId);
 
     IamportResponse<AccessToken> auth = iamportClient.getAuth();
-    log.info("auth Token => {}", auth.getResponse().getToken());
+//    log.info("auth Token => {}", auth.getResponse().getToken());
 
     try {
       IamportResponse<com.siot.IamportRestClient.response.Payment> paymentResponse = iamportClient.paymentByImpUid(receiptId);
 
       if (Objects.nonNull(paymentResponse.getResponse())) {
         com.siot.IamportRestClient.response.Payment paymentData = paymentResponse.getResponse();
-        log.info("===============================================================");
-        log.info(paymentData.getImpUid() + " = ? " + receiptId + " : " + (paymentData.getImpUid().equals(receiptId)));
-        log.info(paymentData.getMerchantUid() + " = ? " + orderNumber + " : " + (paymentData.getMerchantUid().equals(orderNumber)));
-        log.info(paymentData.getAmount() + " = ? " + payment.getAmount() + " : " +  (Objects.equals(paymentData.getAmount(), payment.getAmount())));
-        log.info("===============================================================");
+//        log.info("===============================================================");
+//        log.info(paymentData.getImpUid() + " = ? " + receiptId + " : " + (paymentData.getImpUid().equals(receiptId)));
+//        log.info(paymentData.getMerchantUid() + " = ? " + orderNumber + " : " + (paymentData.getMerchantUid().equals(orderNumber)));
+//        log.info(paymentData.getAmount() + " = ? " + payment.getAmount() + " : " +  (Objects.equals(paymentData.getAmount(), payment.getAmount())));
+//        log.info("===============================================================");
         if (receiptId.equals(paymentData.getImpUid())
             && orderNumber.equals(paymentData.getMerchantUid())
             && payment.getAmount().compareTo(paymentData.getAmount()) == 0) {
