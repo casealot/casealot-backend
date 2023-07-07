@@ -19,6 +19,4 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     boolean existsCustomerById(String customerId);
     boolean existsByEmail(String email);
     int countByModifiedDtBetween(LocalDateTime startDate, LocalDateTime endDate); // 날짜별 요청의 총 수를 조회하는 메서드
-
-
 }
