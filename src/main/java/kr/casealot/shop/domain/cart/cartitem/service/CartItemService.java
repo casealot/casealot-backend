@@ -8,11 +8,14 @@ import kr.casealot.shop.domain.cart.cartitem.repository.CartItemRepository;
 import kr.casealot.shop.domain.cart.dto.CartGetDTO;
 import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
+import kr.casealot.shop.domain.cart.exception.NotFoundCartException;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.product.dto.ProductCartDTO;
 import kr.casealot.shop.global.common.APIResponse;
+import kr.casealot.shop.global.exception.NotFoundProductException;
+import kr.casealot.shop.global.exception.NotFoundUserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,17 +40,17 @@ public class CartItemService {
   public APIResponse<CartGetDTO> reduceCartItemQuantity(Principal principal, Long cartItemId) {
     Customer customer = customerRepository.findCustomerById(principal.getName());
     if (customer == null) {
-      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
+      throw new NotFoundUserException();
     }
 
     Cart cart = cartRepository.findByCustomerId(customer.getId());
     if (cart == null) {
-      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
+      throw new NotFoundCartException();
     }
 
     CartItem cartItem = getCartItemFromCart(cart, cartItemId);
     if (cartItem == null) {
-      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
+      throw new NotFoundProductException();
     }
 
     int currentQuantity = cartItem.getQuantity();
@@ -67,17 +70,17 @@ public class CartItemService {
   public APIResponse<CartGetDTO> addCartItemQuantity(Principal principal, Long cartItemId) {
     Customer customer = customerRepository.findCustomerById(principal.getName());
     if (customer == null) {
-      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
+      throw new NotFoundUserException();
     }
 
     Cart cart = cartRepository.findByCustomerId(customer.getId());
     if (cart == null) {
-      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
+      throw new NotFoundCartException();
     }
 
     CartItem cartItem = getCartItemFromCart(cart, cartItemId);
     if (cartItem == null) {
-      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
+      throw new NotFoundProductException();
     }
 
     int currentQuantity = cartItem.getQuantity();
@@ -93,17 +96,17 @@ public class CartItemService {
   public APIResponse<CartGetDTO> removeCartItem(Principal principal, Long cartItemId) {
     Customer customer = customerRepository.findCustomerById(principal.getName());
     if (customer == null) {
-      throw new NotFoundException("존재하지 않는 고객에 대한 요청입니다.");
+      throw new NotFoundUserException();
     }
 
     Cart cart = cartRepository.findByCustomerId(customer.getId());
     if (cart == null) {
-      throw new NotFoundException("존재하지 않는 장바구니에 대한 요청입니다.");
+      throw new NotFoundCartException();
     }
 
     CartItem cartItem = getCartItemFromCart(cart, cartItemId);
     if (cartItem == null) {
-      throw new NotFoundException("존재하지 않는 상품에 대한 요청입니다.");
+      throw new NotFoundProductException();
     }
 
     cart.getCartItems().remove(cartItem);

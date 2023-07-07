@@ -65,7 +65,6 @@ public class FunctionService {
     FunctionDTO functionDTO = new FunctionDTO().builder()
         .todayOrder(todayOrder)
         .todayCancel(todayCancel)
-//        .todayReturn(0L)
         .todayChange(todayChange)
         .todayQna(todaysEmptyComments)
         .build();
