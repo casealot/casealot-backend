@@ -2,15 +2,15 @@ package kr.casealot.shop.domain.cart.service;
 
 import static kr.casealot.shop.domain.cart.dto.CartGetDTO.buildCartGetDTO;
 
-import com.amazonaws.services.kms.model.NotFoundException;
+import java.security.Principal;
+import java.util.List;
+import javax.transaction.Transactional;
 import kr.casealot.shop.domain.cart.cartitem.entity.CartItem;
 import kr.casealot.shop.domain.cart.dto.CartGetDTO;
-import kr.casealot.shop.domain.cart.dto.CartResDTO;
 import kr.casealot.shop.domain.cart.entity.Cart;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.entity.Customer;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
-import kr.casealot.shop.domain.product.dto.ProductCartDTO;
 import kr.casealot.shop.domain.product.entity.Product;
 import kr.casealot.shop.domain.product.repository.ProductRepository;
 import kr.casealot.shop.global.common.APIResponse;
@@ -19,11 +19,6 @@ import kr.casealot.shop.global.exception.NotFoundProductException;
 import kr.casealot.shop.global.exception.NotFoundUserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

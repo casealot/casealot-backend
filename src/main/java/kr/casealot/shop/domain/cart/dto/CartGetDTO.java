@@ -26,6 +26,7 @@ public class CartGetDTO {
         productCartDTO.setId(cartItem.getProduct().getId());
         productCartDTO.setName(cartItem.getProduct().getName());
         productCartDTO.setPrice(cartItem.getProduct().getPrice());
+        productCartDTO.setCalculatePrice(cartItem.getProduct().getCalculatePrice());
         productCartDTO.setQuantity(cartItem.getQuantity());
         if (cartItem.getProduct().getThumbnail() == null) {
             productCartDTO.setThumbnail(null);

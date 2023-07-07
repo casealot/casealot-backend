@@ -12,6 +12,7 @@ public class ProductCartDTO {
     private String name;
     private int price;
     private int quantity;
+    private double calculatePrice;
     private String thumbnail ="";
     private String content;
     private String color;
