@@ -34,7 +34,6 @@ public class ReviewService {
   private final ProductRepository productRepository;
   private final CustomerRepository customerRepository;
   private final OrderProductRepository orderProductRepository;
-  private final OrderRepository orderRepository;
   private final ReviewCommentService reviewCommentService;
 
   @Transactional
@@ -48,7 +47,7 @@ public class ReviewService {
       throw new NoAuthToReplyException(); //리뷰 작성권한 X
     }
 
-    if(reviewRepository.existsByCustomerSeqAndProductId(customer.getSeq(), productId)){
+    if (reviewRepository.existsByCustomerSeqAndProductId(customer.getSeq(), productId)) {
       throw new AlreadyReplyException(); //이미 리뷰 작성한 적 있음
     }
 
@@ -60,15 +59,7 @@ public class ReviewService {
         .reviewText(reviewReqDTO.getReviewText())
         .build());
 
-    ReviewResDTO reviewResDTO = new ReviewResDTO();
-    reviewResDTO.setId(review.getSeq());
-    reviewResDTO.setCustomerName(review.getCustomer().getName());
-    reviewResDTO.setRating(review.getRating());
-    reviewResDTO.setReviewText(review.getReviewText());
-    reviewResDTO.setReviewCommentList(
-        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-    reviewResDTO.setCreatedDt(review.getCreatedDt());
-    reviewResDTO.setModifiedDt(review.getModifiedDt());
+    ReviewResDTO reviewResDTO = buildReviewResDTO(review);
 
     product.updateRating(reviewReqDTO.getRating());
     productRepository.saveAndFlush(product);
@@ -96,15 +87,8 @@ public class ReviewService {
     product.fixRating(reviewOldRating, reviewReqDTO.getRating());
     productRepository.save(product);
 
-    ReviewResDTO reviewResDTO = new ReviewResDTO();
-    reviewResDTO.setId(review.getSeq());
-    reviewResDTO.setCustomerName(principal.getName());
-    reviewResDTO.setRating(review.getRating());
-    reviewResDTO.setReviewText(review.getReviewText());
-    reviewResDTO.setReviewCommentList(
-        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-    reviewResDTO.setCreatedDt(review.getCreatedDt());
-    reviewResDTO.setModifiedDt(review.getModifiedDt());
+    ReviewResDTO reviewResDTO = buildReviewResDTO(review);
+
 
     return APIResponse.success("review", reviewResDTO);
   }
@@ -124,15 +108,8 @@ public class ReviewService {
     product.revertRating(optionalReview.get().getRating());
     productRepository.saveAndFlush(product);
 
-    ReviewResDTO reviewResDTO = new ReviewResDTO();
-    reviewResDTO.setId(review.getSeq());
-    reviewResDTO.setCustomerName(principal.getName());
-    reviewResDTO.setRating(review.getRating());
-    reviewResDTO.setReviewText(review.getReviewText());
-    reviewResDTO.setReviewCommentList(
-        reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-    reviewResDTO.setCreatedDt(review.getCreatedDt());
-    reviewResDTO.setModifiedDt(review.getModifiedDt());
+    ReviewResDTO reviewResDTO = buildReviewResDTO(review);
+
 
     return APIResponse.success("review", reviewResDTO);
 
@@ -140,26 +117,24 @@ public class ReviewService {
 
   @Transactional(readOnly = true)
   public APIResponse<ReviewResDTO> getReview(Long reviewSeq) {
-    Optional<Review> reviewOptional = reviewRepository.findById(reviewSeq);
+    Review review = reviewRepository.findById(reviewSeq).orElseThrow(NoReviewException::new);
 
-    if (reviewOptional.isPresent()) {
-      Review review = reviewOptional.get();
-
-      ReviewResDTO reviewResDTO = new ReviewResDTO();
-      reviewResDTO.setId(review.getSeq());
-      reviewResDTO.setCustomerName(review.getCustomer().getName());
-      reviewResDTO.setRating(review.getRating());
-      reviewResDTO.setReviewText(review.getReviewText());
-      reviewResDTO.setReviewCommentList(
-          reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
-      reviewResDTO.setCreatedDt(review.getCreatedDt());
-      reviewResDTO.setModifiedDt(review.getModifiedDt());
+      ReviewResDTO reviewResDTO = buildReviewResDTO(review);
 
       return APIResponse.success("review", reviewResDTO);
-    } else {
-      // Optional이 비어있을 경우에 대한 처리
-      log.warn("리뷰Optional이 존재하지 않음.");
-      throw new NoReviewException();
-    }
+
   }
+
+  private ReviewResDTO buildReviewResDTO(Review review) {
+    ReviewResDTO reviewResDTO = new ReviewResDTO();
+    reviewResDTO.setId(review.getSeq());
+    reviewResDTO.setCustomerName(review.getCustomer().getName());
+    reviewResDTO.setRating(review.getRating());
+    reviewResDTO.setReviewText(review.getReviewText());
+    reviewResDTO.setReviewCommentList(reviewCommentService.getReviewCommentByReviewId(review.getSeq()));
+    reviewResDTO.setCreatedDt(review.getCreatedDt());
+    reviewResDTO.setModifiedDt(review.getModifiedDt());
+    return reviewResDTO;
+  }
+
 }
