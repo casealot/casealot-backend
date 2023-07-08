@@ -30,7 +30,7 @@ public class ProductMapper {
         .sale(request.getSale())
         .color(request.getColor())
         .category(request.getCategory())
-        .type("new")
+        .type("NEW")
         .sells(0)
         .rating(0.0)
         .ratingCount(0.0)
