@@ -98,8 +98,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 new Date(now.getTime() + refreshTokenExpiry)
         );
 
-        // DB 저장
-        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById(userInfo.getId());
+        // DB 저장 ( 소셜 로그인 providerType + 제공 ID)
+        CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findById( providerType + userInfo.getId());
 
         if(null != customerRefreshToken){
             Long modifiedTime = customerRefreshToken.getModifiedDt().now()
