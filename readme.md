@@ -24,7 +24,9 @@
 - Database
     - <img src="https://img.shields.io/badge/Mysql-E6B91E?style=for-the-square&logo=MySql&logoColor=white"/>
 - DevOps
-    - <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-square&logo=Docker&logoColor=white"/> <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-square&logo=amazonaws&logoColor=white">
+    - <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-square&logo=amazonaws&logoColor=white"/>
+    - <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-square&logo=Docker&logoColor=white"/>
+    - <img src="https://img.shields.io/badge/Jenkins-000000?style=for-the-square&logo=JENKINS&logoColor=red"/>
 
 ## ADMIN
 
