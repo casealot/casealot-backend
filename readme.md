@@ -71,3 +71,7 @@
 
 ## ERD
 ![image](https://github.com/casealot/casealot-backend/assets/101981639/db922f8f-fbcf-4375-a714-217930050a71)
+
+## Backend Architecture
+![image](https://github.com/casealot/casealot-backend/assets/70744371/a481b40f-8d25-4802-b333-39d823acba82)
+
