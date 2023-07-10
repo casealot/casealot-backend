@@ -8,9 +8,12 @@ import kr.casealot.shop.domain.auth.repository.CustomerRefreshTokenRepository;
 import kr.casealot.shop.domain.cart.repository.CartRepository;
 import kr.casealot.shop.domain.customer.dto.*;
 import kr.casealot.shop.domain.customer.entity.Customer;
+import kr.casealot.shop.domain.customer.exception.CheckEmailException;
+import kr.casealot.shop.domain.customer.exception.CheckNameException;
 import kr.casealot.shop.domain.customer.exception.DuplicateEmailException;
 import kr.casealot.shop.domain.customer.exception.DuplicateIdException;
 import kr.casealot.shop.domain.customer.exception.IncorrectPasswordException;
+import kr.casealot.shop.domain.customer.exception.ShortPasswordException;
 import kr.casealot.shop.domain.customer.repository.CustomerRepository;
 import kr.casealot.shop.domain.file.entity.UploadFile;
 import kr.casealot.shop.domain.file.service.S3UploadService;
@@ -70,6 +73,10 @@ public class CustomerService {
       throw new DuplicateEmailException();
     }
 
+    else if (customerDto.getPassword().length() < 8) {
+      throw new ShortPasswordException();
+    }
+
     Customer customer = Customer.builder()
         .id(customerDto.getId())
         .name(customerDto.getName())
@@ -86,6 +93,7 @@ public class CustomerService {
 
     return APIResponse.success(API_NAME, customer.getId() + " join success!");
   }
+
   @Transactional
   public APIResponse<CustomerTokenDto> login(CustomerLoginDto customerLoginDto
       , HttpServletRequest request
@@ -273,5 +281,29 @@ public class CustomerService {
         .build();
 
     return APIResponse.success(API_NAME, customerDto);
+  }
+
+  public APIResponse<String> findPassword(CustomerPasswordFindDto customerPasswordFindDto,
+      String newPassword) {
+    Customer customer = customerRepository.findById(customerPasswordFindDto.getId());
+    if (customer == null) {
+      throw new NotFoundUserException();
+    } else if (!customer.getName().equals(customerPasswordFindDto.getName())) {
+      throw new CheckNameException();
+    } else if (!customer.getEmail().equals(customerPasswordFindDto.getEmail())) {
+      throw new CheckEmailException();
+    }
+
+    if (newPassword == null) {
+      return APIResponse.success(API_NAME, "pass");
+    } else if (newPassword.length() < 8) {
+      throw new ShortPasswordException();
+    } else {
+      String encodedPassword = passwordEncoder.encode(newPassword);
+      customer.setPassword(encodedPassword);
+      customerRepository.save(customer);
+
+      return APIResponse.success(API_NAME, customer.getId());
+    }
   }
 }
