@@ -234,6 +234,7 @@ public class FunctionService {
         if (thumbnail != null) {
           functionReviewDTO = FunctionReviewDTO.builder()
               .id(review.getSeq())
+              .productId(product.getId())
               .productName(product.getName())
               .productThumbnail(thumbnail.getUrl())
               .reviewText(review.getReviewText())
@@ -244,6 +245,7 @@ public class FunctionService {
         } else {
           functionReviewDTO = FunctionReviewDTO.builder()
               .id(review.getSeq())
+              .productId(product.getId())
               .productName(product.getName())
               .productThumbnail(null)
               .reviewText(review.getReviewText())
