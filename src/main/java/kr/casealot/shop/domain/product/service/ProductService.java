@@ -78,6 +78,7 @@ public class ProductService {
         return APIResponse.success(API_NAME, response);
     }
 
+    @Transactional
     public APIResponse<ProductDTO.DetailResponse> getDetailProduct(Long id, Principal principal)
             throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(

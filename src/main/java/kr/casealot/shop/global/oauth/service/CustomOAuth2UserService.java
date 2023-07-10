@@ -79,8 +79,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             customer.setProfileImageUrl(userInfo.getImageUrl());
         }
 
-        //
-        if (userInfo.getMobile() != null && !customer.getPhoneNumber().equals(userInfo.getMobile())) {
+        // 폰 넘버
+        if (userInfo.getMobile() != null && !userInfo.getMobile().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(userInfo.getMobile());
         }
 
