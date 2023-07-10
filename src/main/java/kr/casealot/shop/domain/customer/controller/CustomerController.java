@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
+import kr.casealot.shop.domain.customer.dto.CustomerPasswordFindDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
 import kr.casealot.shop.domain.customer.dto.CustomerUpdateDto;
 import kr.casealot.shop.domain.customer.entity.Customer;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -78,6 +80,14 @@ public class CustomerController {
   @ApiOperation(value = "회원 정보", notes = "회원 정보를 보여준다.")
   public APIResponse<CustomerDto> info(Principal principal) {
     return customerService.customerInfo(principal);
+  }
+
+  @PostMapping("/password")
+  @ApiOperation(value = "비밀번호 찾기(변경)", notes = "ID, 이름, Eamil, 휴대폰 번호 일치하는 사용자를 찾아 비밀번호를 변경시킨다.")
+  public APIResponse<String> findPassword(
+      @ApiParam(value = "비밀번호 변경을 위한 개인정보 요청 DTO") @RequestBody CustomerPasswordFindDto customerPasswordFindDto,
+      @ApiParam(value = "새로운 비밀번호") @RequestParam(required = false) String newPassword) {
+    return customerService.findPassword(customerPasswordFindDto, newPassword);
   }
 
   @GetMapping("/mypage")
