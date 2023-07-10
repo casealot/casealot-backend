@@ -15,16 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Transactional(readOnly = true)
     Optional<Product> findById(Long id);
 
-    @Transactional(readOnly = true)
     Page<Product> findAll(Pageable pageable);
 
-    @Transactional(readOnly = true)
     Product findByName(String name);
 
-    @Transactional(readOnly = true)
     Page<Product> findAll(Specification<Product> specification, Pageable pageable);
 
     @Query("SELECT distinct p.name FROM Product p")

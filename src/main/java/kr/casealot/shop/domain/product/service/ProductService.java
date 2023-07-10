@@ -45,6 +45,7 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final OrderRepository orderRepository;
 
+    @Transactional(readOnly = true)
     public APIResponse<ProductDTO.GetResponse> search(ProductDTO.GetRequest productReqDTO) {
 
         // criteria query
