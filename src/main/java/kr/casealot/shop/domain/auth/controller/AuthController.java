@@ -58,7 +58,10 @@ public class AuthController {
 
         // userId refresh token으로 DB 확인
         CustomerRefreshToken customerRefreshToken = customerRefreshTokenRepository.findByRefreshToken(refreshToken);
-        Optional.of(customerRefreshToken).orElseThrow(NotFoundRefreshTokenException::new);
+
+        if(customerRefreshToken == null){
+            throw new NotFoundRefreshTokenException();
+        }
 
         String userId = customerRefreshToken.getId();
         if(userId == null){

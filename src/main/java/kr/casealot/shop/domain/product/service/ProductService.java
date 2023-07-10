@@ -72,7 +72,7 @@ public class ProductService {
 
         ProductDTO.GetResponse response = ProductDTO.GetResponse.builder()
                 .items(productInfos)
-                .count((long) products.getContent().size())
+                .count((long) products.getNumberOfElements())
                 .totalCount(products.getTotalElements())
                 .totalPages((long) products.getTotalPages()).build();
 

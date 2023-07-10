@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Getter
 @Setter
@@ -25,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
         @Index(name = "idx_product_type", columnList = "PRODUCT_TYPE"),
         @Index(name = "idx_product_color", columnList = "PRODUCT_COLOR"),
 })
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Slf4j
 public class Product extends BaseTimeEntity {
     @Id
