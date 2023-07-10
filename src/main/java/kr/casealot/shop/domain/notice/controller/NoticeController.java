@@ -34,7 +34,7 @@ public class NoticeController {
 
     // 특정 공지 조회
     @GetMapping("/{notice_id}")
-    @ApiOperation(value = "공지 전체 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
+    @ApiOperation(value = "특정 공지 조회", notes = "모든 사용자가 특정 공지를 조회한다.")
     public APIResponse<NoticeDetailDTO> getNotice(
             @ApiParam(value = "공지 ID") @PathVariable("notice_id") Long noticeId,
             Principal principal) {

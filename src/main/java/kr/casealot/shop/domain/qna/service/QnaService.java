@@ -15,7 +15,9 @@ import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -185,7 +187,8 @@ public class QnaService {
 
     // qna 목록
     public APIResponse<List<QnaResDTO>> getQnaList(Pageable pageable) {
-        Page<Qna> qnaPage = qnaRepository.findAll(pageable);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDt").descending());
+        Page<Qna> qnaPage = qnaRepository.findAll(sortedPageable);
         List<Qna> qnaList = qnaPage.getContent();
 
         List<QnaResDTO> qnaResDTOList = new ArrayList<>();
@@ -208,7 +211,8 @@ public class QnaService {
     }
 
     public APIResponse<List<QnaResDTO>> getAdminQnaList(Pageable pageable) {
-        Page<Qna> qnaPage = qnaRepository.findAll(pageable);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDt").descending());
+        Page<Qna> qnaPage = qnaRepository.findAll(sortedPageable);
         List<Qna> qnaList = qnaPage.getContent();
 
         List<QnaResDTO> qnaResDTOList = new ArrayList<>();
@@ -234,7 +238,8 @@ public class QnaService {
     }
 
     public APIResponse<List<QnaResDTO>> getAdminTodayQnaList(Pageable pageable) {
-        Page<Qna> qnaPage = qnaRepository.findAll(pageable);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDt").descending());
+        Page<Qna> qnaPage = qnaRepository.findAll(sortedPageable);
         List<Qna> qnaList = qnaPage.getContent();
 
         List<QnaResDTO> qnaResDTOList = new ArrayList<>();

@@ -14,7 +14,9 @@ import kr.casealot.shop.global.exception.NotFoundWriteException;
 import kr.casealot.shop.global.exception.PermissionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +36,8 @@ public class NoticeService {
 
 
     public APIResponse<List<NoticeResDTO>> getNoticeList(Pageable pageable) {
-        Page<Notice> noticePage = noticeRepository.findAll(pageable);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDt").descending());
+        Page<Notice> noticePage = noticeRepository.findAll(sortedPageable);
         List<Notice> noticeList = noticePage.getContent();
 
         List<NoticeResDTO> noticeResDTOList = new ArrayList<>();
