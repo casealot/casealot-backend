@@ -64,9 +64,7 @@ public class NoticeCommentService {
 
         String customerId = principal.getName();
 
-        boolean isAdmin = checkAdminRole(customerId);
-
-        if (!isAdmin || !customerId.equals(noticeComment.getCustomer().getId())) {
+        if (!customerId.equals(noticeComment.getCustomer().getId())) {
             throw new PermissionException();
         }
 
