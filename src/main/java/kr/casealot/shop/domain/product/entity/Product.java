@@ -19,7 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "PRODUCT")
+@Table(name = "PRODUCT", indexes = {
+        @Index(name = "idx_product_id", columnList = "PRODUCT_ID"),
+        @Index(name = "idx_product_name", columnList = "PRODUCT_NAME"),
+        @Index(name = "idx_product_type", columnList = "PRODUCT_TYPE"),
+        @Index(name = "idx_product_color", columnList = "PRODUCT_COLOR"),
+})
 @Slf4j
 public class Product extends BaseTimeEntity {
     @Id
@@ -32,7 +37,7 @@ public class Product extends BaseTimeEntity {
     @ManyToOne
     private Customer customer;
 
-    @Column(name = "PRODUCT_NAME", length = 1024)
+    @Column(name = "PRODUCT_NAME", length = 512)
     private String name;
     @Lob
     @Basic(fetch = FetchType.LAZY)

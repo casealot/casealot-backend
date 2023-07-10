@@ -47,7 +47,7 @@ public class Customer extends BaseTimeEntity {
     @Column(name = "PHONE_NUMBER", length = 11)
     private String phoneNumber;
 
-    @Column(name = "EMAIL", length = 512, unique = true)
+    @Column(name = "EMAIL", length = 512)
     private String email;
 
     @JsonIgnore
@@ -132,6 +132,7 @@ public class Customer extends BaseTimeEntity {
             String email,
             String emailVerifiedYn,
             String profileImageUrl,
+            String phoneNumber,
             ProviderType providerType,
             RoleType roleType
     ) {
@@ -142,6 +143,7 @@ public class Customer extends BaseTimeEntity {
         this.emailVerifiedYn = emailVerifiedYn;
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
         this.providerType = providerType;
+        this.phoneNumber = phoneNumber;
         this.roleType = roleType;
     }
 

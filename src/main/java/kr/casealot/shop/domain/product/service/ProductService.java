@@ -45,7 +45,6 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final OrderRepository orderRepository;
 
-    @Transactional
     public APIResponse<ProductDTO.GetResponse> search(ProductDTO.GetRequest productReqDTO) {
 
         // criteria query
@@ -79,7 +78,6 @@ public class ProductService {
         return APIResponse.success(API_NAME, response);
     }
 
-    @Transactional
     public APIResponse<ProductDTO.DetailResponse> getDetailProduct(Long id, Principal principal)
             throws Exception {
         Product savedProduct = productRepository.findById(id).orElseThrow(

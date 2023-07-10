@@ -60,6 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 userInfo.getEmail(),
                 "Y",
                 userInfo.getImageUrl(),
+                userInfo.getMobile(),
                 providerType,
                 RoleType.USER
         );
@@ -68,12 +69,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Customer updateUser(Customer customer, OAuth2UserInfo userInfo) {
+        // 이름이 바뀔경우
         if (userInfo.getName() != null && !customer.getName().equals(userInfo.getName())) {
             customer.setName(userInfo.getName());
         }
 
+        // 이미지가 바뀔경우
         if (userInfo.getImageUrl() != null && !customer.getProfileImageUrl().equals(userInfo.getImageUrl())) {
             customer.setProfileImageUrl(userInfo.getImageUrl());
+        }
+
+        //
+        if (userInfo.getMobile() != null && !customer.getPhoneNumber().equals(userInfo.getMobile())) {
+            customer.setPhoneNumber(userInfo.getMobile());
         }
 
         return customer;
