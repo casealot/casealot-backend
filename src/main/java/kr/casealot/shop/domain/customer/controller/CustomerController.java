@@ -7,6 +7,7 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import kr.casealot.shop.domain.customer.dto.CustomerDto;
+import kr.casealot.shop.domain.customer.dto.CustomerIdFindDto;
 import kr.casealot.shop.domain.customer.dto.CustomerLoginDto;
 import kr.casealot.shop.domain.customer.dto.CustomerPasswordFindDto;
 import kr.casealot.shop.domain.customer.dto.CustomerTokenDto;
@@ -88,6 +89,13 @@ public class CustomerController {
       @ApiParam(value = "비밀번호 변경을 위한 개인정보 요청 DTO") @RequestBody CustomerPasswordFindDto customerPasswordFindDto,
       @ApiParam(value = "새로운 비밀번호") @RequestParam(required = false) String newPassword) {
     return customerService.findPassword(customerPasswordFindDto, newPassword);
+  }
+
+  @PostMapping("/id")
+  @ApiOperation(value = "아이디 찾기(변경)", notes = "이름, Eamil 일치하는 사용자를 찾아 아이디를 알려준다.")
+  public APIResponse<String> findId(
+      @ApiParam(value = "아이디 변경을 위한 개인정보 요청 DTO") @RequestBody CustomerIdFindDto customerIdFindDto) {
+    return customerService.findId(customerIdFindDto);
   }
 
   @GetMapping("/mypage")
